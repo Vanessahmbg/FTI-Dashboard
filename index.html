@@ -894,11 +894,89 @@ function vCategory(d) {
 }
 
 function vConsumerConfidence(d) {
-  const histRows = d.history.map(h => [h.month, h.cci, h.beauty]);
-  return H.vh('Consumer Confidence', d.desc, d.updated, d.alertBadge)
+  const history = d.history || [];
+
+  // Averages
+  const cciVals   = history.map(h => Number(h.cci)).filter(Boolean);
+  const avgCCI    = cciVals.length ? (cciVals.reduce((a,b) => a+b,0) / cciVals.length).toFixed(1) : '—';
+  const maxCCI    = cciVals.length ? Math.max(...cciVals).toFixed(1) : '—';
+  const minCCI    = cciVals.length ? Math.min(...cciVals).toFixed(1) : '—';
+  const latestCCI = cciVals.length ? cciVals[cciVals.length - 1].toFixed(1) : d.kpis?.[0]?.val ?? '—';
+
+  const avgBadge = cciVals.length
+    ? `<div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+        <div class="kpi" style="flex:1;min-width:100px">
+          <div class="kpi-lbl">Average IKK</div>
+          <div class="kpi-val">${avgCCI}</div>
+          <div class="kpi-trend tst">Avg over ${cciVals.length} months</div>
+        </div>
+        <div class="kpi" style="flex:1;min-width:100px">
+          <div class="kpi-lbl">Highest</div>
+          <div class="kpi-val tup">${maxCCI}</div>
+        </div>
+        <div class="kpi" style="flex:1;min-width:100px">
+          <div class="kpi-lbl">Lowest</div>
+          <div class="kpi-val tdn">${minCCI}</div>
+        </div>
+        <div class="kpi" style="flex:1;min-width:100px">
+          <div class="kpi-lbl">Latest (${history[history.length-1]?.month ?? ''})</div>
+          <div class="kpi-val">${latestCCI}</div>
+          <div class="kpi-trend ${Number(latestCCI) >= 100 ? 'tup' : 'tdn'}">${Number(latestCCI) >= 100 ? '✓ Zona Optimis' : '⚠ Zona Pesimis'}</div>
+        </div>
+      </div>`
+    : '';
+
+  // Spark bar chart inline
+  const sparkMax = Math.max(...cciVals, 100) * 1.05;
+  const sparkBars = history.map(h => {
+    const val   = Number(h.cci);
+    const pct   = ((val / sparkMax) * 100).toFixed(1);
+    const color = val >= 100 ? 'var(--olive)' : 'var(--red)';
+    const isLast = h === history[history.length - 1];
+    return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px">
+      <div style="font-size:10px;font-weight:700;color:${color}">${val}</div>
+      <div style="width:100%;background:var(--g2);border-radius:3px;height:60px;display:flex;align-items:flex-end">
+        <div style="width:100%;height:${pct}%;background:${color};border-radius:3px;${isLast ? 'opacity:1' : 'opacity:0.65'}"></div>
+      </div>
+      <div style="font-size:9px;color:var(--muted);text-align:center;line-height:1.2">${h.month}</div>
+    </div>`;
+  }).join('');
+
+  const sparkChart = history.length
+    ? `<div style="display:flex;gap:6px;align-items:flex-end;padding:8px 0 4px">${sparkBars}</div>
+       <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10.5px">
+         <span style="color:var(--muted)">Threshold optimis: <strong>100</strong></span>
+         <span><span style="display:inline-block;width:10px;height:10px;background:var(--olive);border-radius:2px;margin-right:4px"></span>Optimis
+         <span style="display:inline-block;width:10px;height:10px;background:var(--red);border-radius:2px;margin:0 4px 0 10px"></span>Pesimis</span>
+       </div>`
+    : '<div style="color:var(--muted);font-size:12px">Belum ada data historis.</div>';
+
+  // Table with average row
+  const avgBeauty = history.map(h => h.beauty).filter(Boolean);
+  const histRows = history.map(h => {
+    const v = Number(h.cci);
+    const isLast = h === history[history.length - 1];
+    return [
+      isLast ? `<strong>${h.month}</strong>` : h.month,
+      `<span class="fw ${v >= 100 ? 'tup' : 'tdn'}">${v}</span>`,
+      v >= 100 ? '<span class="st st-g">✓ Optimis</span>' : '<span class="st st-r">⚠ Pesimis</span>',
+      h.beauty || '—',
+    ];
+  });
+  // Append average summary row
+  histRows.push([
+    '<span style="font-weight:700;color:var(--muted)">Average</span>',
+    `<span class="fw">${avgCCI}</span>`,
+    '',
+    '',
+  ]);
+
+  return H.vh('Consumer Confidence — IKK Bank Indonesia', d.desc, d.updated, d.alertBadge)
     + H.kpiRow(d.kpis)
-    + H.blk('CCI Historical (Last 6 Months)', H.table(['Month','CCI','Beauty Spend YoY'], histRows))
-    + H.blk('AI Insight', `<div class="ai-box"><div class="ai-lbl">AI Summary</div><div class="ai-text">${d.ai}</div></div>`);
+    + H.blk('Ringkasan Statistik', avgBadge)
+    + H.blk('Tren IKK — Data Live dari Bank Indonesia', sparkChart)
+    + H.blk('Riwayat IKK Bulanan', H.table(['Bulan','IKK','Status','Beauty Spend YoY'], histRows))
+    + H.blk('AI Insight', `<div class="ai-box"><div class="ai-lbl">AI Summary — Auto-generated</div><div class="ai-text">${d.ai}</div></div>`);
 }
 
 function vInflationRate(d) {
@@ -954,7 +1032,7 @@ const WIP_IDS = [
   'competitor-alerts', 'competitor-sentiments',
   'trends-signals', 'fti-relevance-score',
   'self-care', 'makeup', 'lifestyle-merchandise',
-  'consumer-confidence', 'inflation-rate', 'peak-season-alert',
+  'inflation-rate', 'peak-season-alert',
 ];
 
 function navigate(id) {
