@@ -1012,18 +1012,17 @@ function vSelfCare(d) {
   function buildSubcats(subcats) {
     const sorted=[...subcats].sort((a,b)=>b.growth-a.growth);
     const maxG=sorted[0].growth;
-    const LW=158, BW=100, TW=36, ROW=22, PAD=8;
-    const H_=sorted.length*ROW+PAD*2;
-    let rows='';
-    sorted.forEach((s,i)=>{
-      const y=PAD+i*ROW;
-      const bw=(s.growth/maxG)*BW;
+    return sorted.map(s=>{
       const col=s.growth>=25?'var(--olive)':s.growth>=15?'#5a8a5a':s.growth>=10?'var(--amber)':'var(--muted)';
-      rows+=`<text x="0" y="${y+14}" font-size="10" fill="var(--text)">${s.name}</text>
-        <rect x="${LW}" y="${y+5}" width="${bw.toFixed(1)}" height="12" fill="${col}" opacity="0.8" rx="3"/>
-        <text x="${LW+BW+5}" y="${y+14}" font-size="10" fill="${col}" font-weight="700">+${s.growth}%</text>`;
-    });
-    return `<svg viewBox="0 0 ${LW+BW+TW} ${H_}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">${rows}</svg>`;
+      const pct=((s.growth/maxG)*100).toFixed(0);
+      return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
+        <span style="font-size:12px;color:var(--text);flex:0 0 170px;white-space:nowrap">${s.name}</span>
+        <div style="flex:1;background:var(--g2);border-radius:4px;height:10px;min-width:60px">
+          <div style="width:${pct}%;height:10px;background:${col};border-radius:4px;opacity:0.85"></div>
+        </div>
+        <span style="font-size:12px;font-weight:700;color:${col};flex:0 0 36px;text-align:right">+${s.growth}%</span>
+      </div>`;
+    }).join('');
   }
 
   function renderChart(period) {
