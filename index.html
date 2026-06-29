@@ -907,8 +907,42 @@ function vSelfCare(d) {
   const allHistory = d.history || [];
   window.__scPeriod = 'all';
 
+  window.scHover = function(evt) {
+    const svg = document.getElementById('sc-svg');
+    const tip = document.getElementById('sc-tip');
+    const cross = document.getElementById('sc-cross');
+    const hdot = document.getElementById('sc-hdot');
+    if (!svg || !tip) return;
+    const rect = svg.getBoundingClientRect();
+    const mx = (evt.clientX - rect.left) * (560 / rect.width);
+    const pts = window.__scPts || [];
+    if (!pts.length) return;
+    let near = pts[0];
+    pts.forEach(p => { if (Math.abs(p.x - mx) < Math.abs(near.x - mx)) near = p; });
+    if (cross) { cross.setAttribute('x1', near.x); cross.setAttribute('x2', near.x); cross.setAttribute('opacity','0.4'); }
+    if (hdot && near.lineY != null) { hdot.setAttribute('cx', near.x); hdot.setAttribute('cy', near.lineY); hdot.setAttribute('opacity','1'); }
+    const wrap = document.getElementById('sc-chart-block');
+    const wr = wrap ? wrap.getBoundingClientRect() : rect;
+    let lft = evt.clientX - wr.left + 14;
+    let top = evt.clientY - wr.top - 80;
+    if (lft + 150 > wr.width) lft -= 165;
+    if (top < 30) top = 30;
+    tip.style.cssText = `display:block;position:absolute;left:${lft}px;top:${top}px;background:white;border:1.5px solid var(--g3);border-radius:8px;padding:8px 12px;box-shadow:0 2px 10px rgba(0,0,0,.1);pointer-events:none;z-index:99`;
+    const gc = near.yoy != null ? (near.yoy < 0 ? 'var(--red)' : 'var(--amber)') : 'var(--muted)';
+    const gl = near.yoy != null ? `<div style="font-size:11px;color:${gc};margin-top:2px">YoY: ${near.yoy > 0 ? '+' : ''}${near.yoy}%</div>` : `<div style="font-size:11px;color:var(--muted);margin-top:2px">YoY: —</div>`;
+    tip.innerHTML = `<div style="font-size:10px;color:var(--muted);font-weight:600">${near.year}${near.proj ? ' ✦ Proj.' : ''}</div><div style="font-size:15px;font-weight:800;color:var(--olive)">${(near.size/1000).toFixed(1)}T IDR</div>${gl}`;
+  };
+  window.scHoverOut = function() {
+    const tip = document.getElementById('sc-tip');
+    const cross = document.getElementById('sc-cross');
+    const hdot = document.getElementById('sc-hdot');
+    if (tip) tip.style.display = 'none';
+    if (cross) cross.setAttribute('opacity','0');
+    if (hdot) hdot.setAttribute('opacity','0');
+  };
+
   function buildComboChart(data) {
-    const W=560,CH=210,PL=54,PR=48,PT=24,PB=38;
+    const W=560,CH=210,PL=60,PR=50,PT=24,PB=38;
     const cW=W-PL-PR, cH=CH-PT-PB, n=data.length;
     const step=cW/n, barW=Math.max(12,step*0.52);
     const maxSize=Math.max(...data.map(r=>r.size))*1.14;
@@ -919,6 +953,7 @@ function vSelfCare(d) {
     const yY=v=>PT+cH-((v-minY)/(maxY-minY))*cH;
 
     let bars='',line='',dots='',xlbls='',topL='',yaxL='',yaxR='',projL='';
+    const pts=[];
 
     data.forEach((r,i)=>{
       const x=xOf(i), bh=(r.size/maxSize)*cH, by=PT+cH-bh;
@@ -928,19 +963,23 @@ function vSelfCare(d) {
       const showLbl = n<=7 || i%2===0 || i===n-1;
       if(showLbl) topL+=`<text x="${x.toFixed(1)}" y="${(by-3).toFixed(1)}" text-anchor="middle" font-size="8" fill="${r.proj?'var(--muted)':'var(--text)'}" font-weight="600">${(r.size/1000).toFixed(1)}T</text>`;
       xlbls+=`<text x="${x.toFixed(1)}" y="${(CH-9).toFixed(1)}" text-anchor="middle" font-size="9" fill="${r.proj?'var(--muted)':'var(--text)'}">${r.year}${r.proj?'*':''}</text>`;
+      let lineY=null;
       if(r.yoy!==null){
         const lx=x, ly=yY(r.yoy);
+        lineY=ly;
         line+=line?` ${lx.toFixed(1)},${ly.toFixed(1)}`:`${lx.toFixed(1)},${ly.toFixed(1)}`;
         const dc=r.yoy<0?'var(--red)':r.proj?'#c8a040':'var(--amber)';
         dots+=`<circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="3.5" fill="white" stroke="${dc}" stroke-width="2"/>`;
         if(showLbl){const pf=r.yoy>0?'+':''; dots+=`<text x="${lx.toFixed(1)}" y="${(ly-7).toFixed(1)}" text-anchor="middle" font-size="7.5" fill="${dc}" font-weight="700">${pf}${r.yoy}%</text>`;}
       }
+      pts.push({x, size:r.size, yoy:r.yoy, year:r.year, proj:r.proj, lineY});
     });
+    window.__scPts=pts;
 
     [0,maxSize*0.35,maxSize*0.7,maxSize*1.0].forEach(v=>{
       const y=yS(v);
       if(y>=PT&&y<=PT+cH+1){
-        yaxL+=`<text x="${PL-5}" y="${(y+3).toFixed(1)}" text-anchor="end" font-size="8.5" fill="var(--muted)">${(v/1000).toFixed(0)}T</text>`;
+        yaxL+=`<text x="${PL-6}" y="${(y+3).toFixed(1)}" text-anchor="end" font-size="8.5" fill="var(--muted)">${(v/1000).toFixed(0)}T</text>`;
         yaxL+=`<line x1="${PL}" y1="${y.toFixed(1)}" x2="${(W-PR).toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--g3)" stroke-width="0.5"/>`;
       }
     });
@@ -961,29 +1000,36 @@ function vSelfCare(d) {
     const leg=`<rect x="${PL}" y="5" width="12" height="10" fill="rgba(90,138,90,0.72)" rx="2"/>
       <text x="${PL+15}" y="13.5" font-size="9" fill="var(--muted)">Market Size (IDR)</text>
       <rect x="${PL+125}" y="5" width="12" height="10" fill="rgba(90,138,90,0.28)" rx="2"/>
-      <line x1="${PL+125}" y1="10" x2="${PL+137}" y2="10" stroke="none"/>
       <text x="${PL+140}" y="13.5" font-size="9" fill="var(--muted)">Projected</text>
       <line x1="${PL+205}" y1="10" x2="${PL+221}" y2="10" stroke="var(--amber)" stroke-width="2"/>
       <circle cx="${PL+213}" cy="10" r="2.5" fill="white" stroke="var(--amber)" stroke-width="1.5"/>
       <text x="${PL+225}" y="13.5" font-size="9" fill="var(--muted)">YoY Growth %</text>`;
 
-    return `<svg viewBox="0 0 ${W} ${CH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${W}px;display:block">
-      <defs><pattern id="sc-hatch" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="rgba(90,138,90,0.6)" stroke-width="2"/></pattern></defs>
-      ${leg}${yaxL}${projL}${bars}${topL}
-      <polyline points="${line}" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linejoin="round"/>
-      ${dots}${yaxR}${xlbls}
-    </svg>`;
+    return `<div style="position:relative">
+      <div id="sc-tip" style="display:none"></div>
+      <svg id="sc-svg" viewBox="0 0 ${W} ${CH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${W}px;display:block;overflow:visible;cursor:crosshair">
+        <defs><pattern id="sc-hatch" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="rgba(90,138,90,0.6)" stroke-width="2"/></pattern></defs>
+        ${leg}${yaxL}${projL}${bars}${topL}
+        <polyline points="${line}" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linejoin="round"/>
+        ${dots}
+        <line id="sc-cross" x1="0" y1="${PT}" x2="0" y2="${PT+cH}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3,2" opacity="0" pointer-events="none"/>
+        <circle id="sc-hdot" cx="0" cy="0" r="5" fill="white" stroke="var(--amber)" stroke-width="2" opacity="0" pointer-events="none"/>
+        ${yaxR}${xlbls}
+        <rect x="${PL}" y="${PT}" width="${cW}" height="${cH}" fill="transparent" onmousemove="window.scHover(event)" onmouseleave="window.scHoverOut()"/>
+      </svg>
+    </div>`;
   }
 
   function buildDonut(segs) {
-    const cx=90,cy=88,ro=72,ri=42;
+    const W=300, H=215, cx=150, cy=97, ro=79, ri=46;
     const cols=['var(--olive)','#C8A040','#9A8A6A'];
+    const shortNames=['Self-Care','Makeup','Lifestyle'];
     let paths='',lbls='',start=-90;
     segs.forEach((s,i)=>{
       const deg=(s.pct/100)*360, end=start+deg;
       const sr=start*Math.PI/180, er=end*Math.PI/180;
       const lg=deg>180?1:0;
-      const hl=i===0, ox=hl?Math.cos((sr+er)/2)*5:0, oy=hl?Math.sin((sr+er)/2)*5:0;
+      const hl=i===0, ox=hl?Math.cos((sr+er)/2)*6:0, oy=hl?Math.sin((sr+er)/2)*6:0;
       const x1=(cx+ox+ro*Math.cos(sr)).toFixed(2),y1=(cy+oy+ro*Math.sin(sr)).toFixed(2);
       const x2=(cx+ox+ro*Math.cos(er)).toFixed(2),y2=(cy+oy+ro*Math.sin(er)).toFixed(2);
       const x3=(cx+ox+ri*Math.cos(er)).toFixed(2),y3=(cy+oy+ri*Math.sin(er)).toFixed(2);
@@ -991,17 +1037,17 @@ function vSelfCare(d) {
       paths+=`<path d="M${x1},${y1} A${ro},${ro} 0 ${lg},1 ${x2},${y2} L${x3},${y3} A${ri},${ri} 0 ${lg},0 ${x4},${y4}Z" fill="${cols[i%cols.length]}" opacity="${hl?1:0.65}"/>`;
       const ma=(sr+er)/2, lr=(ro+ri)/2;
       const lx=(cx+ox+lr*Math.cos(ma)).toFixed(1),ly=(cy+oy+lr*Math.sin(ma)).toFixed(1);
-      lbls+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="800" fill="white">${s.pct}%</text>`;
+      lbls+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="white">${s.pct}%</text>`;
       start=end;
     });
     let legend='';
+    const itemW=W/3;
     segs.forEach((s,i)=>{
-      const lx=186,ly=30+i*30;
-      legend+=`<rect x="${lx}" y="${ly}" width="11" height="11" fill="${cols[i%cols.length]}" opacity="${i===0?1:0.65}" rx="3"/>
-        <text x="${lx+15}" y="${ly+9}" font-size="11" fill="var(--text)" font-weight="${i===0?'700':'500'}">${s.name}</text>
-        <text x="${lx+15}" y="${ly+21}" font-size="9.5" fill="var(--muted)">${s.pct}% of beauty</text>`;
+      const lx=i*itemW+5;
+      legend+=`<rect x="${lx}" y="183" width="9" height="9" fill="${cols[i%cols.length]}" opacity="${i===0?1:0.65}" rx="2"/>
+        <text x="${lx+13}" y="191" font-size="9.5" fill="var(--text)" font-weight="${i===0?'700':'500'}">${shortNames[i]} ${s.pct}%</text>`;
     });
-    return `<svg viewBox="0 0 310 178" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:310px;display:block">
+    return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
       ${paths}${lbls}${legend}
       <text x="${cx}" y="${cy-8}" text-anchor="middle" font-size="10" fill="var(--muted)">Beauty</text>
       <text x="${cx}" y="${cy+6}" text-anchor="middle" font-size="10" fill="var(--muted)">Split</text>
