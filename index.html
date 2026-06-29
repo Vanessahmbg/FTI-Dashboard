@@ -1149,13 +1149,18 @@ function vInflationRate(d) {
     if (hdot)  hdot.setAttribute('opacity','0');
   };
 
-  function renderIRPeriod(period) {
+  const PAGE_SIZE = 12;
+
+  function renderIRPeriod(period, page) {
+    page = page || 1;
     let filtered = allHistory;
-    if      (period === '1m') filtered = allHistory.slice(-1);
-    else if (period === '3m') filtered = allHistory.slice(-3);
-    else if (period === '1y') filtered = allHistory.slice(-12);
-    let history = filtered.slice().reverse(); // latest first for table, but chart uses chronological order
-    const chronological = filtered; // chronological for chart
+    if      (period === '6mo') filtered = allHistory.slice(-6);
+    else if (period === '1y')  filtered = allHistory.slice(-12);
+    else if (period === '3y')  filtered = allHistory.slice(-36);
+    else if (period === '5y')  filtered = allHistory.slice(-60);
+    // 'max' = all
+    let history = filtered.slice().reverse(); // latest first for table
+    const chronological = filtered; // oldest→newest for chart
 
     const rates    = chronological.map(h => Number(h.rate)).filter(v => !isNaN(v));
     const avgRate  = rates.length ? (rates.reduce((a,b)=>a+b,0)/rates.length).toFixed(2) : '—';
@@ -1191,8 +1196,11 @@ function vInflationRate(d) {
       return `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${dotColor(Number(h.rate))}" stroke="white" stroke-width="1.5" style="pointer-events:none"/>`;
     }).join('');
 
+    // Smart x-axis: every 1 month if ≤12, every 3 if ≤36, every 6 if ≤60, every 12 if >60
+    const labelStep = rates.length <= 12 ? 1 : rates.length <= 36 ? 3 : rates.length <= 60 ? 6 : 12;
     const xLabels = chronological.map((h,i) => {
-      const lbl = rates.length > 8 ? (i % 2 === 0 ? h.month.replace(' 20','\'') : '') : h.month.replace(' 20','\'');
+      if (i % labelStep !== 0 && i !== chronological.length - 1) return '';
+      const lbl = rates.length > 36 ? `'${h.year % 100}` : h.month.replace(' 20','\'');
       return `<text x="${xS(i).toFixed(1)}" y="${CH-4}" text-anchor="middle" font-size="8.5" fill="#888" style="pointer-events:none">${lbl}</text>`;
     }).join('');
 
@@ -1258,31 +1266,47 @@ function vInflationRate(d) {
       </div>
     </div>`;
 
-    const tableRows = history.map(h => {
+    // Paginated table — 12 rows per page, latest first
+    const totalPages = Math.ceil(history.length / PAGE_SIZE);
+    const safePage   = Math.max(1, Math.min(page, totalPages));
+    const pageSlice  = history.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+    const tableRows = pageSlice.map(h => {
       const v = Number(h.rate);
-      const isLast = h === history[0];
+      const isLatest = h === history[0];
       const stLabel = v <= 1.5 ? '<span class="st st-a">Below Target</span>'
                     : v <= 3.5 ? '<span class="st st-g">✓ Within BI Target</span>'
                     : v <= 5.0 ? '<span class="st st-a">⚠ Above Target</span>'
                     : '<span class="st st-r">🔴 High Inflation</span>';
       return [
-        isLast ? `<strong>${h.month}</strong>` : h.month,
+        isLatest ? `<strong>${h.month}</strong>` : h.month,
         `<span class="fw ${v<=3.5?'tup':'tdn'}">${v.toFixed(2)}%</span>`,
         stLabel,
       ];
     });
-    tableRows.push([
-      '<span style="font-weight:700;color:var(--muted)">Average</span>',
-      `<span class="fw">${avgRate}%</span>`, '',
-    ]);
+    if (safePage === totalPages) {
+      tableRows.push(['<span style="font-weight:700;color:var(--muted)">Average</span>', `<span class="fw">${avgRate}%</span>`, '']);
+    }
 
-    return { statsHtml, svgChart, tableHtml: H.table(['Month','CPI Rate','BI Target Status'], tableRows) };
+    const pagination = totalPages > 1 ? `
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px">
+        <button onclick="setIRPage(-1)" ${safePage<=1?'disabled':''} style="padding:3px 14px;border-radius:99px;border:1.5px solid var(--g3);background:${safePage<=1?'var(--g2)':'white'};color:${safePage<=1?'var(--muted)':'var(--text)'};cursor:${safePage<=1?'default':'pointer'};font-family:inherit;font-size:11px;font-weight:700">← Prev</button>
+        <span style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px">${safePage} / ${totalPages}</span>
+        <button onclick="setIRPage(1)" ${safePage>=totalPages?'disabled':''} style="padding:3px 14px;border-radius:99px;border:1.5px solid var(--g3);background:${safePage>=totalPages?'var(--g2)':'white'};color:${safePage>=totalPages?'var(--muted)':'var(--text)'};cursor:${safePage>=totalPages?'default':'pointer'};font-family:inherit;font-size:11px;font-weight:700">Next →</button>
+      </div>` : '';
+
+    return { statsHtml, svgChart, tableHtml: H.table(['Month','CPI Rate','BI Target Status'], tableRows) + pagination };
   }
 
+  window.__irPeriod = 'max';
+  window.__irPage   = 1;
+
   window.setIRPeriod = (period) => {
+    window.__irPeriod = period;
+    window.__irPage = 1;
+    const { statsHtml, svgChart, tableHtml } = renderIRPeriod(period, 1);
     const el = document.getElementById('ir-area');
     if (!el) return;
-    const { statsHtml, svgChart, tableHtml } = renderIRPeriod(period);
     el.querySelector('#ir-stats').innerHTML = statsHtml;
     el.querySelector('#ir-chart').innerHTML = svgChart;
     el.querySelector('#ir-table').innerHTML = tableHtml;
@@ -1293,13 +1317,23 @@ function vInflationRate(d) {
     });
   };
 
-  const init = renderIRPeriod('all');
-  const periods = [['1m','1 Month'],['3m','3 Months'],['1y','1 Year'],['all','All']];
+  window.setIRPage = (delta) => {
+    window.__irPage += delta;
+    const { statsHtml, svgChart, tableHtml } = renderIRPeriod(window.__irPeriod, window.__irPage);
+    const el = document.getElementById('ir-area');
+    if (!el) return;
+    el.querySelector('#ir-stats').innerHTML = statsHtml;
+    el.querySelector('#ir-chart').innerHTML = svgChart;
+    el.querySelector('#ir-table').innerHTML = tableHtml;
+  };
+
+  const init = renderIRPeriod('max', 1);
+  const periods = [['6mo','6MO'],['1y','1Y'],['3y','3Y'],['5y','5Y'],['max','Max']];
   const btnRow = periods.map(([p,lbl]) =>
     `<button class="ir-btn" data-p="${p}" onclick="setIRPeriod('${p}')"
       style="padding:3px 12px;border-radius:99px;border:1.5px solid var(--olive);cursor:pointer;
       font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.4px;transition:all .15s;
-      background:${p==='all'?'var(--olive)':'transparent'};color:${p==='all'?'white':'var(--olive-dk)'}">${lbl}</button>`
+      background:${p==='max'?'var(--olive)':'transparent'};color:${p==='max'?'white':'var(--olive-dk)'}">${lbl}</button>`
   ).join('');
 
   const chartBlock = `<div id="ir-area">
