@@ -949,7 +949,13 @@ const VIEWS = {
 let DATA = {};
 let activeId = null;
 
-const CUSTOMER_IDS = ['review-score', 'repurchase-rate', 'products-sentiment', 'social-listening'];
+const WIP_IDS = [
+  'review-score', 'repurchase-rate', 'products-sentiment', 'social-listening',
+  'competitor-alerts', 'competitor-sentiments',
+  'trends-signals', 'fti-relevance-score',
+  'self-care', 'makeup', 'lifestyle-merchandise',
+  'consumer-confidence', 'inflation-rate', 'peak-season-alert',
+];
 
 function navigate(id) {
   if (!DATA[id]) return;
@@ -959,7 +965,7 @@ function navigate(id) {
   );
   const content = document.getElementById('content');
   content.innerHTML = VIEWS[id](DATA[id]);
-  if (CUSTOMER_IDS.includes(id)) {
+  if (WIP_IDS.includes(id)) {
     content.querySelectorAll('.kpi, .blk-body').forEach(el => {
       el.classList.add('wip-el');
       const label = document.createElement('div');
