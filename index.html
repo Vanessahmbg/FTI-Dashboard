@@ -897,6 +897,38 @@ function vConsumerConfidence(d) {
   const allHistory = d.history || [];
   window.__ccHistory = allHistory;
 
+  // Hover handlers (global so SVG onmousemove can call them)
+  window.ccHover = function(evt) {
+    const svg = document.getElementById('cc-svg');
+    const tip = document.getElementById('cc-tip');
+    const cross = document.getElementById('cc-cross');
+    const hdot = document.getElementById('cc-hdot');
+    if (!svg || !tip) return;
+    const rect = svg.getBoundingClientRect();
+    const mx = (evt.clientX - rect.left) * (560 / rect.width);
+    const data = window.__ccPts || [];
+    if (!data.length) return;
+    let near = data[0];
+    data.forEach(d => { if (Math.abs(d.x - mx) < Math.abs(near.x - mx)) near = d; });
+    if (cross) { cross.setAttribute('x1', near.x); cross.setAttribute('x2', near.x); cross.setAttribute('opacity','0.5'); }
+    if (hdot)  { hdot.setAttribute('cx', near.x); hdot.setAttribute('cy', near.y); hdot.setAttribute('opacity','1'); }
+    const wrap = document.getElementById('cc-wrap');
+    const wr = wrap ? wrap.getBoundingClientRect() : rect;
+    let lft = evt.clientX - wr.left + 14;
+    let top = evt.clientY - wr.top - 58;
+    if (lft + 110 > wr.width) lft -= 130;
+    tip.style.cssText = `display:block;position:absolute;left:${lft}px;top:${top}px;background:white;border:1.5px solid var(--g3);border-radius:8px;padding:6px 10px;box-shadow:0 2px 10px rgba(0,0,0,.1);pointer-events:none;z-index:99`;
+    tip.innerHTML = `<div style="font-size:10px;color:var(--muted);font-weight:600">${near.month}</div><div style="font-size:15px;font-weight:800;color:${near.cci>=100?'var(--olive)':'var(--red)'}">CCI ${near.cci}</div><div style="font-size:9px;color:var(--muted);margin-top:1px">${near.cci>=120?'Highly Optimistic':near.cci>=111?'Optimistic':near.cci>=100?'Slightly Optimistic':'Pessimistic'}</div>`;
+  };
+  window.ccHoverOut = function() {
+    const tip = document.getElementById('cc-tip');
+    const cross = document.getElementById('cc-cross');
+    const hdot = document.getElementById('cc-hdot');
+    if (tip)   tip.style.display = 'none';
+    if (cross) cross.setAttribute('opacity','0');
+    if (hdot)  hdot.setAttribute('opacity','0');
+  };
+
   function renderCCPeriod(period) {
     let filtered = allHistory;
     if      (period === '1m') filtered = allHistory.slice(-1);
@@ -910,86 +942,90 @@ function vConsumerConfidence(d) {
     const minCCI   = cciVals.length ? Math.min(...cciVals).toFixed(1) : '—';
     const latestCCI= cciVals.length ? cciVals[cciVals.length-1].toFixed(1) : '—';
 
-    // SVG line chart
-    const W=560, CH=150, PAD_L=36, PAD_R=12, PAD_T=16, PAD_B=28;
+    // SVG chart — compact height
+    const W=560, CH=110, PAD_L=36, PAD_R=14, PAD_T=12, PAD_B=24;
     const innerW = W - PAD_L - PAD_R;
     const innerH = CH - PAD_T - PAD_B;
     const yMin = Math.max(0, Math.min(...cciVals, 95) - 2);
     const yMax = Math.max(...cciVals, 130) + 2;
     const xS = i => PAD_L + (cciVals.length > 1 ? (i/(cciVals.length-1))*innerW : innerW/2);
     const yS = v => PAD_T + (1 - (v-yMin)/(yMax-yMin)) * innerH;
-
     const y100 = yS(100);
     const pts  = history.map((h,i) => `${xS(i).toFixed(1)},${yS(Number(h.cci)).toFixed(1)}`).join(' ');
-
-    // gradient fill area
     const fillPts = history.length > 1
       ? `${xS(0).toFixed(1)},${(PAD_T+innerH).toFixed(1)} ${pts} ${xS(history.length-1).toFixed(1)},${(PAD_T+innerH).toFixed(1)}`
       : '';
 
+    // Store point data globally for hover
+    window.__ccPts = history.map((h,i) => ({ x: parseFloat(xS(i).toFixed(1)), y: parseFloat(yS(Number(h.cci)).toFixed(1)), cci: Number(h.cci), month: h.month }));
+
     const dots = history.map((h,i) => {
       const cx=xS(i).toFixed(1), cy=yS(Number(h.cci)).toFixed(1);
-      const isLast = i===history.length-1;
       const col = Number(h.cci)>=100 ? '#7A8B5E' : '#C0392B';
-      return `<circle cx="${cx}" cy="${cy}" r="${isLast?5:3.5}" fill="${col}" stroke="white" stroke-width="1.5"/>
-        ${isLast ? `<text x="${cx}" y="${parseFloat(cy)-9}" text-anchor="middle" font-size="10" font-weight="800" fill="${col}">${Number(h.cci)}</text>` : ''}`;
+      return `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${col}" stroke="white" stroke-width="1.5" style="pointer-events:none"/>`;
     }).join('');
 
     const xLabels = history.map((h,i) => {
-      const cx=xS(i).toFixed(1);
-      return `<text x="${cx}" y="${CH-4}" text-anchor="middle" font-size="8.5" fill="#888">${h.month}</text>`;
+      return `<text x="${xS(i).toFixed(1)}" y="${CH-4}" text-anchor="middle" font-size="8.5" fill="#888" style="pointer-events:none">${h.month}</text>`;
     }).join('');
 
-    // y-axis tick labels
     const yTicks = [Math.round(yMin), 100, Math.round(yMax)].map(v => {
       const y=yS(v).toFixed(1);
-      return `<text x="${PAD_L-4}" y="${parseFloat(y)+3}" text-anchor="end" font-size="8" fill="#aaa">${v}</text>
-        <line x1="${PAD_L}" y1="${y}" x2="${W-PAD_R}" y2="${y}" stroke="#eee" stroke-width="1"/>`;
+      return `<text x="${PAD_L-4}" y="${parseFloat(y)+3}" text-anchor="end" font-size="8" fill="#aaa" style="pointer-events:none">${v}</text>
+        <line x1="${PAD_L}" y1="${y}" x2="${W-PAD_R}" y2="${y}" stroke="#eee" stroke-width="1" style="pointer-events:none"/>`;
     }).join('');
 
     const svgChart = cciVals.length
-      ? `<svg viewBox="0 0 ${W} ${CH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">
-          <defs>
-            <linearGradient id="ccGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#7A8B5E" stop-opacity="0.18"/>
-              <stop offset="100%" stop-color="#7A8B5E" stop-opacity="0.01"/>
-            </linearGradient>
-          </defs>
-          ${yTicks}
-          <line x1="${PAD_L}" y1="${y100.toFixed(1)}" x2="${W-PAD_R}" y2="${y100.toFixed(1)}" stroke="#C0392B" stroke-width="1" stroke-dasharray="5,3" opacity="0.4"/>
-          <text x="${W-PAD_R+2}" y="${(y100+3).toFixed(1)}" font-size="7.5" fill="#C0392B" opacity="0.6">100</text>
-          ${fillPts ? `<polygon points="${fillPts}" fill="url(#ccGrad)"/>` : ''}
-          <polyline points="${pts}" fill="none" stroke="#7A8B5E" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-          ${dots}
-          ${xLabels}
-        </svg>
+      ? `<div id="cc-wrap" style="position:relative">
+          <div id="cc-tip" style="display:none"></div>
+          <svg id="cc-svg" viewBox="0 0 ${W} ${CH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible;cursor:crosshair"
+            onmousemove="ccHover(event)" onmouseleave="ccHoverOut()">
+            <defs>
+              <linearGradient id="ccGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#7A8B5E" stop-opacity="0.15"/>
+                <stop offset="100%" stop-color="#7A8B5E" stop-opacity="0.01"/>
+              </linearGradient>
+            </defs>
+            ${yTicks}
+            <line x1="${PAD_L}" y1="${y100.toFixed(1)}" x2="${W-PAD_R}" y2="${y100.toFixed(1)}" stroke="#C0392B" stroke-width="1" stroke-dasharray="5,3" opacity="0.4" style="pointer-events:none"/>
+            <text x="${W-PAD_R+2}" y="${(y100+3).toFixed(1)}" font-size="7.5" fill="#C0392B" opacity="0.6" style="pointer-events:none">100</text>
+            ${fillPts ? `<polygon points="${fillPts}" fill="url(#ccGrad)" style="pointer-events:none"/>` : ''}
+            <polyline points="${pts}" fill="none" stroke="#7A8B5E" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="pointer-events:none"/>
+            ${dots}
+            ${xLabels}
+            <line id="cc-cross" x1="0" y1="${PAD_T}" x2="0" y2="${PAD_T+innerH}" stroke="var(--olive-dk)" stroke-width="1" stroke-dasharray="3,2" opacity="0" style="pointer-events:none"/>
+            <circle id="cc-hdot" cx="0" cy="0" r="5.5" fill="white" stroke="var(--olive-dk)" stroke-width="2" opacity="0" style="pointer-events:none"/>
+            <rect x="${PAD_L}" y="${PAD_T}" width="${innerW}" height="${innerH}" fill="transparent"/>
+          </svg>
+        </div>
         <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted)">
           <span>Optimistic threshold: <strong style="color:var(--text)">100</strong></span>
           <span>
-            <span style="display:inline-block;width:9px;height:9px;background:var(--olive);border-radius:2px;margin-right:3px;vertical-align:middle"></span>Optimistic
-            <span style="display:inline-block;width:9px;height:9px;background:var(--red);border-radius:2px;margin:0 3px 0 10px;vertical-align:middle"></span>Pessimistic
+            <span style="display:inline-block;width:8px;height:8px;background:var(--olive);border-radius:2px;margin-right:3px;vertical-align:middle"></span>Optimistic
+            <span style="display:inline-block;width:8px;height:8px;background:var(--red);border-radius:2px;margin:0 3px 0 8px;vertical-align:middle"></span>Pessimistic
           </span>
         </div>`
-      : `<div style="color:var(--muted);font-size:12px;padding:20px 0">No historical data yet.</div>`;
+      : `<div style="color:var(--muted);font-size:12px;padding:12px 0">No historical data yet.</div>`;
 
-    const statsHtml = `<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-      <div class="kpi" style="flex:1;min-width:90px">
-        <div class="kpi-lbl">Average CCI</div>
-        <div class="kpi-val">${avgCCI}</div>
-        <div class="kpi-trend tst">${cciVals.length} month${cciVals.length!==1?'s':''}</div>
+    // Compact inline stat strip instead of tall kpi cards
+    const statsHtml = `<div style="display:flex;gap:8px;margin-bottom:10px">
+      <div style="flex:1;padding:8px 10px;background:var(--g1);border-radius:8px;border:1px solid var(--g2)">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">Average</div>
+        <div style="font-size:18px;font-weight:800;color:var(--text);line-height:1.2">${avgCCI}</div>
+        <div style="font-size:9px;color:var(--muted)">${cciVals.length} month${cciVals.length!==1?'s':''}</div>
       </div>
-      <div class="kpi" style="flex:1;min-width:90px">
-        <div class="kpi-lbl">Highest</div>
-        <div class="kpi-val tup">${maxCCI}</div>
+      <div style="flex:1;padding:8px 10px;background:var(--g1);border-radius:8px;border:1px solid var(--g2)">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">Highest</div>
+        <div style="font-size:18px;font-weight:800;color:var(--green);line-height:1.2">${maxCCI}</div>
       </div>
-      <div class="kpi" style="flex:1;min-width:90px">
-        <div class="kpi-lbl">Lowest</div>
-        <div class="kpi-val tdn">${minCCI}</div>
+      <div style="flex:1;padding:8px 10px;background:var(--g1);border-radius:8px;border:1px solid var(--g2)">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">Lowest</div>
+        <div style="font-size:18px;font-weight:800;color:var(--red);line-height:1.2">${minCCI}</div>
       </div>
-      <div class="kpi" style="flex:1;min-width:90px">
-        <div class="kpi-lbl">Latest</div>
-        <div class="kpi-val">${latestCCI}</div>
-        <div class="kpi-trend ${Number(latestCCI)>=100?'tup':'tdn'}">${Number(latestCCI)>=100?'✓ Optimistic':'⚠ Pessimistic'}</div>
+      <div style="flex:1;padding:8px 10px;background:var(--g1);border-radius:8px;border:1px solid var(--g2)">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">Latest</div>
+        <div style="font-size:18px;font-weight:800;color:var(--text);line-height:1.2">${latestCCI}</div>
+        <div style="font-size:9px;color:${Number(latestCCI)>=100?'var(--green)':'var(--red)'}">${Number(latestCCI)>=100?'✓ Optimistic':'⚠ Pessimistic'}</div>
       </div>
     </div>`;
 
@@ -1028,16 +1064,19 @@ function vConsumerConfidence(d) {
   const periods = [['1m','1 Month'],['3m','3 Months'],['1y','1 Year'],['all','All']];
   const btnRow = periods.map(([p,lbl]) =>
     `<button class="cc-btn" data-p="${p}" onclick="setCCPeriod('${p}')"
-      style="padding:4px 13px;border-radius:99px;border:1.5px solid var(--olive);cursor:pointer;
+      style="padding:3px 12px;border-radius:99px;border:1.5px solid var(--olive);cursor:pointer;
       font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.4px;transition:all .15s;
       background:${p==='all'?'var(--olive)':'transparent'};color:${p==='all'?'white':'var(--olive-dk)'}">${lbl}</button>`
   ).join('');
 
   const chartBlock = `<div id="cc-area">
-    <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:14px">${btnRow}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:10px;color:var(--muted)">Hover over the chart to inspect each month</span>
+      <div style="display:flex;gap:5px">${btnRow}</div>
+    </div>
     <div id="cc-stats">${init.statsHtml}</div>
-    <div id="cc-chart" style="margin-top:4px">${init.svgChart}</div>
-    <div id="cc-table" style="margin-top:14px">${init.tableHtml}</div>
+    <div id="cc-chart" style="margin-top:6px">${init.svgChart}</div>
+    <div id="cc-table" style="margin-top:10px">${init.tableHtml}</div>
   </div>`;
 
   // CCI index scale reference
