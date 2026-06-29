@@ -963,19 +963,19 @@ function vConsumerConfidence(d) {
           ${xLabels}
         </svg>
         <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted)">
-          <span>Threshold optimis: <strong style="color:var(--text)">100</strong></span>
+          <span>Optimistic threshold: <strong style="color:var(--text)">100</strong></span>
           <span>
-            <span style="display:inline-block;width:9px;height:9px;background:var(--olive);border-radius:2px;margin-right:3px;vertical-align:middle"></span>Optimis
-            <span style="display:inline-block;width:9px;height:9px;background:var(--red);border-radius:2px;margin:0 3px 0 10px;vertical-align:middle"></span>Pesimis
+            <span style="display:inline-block;width:9px;height:9px;background:var(--olive);border-radius:2px;margin-right:3px;vertical-align:middle"></span>Optimistic
+            <span style="display:inline-block;width:9px;height:9px;background:var(--red);border-radius:2px;margin:0 3px 0 10px;vertical-align:middle"></span>Pessimistic
           </span>
         </div>`
-      : `<div style="color:var(--muted);font-size:12px;padding:20px 0">Belum ada data historis.</div>`;
+      : `<div style="color:var(--muted);font-size:12px;padding:20px 0">No historical data yet.</div>`;
 
     const statsHtml = `<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
       <div class="kpi" style="flex:1;min-width:90px">
         <div class="kpi-lbl">Average IKK</div>
         <div class="kpi-val">${avgCCI}</div>
-        <div class="kpi-trend tst">${cciVals.length} bulan</div>
+        <div class="kpi-trend tst">${cciVals.length} month${cciVals.length!==1?'s':''}</div>
       </div>
       <div class="kpi" style="flex:1;min-width:90px">
         <div class="kpi-lbl">Highest</div>
@@ -988,7 +988,7 @@ function vConsumerConfidence(d) {
       <div class="kpi" style="flex:1;min-width:90px">
         <div class="kpi-lbl">Latest</div>
         <div class="kpi-val">${latestCCI}</div>
-        <div class="kpi-trend ${Number(latestCCI)>=100?'tup':'tdn'}">${Number(latestCCI)>=100?'✓ Optimis':'⚠ Pesimis'}</div>
+        <div class="kpi-trend ${Number(latestCCI)>=100?'tup':'tdn'}">${Number(latestCCI)>=100?'✓ Optimistic':'⚠ Pessimistic'}</div>
       </div>
     </div>`;
 
@@ -997,7 +997,7 @@ function vConsumerConfidence(d) {
       return [
         isLast?`<strong>${h.month}</strong>`:h.month,
         `<span class="fw ${v>=100?'tup':'tdn'}">${v}</span>`,
-        v>=100?'<span class="st st-g">✓ Optimis</span>':'<span class="st st-r">⚠ Pesimis</span>',
+        v>=100?'<span class="st st-g">✓ Optimistic</span>':'<span class="st st-r">⚠ Pessimistic</span>',
         h.beauty||'—',
       ];
     });
@@ -1006,7 +1006,7 @@ function vConsumerConfidence(d) {
       `<span class="fw">${avgCCI}</span>`,'','',
     ]);
 
-    return { statsHtml, svgChart, tableHtml: H.table(['Bulan','IKK','Status','Beauty Spend YoY'], tableRows) };
+    return { statsHtml, svgChart, tableHtml: H.table(['Month','IKK','Status','Beauty Spend YoY'], tableRows) };
   }
 
   window.setCCPeriod = (period) => {
@@ -1041,7 +1041,7 @@ function vConsumerConfidence(d) {
 
   return H.vh('Consumer Confidence — IKK Bank Indonesia', d.desc, d.updated, d.alertBadge)
     + H.kpiRow(d.kpis)
-    + H.blk('Tren IKK — Data Live dari Bank Indonesia', chartBlock)
+    + H.blk('IKK Trend — Live Data from Bank Indonesia', chartBlock)
     + H.blk('AI Insight', `<div class="ai-box"><div class="ai-lbl">AI Summary — Auto-generated</div><div class="ai-text">${d.ai}</div></div>`);
 }
 
