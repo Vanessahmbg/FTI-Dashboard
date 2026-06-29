@@ -509,23 +509,45 @@ const MOCK_DATA = {
 
   /* ── 4a. SELF-CARE ──────────────────────────────────────── */
   'self-care': {
-    updated: 'Q1 2026', alertBadge: null,
+    updated: 'Q2 2026', alertBadge: null,
     catName: 'Self-Care',
-    desc: 'Market size and growth data for the self-care category (skincare, body care, personal wellness) in Indonesia.',
+    desc: 'Skincare, body care and personal wellness segment in the Indonesian beauty market. Covers facial skincare, body care, sunscreen, hair care, and personal hygiene products.',
     kpis: [
-      { lbl: 'Market Size',        val: 'IDR 8,400', u: 'bn', trend: 'up', t: '↑ YoY growth' },
-      { lbl: 'YoY Growth',         val: '14.2', u: '%',   trend: 'up', t: '↑ vs 11.4% last yr' },
-      { lbl: '3Y CAGR',            val: '11.8', u: '%',   trend: null },
-      { lbl: 'Beauty Industry Share', val: '34', u: '%',  trend: 'up', t: '↑ Largest category' },
+      { lbl: 'Market Size (2024)',     val: 'IDR 8,400', u: 'bn', trend: 'up', t: '↑ +14.1% YoY' },
+      { lbl: 'YoY Growth',             val: '14.1',      u: '%',  trend: 'up', t: '↑ vs 8.2% in 2023' },
+      { lbl: '3Y CAGR (2021–24)',      val: '11.3',      u: '%',  trend: 'up', t: '→ Steady compounding' },
+      { lbl: 'Beauty Category Share',  val: '43',        u: '%',  trend: 'up', t: '↑ Largest of 3 categories' },
+    ],
+    history: [
+      { year: 2018, size: 5380,  yoy: null,  proj: false },
+      { year: 2019, size: 5970,  yoy: 11.0,  proj: false },
+      { year: 2020, size: 5250,  yoy: -12.1, proj: false },
+      { year: 2021, size: 6100,  yoy: 16.2,  proj: false },
+      { year: 2022, size: 6800,  yoy: 11.5,  proj: false },
+      { year: 2023, size: 7360,  yoy: 8.2,   proj: false },
+      { year: 2024, size: 8400,  yoy: 14.1,  proj: false },
+      { year: 2025, size: 9380,  yoy: 11.7,  proj: true  },
+      { year: 2026, size: 10440, yoy: 11.3,  proj: true  },
+      { year: 2027, size: 11630, yoy: 11.4,  proj: true  },
+    ],
+    catShare: [
+      { name: 'Self-Care',         pct: 43 },
+      { name: 'Makeup',            pct: 29 },
+      { name: 'Lifestyle & Merch', pct: 28 },
     ],
     subcats: [
-      { name: 'Facial Serum',       growth: 28, size: 'IDR 1,820bn' },
-      { name: 'Sunscreen',          growth: 31, size: 'IDR 1,540bn' },
-      { name: 'Face Toner',         growth: 22, size: 'IDR 1,120bn' },
-      { name: 'Moisturiser',        growth: 18, size: 'IDR 2,100bn' },
-      { name: 'Face Wash',          growth: 10, size: 'IDR 1,820bn' },
+      { name: 'Sunscreen / UV Protection',  growth: 31, size: 'IDR 1,540bn' },
+      { name: 'Facial Serum',               growth: 28, size: 'IDR 1,820bn' },
+      { name: 'Face Toner / Essence',       growth: 22, size: 'IDR 1,120bn' },
+      { name: 'Moisturiser',                growth: 18, size: 'IDR 2,100bn' },
+      { name: 'Eye Cream / Eye Care',       growth: 14, size: 'IDR 480bn'   },
+      { name: 'Sheet / Clay Mask',          growth: 12, size: 'IDR 890bn'   },
+      { name: 'Face Wash / Cleanser',       growth: 10, size: 'IDR 1,820bn' },
+      { name: 'Body Lotion / Body Care',    growth:  8, size: 'IDR 2,340bn' },
+      { name: 'Lip Care / Treatment',       growth:  6, size: 'IDR 380bn'   },
+      { name: 'Deodorant / Antiperspirant', growth:  4, size: 'IDR 1,100bn' },
     ],
-    summary: 'Self-care is the largest and fastest-growing segment in Indonesian beauty. Facial serum and sunscreen are outpacing the overall category — both areas where FTI has existing presence. Moisturiser remains the largest subcategory by market size.',
+    ai: `Self-care is the largest and fastest-growing segment in Indonesia's beauty market, commanding **43%** of FTI's three core beauty categories. The **14.1% YoY surge in 2024** marks a sharp acceleration from the 8.2% growth in 2023, driven by skincare literacy via social media (TikTok Beauty), post-pandemic wellness consciousness, and strong premiumisation in facial care.\n\n**FTI Action Items:**\n1. **Lead with Sun Protection** — Sunscreen (+31% YoY, IDR 1,540bn market) is the #1 growth subcategory. Prioritise TikTok educational content around SPF and UV protection for daily routines.\n2. **Invest in Serum + Toner SKUs** — Facial serum (+28%) and toner/essence (+22%) are capturing mid-premium price points (Rp 100K–350K). FTI should ensure strong presence in actives (niacinamide, hyaluronic acid, vitamin C).\n3. **Body Care is Volume, Serum is Value** — Body lotion has the largest market size (IDR 2,340bn) but lowest growth (+8%). Treat it as a repurchase/loyalty driver, not a growth engine.\n4. **Plan for 2025 Moderation** — Growth is projected to ease to ~11% from 14%. Avoid over-indexing 2024 growth into forward orders. Build scenario plans for 10% and 15% growth outcomes.\n5. **Quarterly Watch** — If Q3 2026 shows self-care share dropping below 40%, investigate whether consumer spending is shifting to makeup or lifestyle categories.`,
   },
 
   /* ── 4b. MAKEUP ─────────────────────────────────────────── */
@@ -879,6 +901,157 @@ function vRelevanceScore(d) {
     + H.blk('Score by Trend Category', catBars)
     + H.blk('High-Opportunity Gaps (FTI Under-indexed)', H.table(['Trend','Trend Score','FTI Score','Opportunity'], gapRows))
     + H.blk('Recommendations', recList);
+}
+
+function vSelfCare(d) {
+  const allHistory = d.history || [];
+  window.__scPeriod = 'all';
+
+  function buildComboChart(data) {
+    const W=560,CH=210,PL=54,PR=48,PT=24,PB=38;
+    const cW=W-PL-PR, cH=CH-PT-PB, n=data.length;
+    const step=cW/n, barW=Math.max(12,step*0.52);
+    const maxSize=Math.max(...data.map(r=>r.size))*1.14;
+    const yoys=data.filter(r=>r.yoy!==null).map(r=>r.yoy);
+    const minY=Math.min(...yoys)-4, maxY=Math.max(...yoys)+4;
+    const xOf=i=>PL+step*i+step/2;
+    const yS=v=>PT+cH-(v/maxSize)*cH;
+    const yY=v=>PT+cH-((v-minY)/(maxY-minY))*cH;
+
+    let bars='',line='',dots='',xlbls='',topL='',yaxL='',yaxR='',projL='';
+
+    data.forEach((r,i)=>{
+      const x=xOf(i), bh=(r.size/maxSize)*cH, by=PT+cH-bh;
+      const col=r.proj?'rgba(90,138,90,0.28)':'rgba(90,138,90,0.72)';
+      bars+=`<rect x="${(x-barW/2).toFixed(1)}" y="${by.toFixed(1)}" width="${barW}" height="${bh.toFixed(1)}" fill="${col}" rx="2"/>`;
+      if(r.proj) bars+=`<rect x="${(x-barW/2).toFixed(1)}" y="${by.toFixed(1)}" width="${barW}" height="${bh.toFixed(1)}" fill="url(#sc-hatch)" rx="2" opacity="0.5"/>`;
+      const showLbl = n<=7 || i%2===0 || i===n-1;
+      if(showLbl) topL+=`<text x="${x.toFixed(1)}" y="${(by-3).toFixed(1)}" text-anchor="middle" font-size="8" fill="${r.proj?'var(--muted)':'var(--text)'}" font-weight="600">${(r.size/1000).toFixed(1)}T</text>`;
+      xlbls+=`<text x="${x.toFixed(1)}" y="${(CH-9).toFixed(1)}" text-anchor="middle" font-size="9" fill="${r.proj?'var(--muted)':'var(--text)'}">${r.year}${r.proj?'*':''}</text>`;
+      if(r.yoy!==null){
+        const lx=x, ly=yY(r.yoy);
+        line+=line?` ${lx.toFixed(1)},${ly.toFixed(1)}`:`${lx.toFixed(1)},${ly.toFixed(1)}`;
+        const dc=r.yoy<0?'var(--red)':r.proj?'#c8a040':'var(--amber)';
+        dots+=`<circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="3.5" fill="white" stroke="${dc}" stroke-width="2"/>`;
+        if(showLbl){const pf=r.yoy>0?'+':''; dots+=`<text x="${lx.toFixed(1)}" y="${(ly-7).toFixed(1)}" text-anchor="middle" font-size="7.5" fill="${dc}" font-weight="700">${pf}${r.yoy}%</text>`;}
+      }
+    });
+
+    [0,maxSize*0.35,maxSize*0.7,maxSize*1.0].forEach(v=>{
+      const y=yS(v);
+      if(y>=PT&&y<=PT+cH+1){
+        yaxL+=`<text x="${PL-5}" y="${(y+3).toFixed(1)}" text-anchor="end" font-size="8.5" fill="var(--muted)">${(v/1000).toFixed(0)}T</text>`;
+        yaxL+=`<line x1="${PL}" y1="${y.toFixed(1)}" x2="${(W-PR).toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--g3)" stroke-width="0.5"/>`;
+      }
+    });
+    [Math.round(minY),0,Math.round(maxY)].forEach(v=>{
+      const y=yY(v);
+      if(y>=PT-2&&y<=PT+cH+2){
+        yaxR+=`<text x="${W-PR+5}" y="${(y+3).toFixed(1)}" text-anchor="start" font-size="8.5" fill="var(--amber)">${v>0?'+':''}${v}%</text>`;
+      }
+    });
+
+    const projIdx=data.findIndex(r=>r.proj);
+    if(projIdx>0){
+      const px=xOf(projIdx)-step/2;
+      projL=`<line x1="${px.toFixed(1)}" y1="${PT}" x2="${px.toFixed(1)}" y2="${(PT+cH).toFixed(1)}" stroke="var(--g3)" stroke-width="1.2" stroke-dasharray="4,3"/>
+        <text x="${(px+4).toFixed(1)}" y="${(PT+11).toFixed(1)}" font-size="8" fill="var(--muted)">Proj →</text>`;
+    }
+
+    const leg=`<rect x="${PL}" y="5" width="12" height="10" fill="rgba(90,138,90,0.72)" rx="2"/>
+      <text x="${PL+15}" y="13.5" font-size="9" fill="var(--muted)">Market Size (IDR)</text>
+      <rect x="${PL+125}" y="5" width="12" height="10" fill="rgba(90,138,90,0.28)" rx="2"/>
+      <line x1="${PL+125}" y1="10" x2="${PL+137}" y2="10" stroke="none"/>
+      <text x="${PL+140}" y="13.5" font-size="9" fill="var(--muted)">Projected</text>
+      <line x1="${PL+205}" y1="10" x2="${PL+221}" y2="10" stroke="var(--amber)" stroke-width="2"/>
+      <circle cx="${PL+213}" cy="10" r="2.5" fill="white" stroke="var(--amber)" stroke-width="1.5"/>
+      <text x="${PL+225}" y="13.5" font-size="9" fill="var(--muted)">YoY Growth %</text>`;
+
+    return `<svg viewBox="0 0 ${W} ${CH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${W}px;display:block">
+      <defs><pattern id="sc-hatch" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="rgba(90,138,90,0.6)" stroke-width="2"/></pattern></defs>
+      ${leg}${yaxL}${projL}${bars}${topL}
+      <polyline points="${line}" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linejoin="round"/>
+      ${dots}${yaxR}${xlbls}
+    </svg>`;
+  }
+
+  function buildDonut(segs) {
+    const cx=90,cy=88,ro=72,ri=42;
+    const cols=['var(--olive)','#C8A040','#9A8A6A'];
+    let paths='',lbls='',start=-90;
+    segs.forEach((s,i)=>{
+      const deg=(s.pct/100)*360, end=start+deg;
+      const sr=start*Math.PI/180, er=end*Math.PI/180;
+      const lg=deg>180?1:0;
+      const hl=i===0, ox=hl?Math.cos((sr+er)/2)*5:0, oy=hl?Math.sin((sr+er)/2)*5:0;
+      const x1=(cx+ox+ro*Math.cos(sr)).toFixed(2),y1=(cy+oy+ro*Math.sin(sr)).toFixed(2);
+      const x2=(cx+ox+ro*Math.cos(er)).toFixed(2),y2=(cy+oy+ro*Math.sin(er)).toFixed(2);
+      const x3=(cx+ox+ri*Math.cos(er)).toFixed(2),y3=(cy+oy+ri*Math.sin(er)).toFixed(2);
+      const x4=(cx+ox+ri*Math.cos(sr)).toFixed(2),y4=(cy+oy+ri*Math.sin(sr)).toFixed(2);
+      paths+=`<path d="M${x1},${y1} A${ro},${ro} 0 ${lg},1 ${x2},${y2} L${x3},${y3} A${ri},${ri} 0 ${lg},0 ${x4},${y4}Z" fill="${cols[i%cols.length]}" opacity="${hl?1:0.65}"/>`;
+      const ma=(sr+er)/2, lr=(ro+ri)/2;
+      const lx=(cx+ox+lr*Math.cos(ma)).toFixed(1),ly=(cy+oy+lr*Math.sin(ma)).toFixed(1);
+      lbls+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="800" fill="white">${s.pct}%</text>`;
+      start=end;
+    });
+    let legend='';
+    segs.forEach((s,i)=>{
+      const lx=186,ly=30+i*30;
+      legend+=`<rect x="${lx}" y="${ly}" width="11" height="11" fill="${cols[i%cols.length]}" opacity="${i===0?1:0.65}" rx="3"/>
+        <text x="${lx+15}" y="${ly+9}" font-size="11" fill="var(--text)" font-weight="${i===0?'700':'500'}">${s.name}</text>
+        <text x="${lx+15}" y="${ly+21}" font-size="9.5" fill="var(--muted)">${s.pct}% of beauty</text>`;
+    });
+    return `<svg viewBox="0 0 310 178" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:310px;display:block">
+      ${paths}${lbls}${legend}
+      <text x="${cx}" y="${cy-8}" text-anchor="middle" font-size="10" fill="var(--muted)">Beauty</text>
+      <text x="${cx}" y="${cy+6}" text-anchor="middle" font-size="10" fill="var(--muted)">Split</text>
+      <text x="${cx}" y="${cy+20}" text-anchor="middle" font-size="9" fill="var(--muted)">(2024)</text>
+    </svg>`;
+  }
+
+  function buildSubcats(subcats) {
+    const sorted=[...subcats].sort((a,b)=>b.growth-a.growth);
+    const maxG=sorted[0].growth;
+    const LW=158, BW=100, TW=36, ROW=22, PAD=8;
+    const H_=sorted.length*ROW+PAD*2;
+    let rows='';
+    sorted.forEach((s,i)=>{
+      const y=PAD+i*ROW;
+      const bw=(s.growth/maxG)*BW;
+      const col=s.growth>=25?'var(--olive)':s.growth>=15?'#5a8a5a':s.growth>=10?'var(--amber)':'var(--muted)';
+      rows+=`<text x="0" y="${y+14}" font-size="10" fill="var(--text)">${s.name}</text>
+        <rect x="${LW}" y="${y+5}" width="${bw.toFixed(1)}" height="12" fill="${col}" opacity="0.8" rx="3"/>
+        <text x="${LW+BW+5}" y="${y+14}" font-size="10" fill="${col}" font-weight="700">+${s.growth}%</text>`;
+    });
+    return `<svg viewBox="0 0 ${LW+BW+TW} ${H_}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">${rows}</svg>`;
+  }
+
+  function renderChart(period) {
+    window.__scPeriod=period;
+    let data=allHistory;
+    if(period==='3y') data=allHistory.filter(r=>r.year>=2022);
+    else if(period==='5y') data=allHistory.filter(r=>r.year>=2020);
+    const btns=['3Y','5Y','All'].map(p=>{
+      const v=p.toLowerCase(), act=period===v;
+      return `<button onclick="window.setSCPeriod('${v}')" style="padding:4px 14px;border-radius:20px;border:1.5px solid ${act?'var(--olive)':'var(--g3)'};background:${act?'var(--olive)':'transparent'};color:${act?'white':'var(--text)'};font-size:12px;cursor:pointer;font-weight:600;margin-right:6px;transition:all .15s">${p}</button>`;
+    }).join('');
+    const html=`<div style="margin-bottom:12px">${btns}</div>${buildComboChart(data)}`;
+    const el=document.getElementById('sc-chart-block');
+    if(el) el.innerHTML=html;
+    return html;
+  }
+  window.setSCPeriod=p=>renderChart(p);
+
+  const aiText=(d.ai||d.summary||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+
+  return H.vh(d.catName,d.desc,d.updated,d.alertBadge)
+    + H.kpiRow(d.kpis)
+    + H.blk('Market Size & Growth Rate — Indonesia Self-Care',`<div id="sc-chart-block">${renderChart('all')}</div>`)
+    + `<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-bottom:12px">
+        ${H.blk('Beauty Category Share (2024)',buildDonut(d.catShare||[]))}
+        ${H.blk('Top-Growing Sub-Categories — YoY %',buildSubcats(d.subcats||[]))}
+      </div>`
+    + H.blk('AI Quarterly Insight',`<div class="ai-box"><div class="ai-lbl">Q2 2026 Analysis</div><div class="ai-text">${aiText}</div></div>`);
 }
 
 function vCategory(d) {
@@ -1398,7 +1571,7 @@ const VIEWS = {
   'competitor-sentiments':d => vCompetitorSentiments(d),
   'trends-signals':       d => vTrendsSignals(d),
   'fti-relevance-score':  d => vRelevanceScore(d),
-  'self-care':            d => vCategory(d),
+  'self-care':            d => vSelfCare(d),
   'makeup':               d => vCategory(d),
   'lifestyle-merchandise':d => vCategory(d),
   'consumer-confidence':  d => vConsumerConfidence(d),
@@ -1413,7 +1586,7 @@ const WIP_IDS = [
   'review-score', 'repurchase-rate', 'products-sentiment', 'social-listening',
   'competitor-alerts', 'competitor-sentiments',
   'trends-signals', 'fti-relevance-score',
-  'self-care', 'makeup', 'lifestyle-merchandise',
+  'makeup', 'lifestyle-merchandise',
   'peak-season-alert',
 ];
 
