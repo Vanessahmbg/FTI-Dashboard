@@ -973,7 +973,7 @@ function vConsumerConfidence(d) {
 
     const statsHtml = `<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
       <div class="kpi" style="flex:1;min-width:90px">
-        <div class="kpi-lbl">Average IKK</div>
+        <div class="kpi-lbl">Average CCI</div>
         <div class="kpi-val">${avgCCI}</div>
         <div class="kpi-trend tst">${cciVals.length} month${cciVals.length!==1?'s':''}</div>
       </div>
@@ -1006,7 +1006,7 @@ function vConsumerConfidence(d) {
       `<span class="fw">${avgCCI}</span>`,'','',
     ]);
 
-    return { statsHtml, svgChart, tableHtml: H.table(['Month','IKK','Status','Beauty Spend YoY'], tableRows) };
+    return { statsHtml, svgChart, tableHtml: H.table(['Month','CCI','Status','Beauty Spend YoY'], tableRows) };
   }
 
   window.setCCPeriod = (period) => {
@@ -1039,9 +1039,9 @@ function vConsumerConfidence(d) {
     <div id="cc-table" style="margin-top:14px">${init.tableHtml}</div>
   </div>`;
 
-  return H.vh('Consumer Confidence — IKK Bank Indonesia', d.desc, d.updated, d.alertBadge)
+  return H.vh('Consumer Confidence — CCI (Consumer Confidence Index)', d.desc, d.updated, d.alertBadge)
     + H.kpiRow(d.kpis)
-    + H.blk('IKK Trend — Live Data from Bank Indonesia', chartBlock)
+    + H.blk('CCI Trend — Live Data from Bank Indonesia', chartBlock)
     + H.blk('AI Insight', `<div class="ai-box"><div class="ai-lbl">AI Summary — Auto-generated</div><div class="ai-text">${d.ai}</div></div>`);
 }
 
