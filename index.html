@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Market Intelligence — FTI Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #F5F2EA;
+      --olive: #7A8B5E;
+      --olive-dk: #3D4A2E;
+      --olive-lt: #EFF4E5;
+      --olive-bar: #D9E5C2;
+      --white: #FFFFFF;
+      --g1: #F8F7F4;
+      --g2: #EDEBE4;
+      --g3: #DAD7CF;
+      --text: #1A1A1A;
+      --muted: #888;
+      --red: #C0392B;
+      --red-lt: #FDECEA;
+      --green: #219653;
+      --green-lt: #E9F7EF;
+      --amber: #C47D0E;
+      --amber-lt: #FEF3E2;
+    }
+
+    body {
+      font-family: 'Manrope', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    /* ── NAV ─────────────────────────────────────────────── */
+    .nav {
+      background: var(--white);
+      border-bottom: 1.5px solid var(--g3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      height: 52px;
+      flex-shrink: 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      z-index: 10;
+    }
+    .nav-l { display: flex; align-items: center; gap: 18px; }
+    .logo { font-weight: 900; font-size: 16px; color: var(--olive-dk); letter-spacing: 3px; }
+    .nav-tabs { display: flex; gap: 3px; list-style: none; }
+    .nav-tab { padding: 5px 13px; border-radius: 7px; font-size: 12.5px; cursor: default; border: 1.5px solid transparent; font-weight: 500; }
+    .nav-tab.active { color: var(--olive-dk); border: 2px solid var(--olive); font-weight: 700; background: var(--olive-lt); }
+    .nav-tab:not(.active) { color: #CCC; pointer-events: none; }
+    .nav-r { font-size: 10.5px; font-weight: 700; color: var(--olive); letter-spacing: 1px; text-transform: uppercase; }
+
+    /* ── LAYOUT ──────────────────────────────────────────── */
+    .layout { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── SIDEBAR ─────────────────────────────────────────── */
+    .sidebar {
+      width: 210px;
+      background: var(--white);
+      border-right: 1.5px solid var(--g3);
+      overflow-y: auto;
+      flex-shrink: 0;
+      padding-bottom: 24px;
+    }
+    .sb-group {}
+    .sb-hd {
+      display: flex; align-items: center; gap: 7px;
+      padding: 9px 12px;
+      cursor: pointer; user-select: none;
+      border-bottom: 1px solid var(--g2);
+      transition: background 0.1s;
+    }
+    .sb-hd:hover { background: var(--g1); }
+    .sb-num { font-size: 10px; font-weight: 700; color: var(--olive); min-width: 16px; }
+    .sb-name { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--olive-dk); flex: 1; }
+    .sb-chev { font-size: 8px; color: var(--muted); transition: transform 0.2s; }
+    .sb-group.closed .sb-chev { transform: rotate(-90deg); }
+    .sb-items {}
+    .sb-group.closed .sb-items { display: none; }
+    .sb-item {
+      display: flex; align-items: center;
+      padding: 7px 12px 7px 24px;
+      cursor: pointer; color: #555;
+      border-left: 3px solid transparent;
+      transition: all 0.1s;
+      font-size: 12.5px;
+      line-height: 1.3;
+    }
+    .sb-item:hover { background: var(--g1); color: var(--olive-dk); }
+    .sb-item.active { background: var(--olive-lt); color: var(--olive-dk); font-weight: 600; border-left-color: var(--olive); }
+    .sb-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); flex-shrink: 0; margin-left: auto; }
+
+    /* ── CONTENT ─────────────────────────────────────────── */
+    .content { flex: 1; overflow-y: auto; padding: 22px 26px 40px; }
+
+    /* ── VIEW HEADER ─────────────────────────────────────── */
+    .vh { margin-bottom: 18px; }
+    .vh-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 5px; }
+    .vh-title { font-size: 20px; font-weight: 800; }
+    .vh-badges { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+    .badge { font-size: 10.5px; padding: 2px 8px; border-radius: 20px; font-weight: 700; white-space: nowrap; }
+    .b-gray { background: var(--g2); color: #666; }
+    .b-red  { background: var(--red-lt); color: var(--red); }
+    .b-green{ background: var(--green-lt); color: var(--green); }
+    .b-amber{ background: var(--amber-lt); color: var(--amber); }
+    .vh-desc { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+
+    /* ── KPI ROW ─────────────────────────────────────────── */
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+    .kpi { background: var(--white); border-radius: 9px; padding: 13px 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .kpi-lbl { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
+    .kpi-val { font-size: 24px; font-weight: 900; color: var(--text); line-height: 1; }
+    .kpi-val .u { font-size: 13px; font-weight: 400; color: var(--muted); }
+    .kpi-trend { font-size: 11px; margin-top: 4px; font-weight: 600; }
+    .tup { color: var(--green); }
+    .tdn { color: var(--red); }
+    .tst { color: var(--muted); }
+
+    /* ── BLOCK ───────────────────────────────────────────── */
+    .blk { background: var(--white); border-radius: 9px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 14px; overflow: hidden; }
+    .blk-hd { padding: 9px 14px; border-bottom: 1px solid var(--g2); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--olive-dk); background: var(--g1); }
+    .blk-body { padding: 14px; }
+
+    /* ── TABLE ───────────────────────────────────────────── */
+    .tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .tbl th { text-align: left; padding: 7px 10px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #666; border-bottom: 1.5px solid var(--g2); }
+    .tbl td { padding: 8px 10px; border-bottom: 1px solid var(--g2); vertical-align: middle; }
+    .tbl tr:last-child td { border-bottom: none; }
+    .tbl tr:hover td { background: var(--g1); }
+    .tbl .fw { font-weight: 700; }
+
+    /* ── STATUS CHIP ─────────────────────────────────────── */
+    .st { display: inline-flex; align-items: center; font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+    .st-r { background: var(--red-lt); color: var(--red); }
+    .st-g { background: var(--green-lt); color: var(--green); }
+    .st-a { background: var(--amber-lt); color: var(--amber); }
+    .st-n { background: var(--g2); color: #666; }
+
+    /* ── PROGRESS BARS ───────────────────────────────────── */
+    .brow { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+    .brow:last-child { margin-bottom: 0; }
+    .blbl { font-size: 12px; color: #444; min-width: 128px; }
+    .btrack { flex: 1; height: 8px; background: var(--g2); border-radius: 4px; overflow: hidden; }
+    .bfill { height: 100%; border-radius: 4px; background: var(--olive); transition: width 0.4s; }
+    .bfill.warn { background: var(--amber); }
+    .bfill.danger { background: var(--red); }
+    .bpct { font-size: 11.5px; font-weight: 700; min-width: 36px; text-align: right; }
+
+    /* ── CALLOUT ─────────────────────────────────────────── */
+    .callout { padding: 10px 12px; border-radius: 7px; margin-bottom: 12px; border-left: 3px solid; }
+    .callout.red   { background: var(--red-lt);   border-color: var(--red);   }
+    .callout.amber { background: var(--amber-lt); border-color: var(--amber); }
+    .callout.green { background: var(--green-lt); border-color: var(--green); }
+    .c-title { font-size: 12px; font-weight: 700; margin-bottom: 3px; }
+    .callout.red   .c-title { color: var(--red);   }
+    .callout.amber .c-title { color: var(--amber); }
+    .callout.green .c-title { color: var(--green); }
+    .c-body { font-size: 12px; color: #444; line-height: 1.55; }
+
+    /* ── QUOTE ───────────────────────────────────────────── */
+    .quote { border-left: 3px solid var(--g3); padding: 7px 10px; margin-bottom: 8px; }
+    .quote.pos { border-left-color: var(--green); }
+    .quote.neg { border-left-color: var(--red); }
+    .q-text { font-size: 12.5px; color: #444; font-style: italic; line-height: 1.55; }
+    .q-meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    /* ── AI SUMMARY ──────────────────────────────────────── */
+    .ai-box { background: var(--g1); border-radius: 7px; border-left: 3px solid var(--olive); padding: 12px 14px; }
+    .ai-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--olive); margin-bottom: 5px; }
+    .ai-text { font-size: 12.5px; color: #444; line-height: 1.65; }
+
+    /* ── COUNTDOWN CARDS ─────────────────────────────────── */
+    .cd-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+    .cd-card { background: var(--white); border-radius: 9px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border-top: 3px solid var(--olive); }
+    .cd-card.urgent { border-top-color: var(--red); }
+    .cd-card.medium { border-top-color: var(--amber); }
+    .cd-event { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .cd-date  { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+    .cd-num   { font-size: 32px; font-weight: 900; line-height: 1; color: var(--olive-dk); }
+    .cd-card.urgent .cd-num { color: var(--red); }
+    .cd-card.medium .cd-num { color: var(--amber); }
+    .cd-unit  { font-size: 11.5px; color: var(--muted); font-weight: 500; }
+    .cd-uplift{ margin-top: 8px; font-size: 11.5px; font-weight: 700; color: var(--green); }
+
+    /* ── SCORE DISPLAY ───────────────────────────────────── */
+    .score-wrap { text-align: center; padding: 20px 14px; }
+    .score-num  { font-size: 60px; font-weight: 900; color: var(--olive-dk); line-height: 1; }
+    .score-den  { font-size: 20px; color: var(--muted); font-weight: 400; }
+    .score-lbl  { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* ── TWO COLUMN ──────────────────────────────────────── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* ── MISC ────────────────────────────────────────────── */
+    .tag { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin: 2px 2px 2px 0; }
+    .tag-olive { background: var(--olive-lt); color: var(--olive-dk); }
+    .tag-red   { background: var(--red-lt); color: var(--red); }
+    .tag-green { background: var(--green-lt); color: var(--green); }
+    .tag-gray  { background: var(--g2); color: #555; }
+    .divider   { border: none; border-top: 1px solid var(--g2); margin: 12px 0; }
+    .empty     { text-align: center; padding: 80px 20px; color: var(--muted); }
+    .mt10 { margin-top: 10px; }
+    .mb0  { margin-bottom: 0 !important; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--g3); border-radius: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+
+    /* ── WIP PER-BOX ─────────────────────────────────────────── */
+    .wip-el { position: relative; overflow: hidden; }
+    .wip-el > *:not(.wip-label) { filter: blur(5px); pointer-events: none; user-select: none; }
+    .wip-label {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 800; letter-spacing: 1.2px;
+      text-transform: uppercase; color: var(--olive-dk);
+      background: rgba(255,255,255,0.45);
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-l">
+    <div class="logo">FTI</div>
+    <ul class="nav-tabs" id="nav-tabs"></ul>
+  </div>
+  <div class="nav-r">Intelligence Hub</div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="content" id="content">
+    <div class="empty">← Select a sub-component from the sidebar to begin.</div>
+  </main>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+ * CONFIG
+ * ════════════════════════════════════════════════════════════════ */
+
+const NAV_TABS = [
+  { label: 'Today', active: false },
+  { label: 'Performance', active: false },
+  { label: 'Market Intelligence', active: true },
+  { label: 'AI Advisor', active: false },
+  { label: 'Projects', active: false },
+];
+
+const SIDEBAR = [
+  { id: 'customer',  num: '01', name: 'Customer', items: [
+    { id: 'review-score',        label: 'Review Score',        alert: true  },
+    { id: 'repurchase-rate',     label: 'Repurchase Rate',     alert: true  },
+    { id: 'products-sentiment',  label: 'Products Sentiment',  alert: true  },
+    { id: 'social-listening',    label: 'Social Listening',    alert: true  },
+  ]},
+  { id: 'competitor', num: '02', name: 'Competitor', items: [
+    { id: 'competitor-alerts',     label: 'Competitor Alerts',     alert: true  },
+    { id: 'competitor-sentiments', label: 'Competitor Sentiments', alert: true  },
+  ]},
+  { id: 'trends', num: '03', name: 'Trends', items: [
+    { id: 'trends-signals',     label: 'Trends Signals',     alert: false },
+    { id: 'fti-relevance-score', label: 'FTI Relevance Score', alert: true  },
+  ]},
+  { id: 'category', num: '04', name: 'Category', items: [
+    { id: 'self-care',              label: 'Self-Care',              alert: false },
+    { id: 'makeup',                 label: 'Makeup',                 alert: false },
+    { id: 'lifestyle-merchandise',  label: 'Lifestyle & Merch',      alert: false },
+  ]},
+  { id: 'macro', num: '05', name: 'Macro Outlook', items: [
+    { id: 'consumer-confidence', label: 'Consumer Confidence', alert: false },
+    { id: 'inflation-rate',      label: 'Inflation Rate',      alert: false },
+    { id: 'peak-season-alert',   label: 'Peak Season Alert',   alert: true  },
+  ]},
+];
+
+/* ════════════════════════════════════════════════════════════════
+ * DATA LAYER — swap loadData() for a fetch() call when ready
+ * ════════════════════════════════════════════════════════════════ */
+
+const MOCK_DATA = {
+
+  /* ── 1a. REVIEW SCORE ───────────────────────────────────── */
+  'review-score': {
+    updated: 'June 2026', alertBadge: '⚠ 3 Alerts',
+    desc: 'Overall review scores across platforms and products. Alerts fire when any score drops month-over-month.',
+    kpis: [
+      { lbl: 'Overall Score',        val: '4.6', u: '/5',  trend: 'st', t: '→ No change MoM' },
+      { lbl: 'Total Reviews',        val: '4,576', u: '',  trend: 'up', t: '↑ +312 this month' },
+      { lbl: 'Platforms Tracked',    val: '3',   u: '',    trend: null },
+      { lbl: 'Products w/ Decline',  val: '3',   u: '',    trend: 'dn', t: '↓ Was 1 last month' },
+    ],
+    alert: { type: 'red', title: 'Declining Scores on 3 Products', body: 'Hydra Toner (−0.3), Lip Tint Coral (−0.2), and Eye Cream (−0.1) dropped MoM. Top complaints: texture on Hydra Toner, color payoff on Lip Tint.' },
+    byPlatform: [
+      { name: 'Shopee',       score: 4.7, reviews: 2341, mom: '+0.1', st: 'g' },
+      { name: 'TikTok Shop',  score: 4.5, reviews: 1823, mom: '−0.2', st: 'r' },
+      { name: 'FTI Website',  score: 4.8, reviews:  412, mom: '  0.0', st: 'g' },
+    ],
+    byProduct: [
+      { name: 'Skincare | Mangosteen Brightening Serum',            score: 4.8, reviews: 1205, mom: '+0.1', st: 'g' },
+      { name: 'Skincare | Tropical Guava Barrier Moisture Gel',     score: 4.6, reviews:  876, mom: '  0.0', st: 'g' },
+      { name: 'Skincare | White Tea Ultra-Light Protective Sun Serum', score: 4.7, reviews: 543, mom: '+0.2', st: 'g' },
+      { name: 'Skincare | Blue Pea Purifying Micellar Water',       score: 4.5, reviews:  987, mom: '−0.3', st: 'r' },
+      { name: 'Skincare | Java Black Tea Soothing Gel Cleanser',    score: 4.5, reviews:  432, mom: '  0.0', st: 'g' },
+      { name: 'Skincare | Papua Red Fruit Plumping Cream',          score: 4.6, reviews:  258, mom: '+0.3', st: 'g' },
+      { name: 'Skincare | Bali Green Coffee Espresso Eye Cream',    score: 4.4, reviews:  321, mom: '−0.1', st: 'a' },
+      { name: 'Makeup | Illipe Plumping Lip Butter',                score: 4.3, reviews:  154, mom: '−0.2', st: 'r' },
+    ],
+  },
+
+  /* ── 1b. REPURCHASE RATE ────────────────────────────────── */
+  'repurchase-rate': {
+    updated: 'June 2026', alertBadge: '⚠ 2 Alerts',
+    desc: 'Repurchase rates across Shopee and TikTok Shop, broken down per product. Alerts fire on stagnant or declining rates.',
+    kpis: [
+      { lbl: 'Shopee Overall',      val: '42', u: '%', trend: 'up', t: '↑ +2pp MoM' },
+      { lbl: 'TikTok Overall',      val: '34', u: '%', trend: 'dn', t: '↓ −1pp MoM' },
+      { lbl: 'Best Product',        val: '52', u: '%', trend: 'up', t: '↑ Mangosteen Brightening Serum' },
+      { lbl: 'Products Declining',  val: '2',  u: '',  trend: 'dn', t: '↓ Micellar Water, Lip Butter' },
+    ],
+    alert: { type: 'amber', title: '2 Products Stagnant / Declining', body: 'Hydra Toner repurchase rate has dropped 4pp over 3 months on TikTok. Lip Tint (Coral) has been flat at 18–22% for 4 months — may indicate saturation.' },
+    rows: [
+      { name: 'Skincare | Mangosteen Brightening Serum',              shopee: 52, tt: 43, mom: '+2pp', st: 'g' },
+      { name: 'Skincare | Tropical Guava Barrier Moisture Gel',       shopee: 45, tt: 38, mom: '+1pp', st: 'g' },
+      { name: 'Skincare | White Tea Ultra-Light Protective Sun Serum',shopee: 48, tt: 41, mom: '+3pp', st: 'g' },
+      { name: 'Skincare | Blue Pea Purifying Micellar Water',         shopee: 38, tt: 29, mom: '−3pp', st: 'r' },
+      { name: 'Skincare | Java Black Tea Soothing Gel Cleanser',      shopee: 35, tt: 28, mom: '  0pp', st: 'n' },
+      { name: 'Skincare | Papua Red Fruit Plumping Cream',            shopee: 31, tt: 24, mom: '+1pp', st: 'g' },
+      { name: 'Skincare | Bali Green Coffee Espresso Eye Cream',      shopee: 29, tt: 21, mom: '−1pp', st: 'a' },
+      { name: 'Makeup | Illipe Plumping Lip Butter',                  shopee: 22, tt: 18, mom: '  0pp', st: 'a' },
+    ],
+  },
+
+  /* ── 1c. PRODUCTS SENTIMENT ─────────────────────────────── */
+  'products-sentiment': {
+    updated: 'June 2026', alertBadge: '⚠ 2 Alerts',
+    desc: 'AI-scored sentiment across key product attributes from Shopee and TikTok Shop reviews. Negative themes trigger alerts.',
+    kpis: [
+      { lbl: 'Avg Positive Score', val: '76', u: '%',  trend: 'dn', t: '↓ −3pp MoM' },
+      { lbl: 'Reviews Analysed',   val: '4,576', u: '', trend: 'up', t: '↑ +312 MoM' },
+      { lbl: 'Best Attribute',     val: 'Ingredients', u: '', trend: null },
+      { lbl: 'Active Alerts',      val: '2',  u: '',   trend: 'dn', t: '↓ Results, Price/Value' },
+    ],
+    alert: { type: 'red', title: 'Recurring Negatives: Results & Price/Value', body: '"Didn\'t see results after 2 weeks" appears in 18% of Hydra Toner reviews. Price/Value concerns are rising on Brightening Serum as competitors drop prices.' },
+    attrs: [
+      { name: 'Ingredients',  pct: 82, cls: ''       },
+      { name: 'Packaging',    pct: 80, cls: ''       },
+      { name: 'Texture',      pct: 76, cls: ''       },
+      { name: 'Results',      pct: 65, cls: 'warn'   },
+      { name: 'Price / Value',pct: 59, cls: 'danger' },
+    ],
+    quotes: [
+      { type: 'pos', text: '"Love the minimalist packaging — looks expensive on my shelf. Brightening effect on my serum is real!"', meta: 'Shopee · Brightening Serum · ★★★★★' },
+      { type: 'pos', text: '"The texture is so light, absorbs fast, doesn\'t leave residue. Perfect for humid weather."', meta: 'TikTok Shop · Daily Moisturizer · ★★★★★' },
+      { type: 'neg', text: '"Been using Hydra Toner for 3 weeks and my skin doesn\'t feel different at all. Expected more."', meta: 'Shopee · Hydra Toner · ★★★' },
+      { type: 'neg', text: '"It\'s fine but the price jumped 15k last month. Same Skintific quality at half the price now."', meta: 'TikTok Shop · Brightening Serum · ★★★' },
+    ],
+  },
+
+  /* ── 1d. SOCIAL LISTENING ───────────────────────────────── */
+  'social-listening': {
+    updated: 'June 2026', alertBadge: '🔥 1 Viral',
+    desc: 'Tracks brand and product mentions across X/Twitter and Threads. Surfaces trending topics, pain points, and viral discussions.',
+    kpis: [
+      { lbl: 'Total Mentions',   val: '2,341', u: '',  trend: 'up', t: '↑ +18% MoM' },
+      { lbl: 'X / Twitter',      val: '1,203', u: '',  trend: 'up', t: '↑ +210 MoM' },
+      { lbl: 'Threads',          val: '1,138', u: '',  trend: 'up', t: '↑ +163 MoM' },
+      { lbl: 'Sentiment Score',  val: '71',    u: '%', trend: 'st', t: '→ Positive' },
+    ],
+    viral: { type: 'green', title: '🔥 Viral Thread: "Glass Skin Routine ft. FTI Serum"', body: 'A Threads post by @glowwithriaka (224K followers) featuring FTI Brightening Serum in a glass skin routine has 12,300 engagements and is driving +40% search uplift. Monitor for potential stock impact.' },
+    topics: [
+      { topic: 'Brightening / glow results', mentions: 420, trend: '↑' },
+      { topic: 'Packaging & aesthetics',     mentions: 318, trend: '↑' },
+      { topic: 'Price point comparison',     mentions: 287, trend: '↑' },
+      { topic: 'Repurchase intent',          mentions: 241, trend: '→' },
+      { topic: 'Ingredient transparency',    mentions: 198, trend: '↑' },
+      { topic: 'Shipping & packaging damage',mentions: 134, trend: '↓' },
+      { topic: 'Shade range (Lip Tint)',     mentions: 112, trend: '↑' },
+    ],
+    pain: [
+      '"Serum feels sticky in humid weather — needs lighter formula"',
+      '"Toner bottle runs out too fast for the price"',
+      '"Only 2 shades for Lip Tint — need more options for NC40+ skin"',
+      '"Still waiting for Brightening Serum to restock on Shopee"',
+    ],
+  },
+
+  /* ── 2a. COMPETITOR ALERTS ──────────────────────────────── */
+  'competitor-alerts': {
+    updated: 'June 2026', alertBadge: '⚠ 3 Alerts',
+    desc: 'Significant movements in competitor sales and product rankings across Shopee and TikTok Shop. AI flags emerging threats.',
+    kpis: [
+      { lbl: 'Competitors Tracked',  val: '5',   u: '', trend: null },
+      { lbl: 'Active Alerts',        val: '3',   u: '', trend: 'dn', t: '↓ Needs response' },
+      { lbl: 'Trending Products',    val: '7',   u: '', trend: 'dn', t: '↓ Competitor launches' },
+      { lbl: 'FTI Rank (Shopee)',    val: '#4',  u: '', trend: 'dn', t: '↓ Was #3 last month' },
+    ],
+    alerts: [
+      { type: 'red',   comp: 'Skintific',  product: '5% Niacinamide Serum',    change: 'Entered Shopee Mall Top 3 skincare — up from #12. Sales volume +180% MoM. Price: Rp 89,000.' },
+      { type: 'red',   comp: 'Somethinc',  product: 'Niacinamide 10% + Zinc',  change: 'TikTok Shop #1 bestseller skincare for 3rd consecutive week. Live-selling sessions averaging 50K viewers.' },
+      { type: 'amber', comp: 'Avoskin',    product: 'Glazed Donut Toner',      change: 'Newly trending on Threads — 8K mentions in 2 weeks. Positioned directly against FTI Hydra Toner.' },
+    ],
+    table: [
+      { comp: 'Skintific',  product: '5% Niacinamide Serum',   platform: 'Shopee',      rank: '#2',  mom: '+180%', price: 'Rp 89K',  st: 'r' },
+      { comp: 'Somethinc',  product: 'Niacinamide 10% + Zinc', platform: 'TikTok Shop', rank: '#1',  mom: '+95%',  price: 'Rp 105K', st: 'r' },
+      { comp: 'Avoskin',    product: 'Glazed Donut Toner',     platform: 'Both',        rank: '#8',  mom: '+62%',  price: 'Rp 99K',  st: 'a' },
+      { comp: 'MS Glow',    product: 'Facial Wash Range',      platform: 'Shopee',      rank: '#5',  mom: '+12%',  price: 'Rp 75K',  st: 'n' },
+      { comp: 'Wardah',     product: 'Lightening Series',      platform: 'Both',        rank: '#9',  mom: '−8%',   price: 'Rp 65K',  st: 'g' },
+    ],
+  },
+
+  /* ── 2b. COMPETITOR SENTIMENTS ──────────────────────────── */
+  'competitor-sentiments': {
+    updated: 'June 2026', alertBadge: '⚠ FTI Behind on Results',
+    desc: 'FTI product sentiment benchmarked against top 2 competitors (Skintific, Somethinc) across key attributes from platform reviews.',
+    kpis: [
+      { lbl: 'FTI Overall',       val: '74', u: '%', trend: 'dn', t: '↓ −2pp MoM' },
+      { lbl: 'Skintific Overall', val: '79', u: '%', trend: 'up', t: '↑ +3pp MoM' },
+      { lbl: 'Somethinc Overall', val: '76', u: '%', trend: 'st', t: '→ Stable' },
+      { lbl: 'FTI Gap vs Best',   val: '−5', u: 'pp', trend: 'dn', t: '↓ Skintific leads' },
+    ],
+    alert: { type: 'red', title: 'FTI Trails on "Results" Attribute', body: 'FTI scores 65% positive on Results vs. Skintific\'s 80% and Somethinc\'s 75%. Customer feedback cites slower visible effect timelines. This is the primary driver of FTI\'s overall sentiment gap.' },
+    attrs: [
+      { name: 'Packaging',    fti: 80, sk: 77, so: 74 },
+      { name: 'Texture',      fti: 76, sk: 79, so: 78 },
+      { name: 'Ingredients',  fti: 82, sk: 81, so: 77 },
+      { name: 'Results',      fti: 65, sk: 80, so: 75 },
+      { name: 'Price / Value',fti: 68, sk: 72, so: 62 },
+    ],
+  },
+
+  /* ── 3a. TRENDS SIGNALS ─────────────────────────────────── */
+  'trends-signals': {
+    updated: 'June 2026', alertBadge: null,
+    desc: 'Monthly trend intelligence from global and Indonesian beauty publications and social channels.',
+    kpis: [
+      { lbl: 'Global Trends Rising',  val: '8',  u: '', trend: 'up', t: '↑ vs 5 last month' },
+      { lbl: 'Global Trends Falling', val: '3',  u: '', trend: null },
+      { lbl: 'IDN Trends Rising',     val: '6',  u: '', trend: 'up', t: '↑ vs 4 last month' },
+      { lbl: 'FTI Alignment',         val: '67', u: '%', trend: 'st', t: '→ See Relevance Score' },
+    ],
+    global: [
+      { name: 'Peptide Skincare',          score: 92, mom: '↑ +8', status: 'Rising fast' },
+      { name: 'Skin Barrier Repair',       score: 88, mom: '↑ +6', status: 'Rising fast' },
+      { name: 'Skinimalism',               score: 84, mom: '↑ +4', status: 'Rising' },
+      { name: 'Glass Skin',                score: 81, mom: '→  0', status: 'Stable peak' },
+      { name: 'SPF Everyday Wear',         score: 79, mom: '↑ +5', status: 'Rising' },
+      { name: 'Clean / Waterless Beauty',  score: 74, mom: '↑ +3', status: 'Rising' },
+      { name: 'Bold Colour Makeup',        score: 63, mom: '↓ −5', status: 'Declining' },
+      { name: 'Heavy Foundation',          score: 42, mom: '↓ −9', status: 'Declining fast' },
+    ],
+    indonesia: [
+      { name: 'Glass Skin',                   score: 95, mom: '↑ +5', status: 'Peak' },
+      { name: 'Natural / Herbal Ingredients', score: 90, mom: '↑ +7', status: 'Rising fast' },
+      { name: 'SPF Awareness',                score: 87, mom: '↑ +8', status: 'Rising fast' },
+      { name: 'Halal Certified Skincare',     score: 80, mom: '↑ +3', status: 'Rising' },
+      { name: 'Skinimalism',                  score: 72, mom: '↑ +6', status: 'Rising' },
+      { name: 'Skincare for Hijab Wearers',   score: 68, mom: '↑ +4', status: 'Niche rising' },
+      { name: 'Heavy Powder Makeup',          score: 38, mom: '↓ −8', status: 'Declining fast' },
+      { name: 'Multi-step AM routine',        score: 55, mom: '↓ −4', status: 'Declining' },
+    ],
+  },
+
+  /* ── 3b. FTI RELEVANCE SCORE ────────────────────────────── */
+  'fti-relevance-score': {
+    updated: 'June 2026', alertBadge: '⚠ Gaps Found',
+    desc: 'AI-generated score measuring how closely FTI\'s product portfolio aligns with today\'s top beauty trends.',
+    kpis: [
+      { lbl: 'Overall Score',      val: '67', u: '/100', trend: 'dn', t: '↓ −3pts MoM' },
+      { lbl: 'Highest Category',   val: 'Packaging', u: '', trend: null },
+      { lbl: 'Lowest Category',    val: 'Ingredients', u: '', trend: null },
+      { lbl: 'Urgent Gaps',        val: '3', u: '', trend: 'dn', t: '↓ Peptide, Barrier, SPF' },
+    ],
+    alert: { type: 'amber', title: 'Score Declined 3pts — Peptide & Barrier Repair Gap Widening', body: 'Global peptide and barrier repair trends grew 8pts this month while FTI has no peptide-forward product. Score will continue declining unless portfolio gap is addressed.' },
+    categories: [
+      { name: 'Packaging',       score: 74, note: 'Minimalist aesthetic aligns well' },
+      { name: 'Claims',          score: 72, note: 'Brightening claims align with glass skin trend' },
+      { name: 'Product Format',  score: 70, note: 'Serum & toner formats are on-trend' },
+      { name: 'Consumer Need',   score: 68, note: 'Hydration and brightening needs covered' },
+      { name: 'Ingredients',     score: 55, note: 'No peptide, limited niacinamide SKUs' },
+    ],
+    gaps: [
+      { trend: 'Peptide Skincare',    trendScore: 92, ftiScore: 38, opp: 'High' },
+      { trend: 'Skin Barrier Repair', trendScore: 88, ftiScore: 42, opp: 'High' },
+      { trend: 'SPF Everyday Wear',   trendScore: 87, ftiScore: 55, opp: 'Medium' },
+      { trend: 'Halal Certified',     trendScore: 80, ftiScore: 60, opp: 'Medium' },
+    ],
+    recs: [
+      'Develop a peptide-active serum SKU — aligns with top global & IDN trends',
+      'Add barrier repair claims to Hydra Toner marketing and reformulate for ceramide inclusion',
+      'Consider SPF 30+ version of Daily Moisturizer (SPF Awareness trend growing 8pts IDN)',
+    ],
+  },
+
+  /* ── 4a. SELF-CARE ──────────────────────────────────────── */
+  'self-care': {
+    updated: 'Q1 2026', alertBadge: null,
+    catName: 'Self-Care',
+    desc: 'Market size and growth data for the self-care category (skincare, body care, personal wellness) in Indonesia.',
+    kpis: [
+      { lbl: 'Market Size',        val: 'IDR 8,400', u: 'bn', trend: 'up', t: '↑ YoY growth' },
+      { lbl: 'YoY Growth',         val: '14.2', u: '%',   trend: 'up', t: '↑ vs 11.4% last yr' },
+      { lbl: '3Y CAGR',            val: '11.8', u: '%',   trend: null },
+      { lbl: 'Beauty Industry Share', val: '34', u: '%',  trend: 'up', t: '↑ Largest category' },
+    ],
+    subcats: [
+      { name: 'Facial Serum',       growth: 28, size: 'IDR 1,820bn' },
+      { name: 'Sunscreen',          growth: 31, size: 'IDR 1,540bn' },
+      { name: 'Face Toner',         growth: 22, size: 'IDR 1,120bn' },
+      { name: 'Moisturiser',        growth: 18, size: 'IDR 2,100bn' },
+      { name: 'Face Wash',          growth: 10, size: 'IDR 1,820bn' },
+    ],
+    summary: 'Self-care is the largest and fastest-growing segment in Indonesian beauty. Facial serum and sunscreen are outpacing the overall category — both areas where FTI has existing presence. Moisturiser remains the largest subcategory by market size.',
+  },
+
+  /* ── 4b. MAKEUP ─────────────────────────────────────────── */
+  'makeup': {
+    updated: 'Q1 2026', alertBadge: null,
+    catName: 'Makeup',
+    desc: 'Market size and growth data for the makeup category in Indonesia.',
+    kpis: [
+      { lbl: 'Market Size',           val: 'IDR 6,200', u: 'bn', trend: 'up', t: '↑ YoY growth' },
+      { lbl: 'YoY Growth',            val: '8.5',  u: '%',  trend: 'up', t: '↑ vs 6.1% last yr' },
+      { lbl: '3Y CAGR',               val: '7.2',  u: '%',  trend: null },
+      { lbl: 'Beauty Industry Share', val: '25',   u: '%',  trend: 'st', t: '→ Stable' },
+    ],
+    subcats: [
+      { name: 'Eyebrow Products',  growth: 18, size: 'IDR 540bn' },
+      { name: 'Lip Products',      growth: 15, size: 'IDR 1,860bn' },
+      { name: 'BB / CC Cream',     growth: 12, size: 'IDR 1,240bn' },
+      { name: 'Blush / Bronzer',   growth: 11, size: 'IDR 680bn' },
+      { name: 'Foundation',        growth:  6, size: 'IDR 1,880bn' },
+    ],
+    summary: 'Makeup growth is solid but slower than self-care. Lip products and eyebrow are the fastest risers, aligned with post-pandemic social activity recovery. Foundation remains the largest subcategory but is growing at a slower clip.',
+  },
+
+  /* ── 4c. LIFESTYLE & MERCHANDISE ───────────────────────── */
+  'lifestyle-merchandise': {
+    updated: 'Q1 2026', alertBadge: null,
+    catName: 'Lifestyle & Merchandise',
+    desc: 'Market data for branded lifestyle and merchandise products (tote bags, pouches, accessories) in Indonesia.',
+    kpis: [
+      { lbl: 'Market Size',          val: 'IDR 2,100', u: 'bn', trend: 'up', t: '↑ YoY growth' },
+      { lbl: 'YoY Growth',           val: '22.3', u: '%',  trend: 'up', t: '↑ Fastest growing' },
+      { lbl: '3Y CAGR',              val: '19.1', u: '%',  trend: null },
+      { lbl: 'Purchase Penetration', val: '18',   u: '%',  trend: 'up', t: '↑ vs 13% last yr' },
+    ],
+    subcats: [
+      { name: 'Branded Tote Bags',    growth: 34, size: 'IDR 620bn' },
+      { name: 'Cosmetic Pouches',     growth: 28, size: 'IDR 480bn' },
+      { name: 'Accessories & Charms', growth: 21, size: 'IDR 340bn' },
+      { name: 'Apparel Collabs',      growth: 18, size: 'IDR 410bn' },
+      { name: 'Stationery / Prints',  growth: 12, size: 'IDR 250bn' },
+    ],
+    summary: 'Lifestyle and merchandise is the smallest but fastest-growing category. Brand-led collaborations and limited edition drops are key drivers. Purchase penetration jumped 5pp YoY, suggesting the audience for lifestyle extensions is maturing quickly.',
+  },
+
+  /* ── 5a. CONSUMER CONFIDENCE ────────────────────────────── */
+  'consumer-confidence': {
+    updated: 'June 2026', alertBadge: null,
+    desc: 'Bank Indonesia Consumer Confidence Index (CCI) and its correlation with beauty and personal care spending.',
+    kpis: [
+      { lbl: 'Current CCI',      val: '108.3', u: '',   trend: 'up', t: '↑ +1.2 vs May' },
+      { lbl: 'CCI Threshold',    val: '100',   u: '',   trend: null },
+      { lbl: 'Status',           val: 'Optimistic', u: '', trend: null },
+      { lbl: 'Beauty Spending',  val: '+12',   u: '%',  trend: 'up', t: '↑ Core FTI segment' },
+    ],
+    history: [
+      { month: 'Jan 2026', cci: 112.1, beauty: '+14%' },
+      { month: 'Feb 2026', cci: 109.8, beauty: '+12%' },
+      { month: 'Mar 2026', cci: 106.2, beauty: '+10%' },
+      { month: 'Apr 2026', cci: 104.5, beauty: '+9%'  },
+      { month: 'May 2026', cci: 107.1, beauty: '+11%' },
+      { month: 'Jun 2026', cci: 108.3, beauty: '+12%' },
+    ],
+    ai: 'Consumer confidence has stabilised after an April dip driven by election uncertainty, now recovering toward Q1 peaks. FTI\'s core segment (urban females 22–35) shows 12% higher purchase intent for skincare this month. A CCI above 105 has historically correlated with 10–15% beauty spend growth — current conditions are favourable. Watch for any CCI dip below 100, which has preceded spending pullbacks within 6–8 weeks.',
+  },
+
+  /* ── 5b. INFLATION RATE ─────────────────────────────────── */
+  'inflation-rate': {
+    updated: 'June 2026', alertBadge: '✓ Within Range',
+    desc: 'National inflation rate and its projected impact on consumer purchasing power and discretionary beauty spending.',
+    kpis: [
+      { lbl: 'Current Rate',     val: '2.8', u: '%', trend: 'st', t: '→ Stable MoM' },
+      { lbl: 'Alert Threshold',  val: '4.0', u: '%', trend: null },
+      { lbl: 'Headroom',         val: '1.2', u: 'pp', trend: null },
+      { lbl: 'Status',           val: 'Safe', u: '',  trend: 'up', t: '↑ No impact expected' },
+    ],
+    history: [
+      { month: 'Jan 2026', rate: 3.2, impact: 'Low' },
+      { month: 'Feb 2026', rate: 3.0, impact: 'Low' },
+      { month: 'Mar 2026', rate: 2.9, impact: 'Low' },
+      { month: 'Apr 2026', rate: 2.7, impact: 'Low' },
+      { month: 'May 2026', rate: 2.8, impact: 'Low' },
+      { month: 'Jun 2026', rate: 2.8, impact: 'Low' },
+    ],
+    ai: 'Inflation at 2.8% remains well below the 4.0% threshold at which discretionary beauty spending historically contracts. Products in the Rp 50K–200K range (FTI\'s core price band) are showing stable demand. Premium SKUs above Rp 500K are experiencing mild 8% softening. If inflation breaches 3.5%, expect downtrading pressure on FTI\'s higher-priced items first. Current trajectory is stable — no immediate action required.',
+  },
+
+  /* ── 5c. PEAK SEASON ALERT ──────────────────────────────── */
+  'peak-season-alert': {
+    updated: 'June 2026', alertBadge: '⚠ 7.7 Sale in 12 Days',
+    desc: 'Upcoming peak shopping periods with historical sales uplift data and demand forecasts per platform.',
+    kpis: [
+      { lbl: 'Next Peak',        val: '7.7 Sale', u: '',   trend: 'dn', t: '↓ Jul 7 — 12 days' },
+      { lbl: 'Exp. Uplift',      val: '+85',      u: '%',  trend: null },
+      { lbl: 'Biggest Ever',     val: '11.11',    u: '',   trend: null },
+      { lbl: '11.11 Uplift',     val: '+210',     u: '%',  trend: 'up', t: '↑ Historical avg' },
+    ],
+    alert: { type: 'red', title: '7.7 Sale — 12 Days Away', body: 'Prepare campaign assets, stock buffer, and TikTok live-selling slots now. Historical 7.7 uplift is +85% on TikTok Shop. Last year FTI stocked out of Brightening Serum within 6 hours of the sale start.' },
+    events: [
+      { name: '7.7 Sale',              date: 'Jul 7, 2026',  days: 12,  urgency: 'urgent', uplift: '+85%'  },
+      { name: '8.8 Sale',              date: 'Aug 8, 2026',  days: 44,  urgency: 'medium', uplift: '+70%'  },
+      { name: '9.9 Sale',              date: 'Sep 9, 2026',  days: 76,  urgency: 'normal', uplift: '+95%'  },
+      { name: '10.10 Sale',            date: 'Oct 10, 2026', days: 107, urgency: 'normal', uplift: '+115%' },
+      { name: '11.11 Sale',            date: 'Nov 11, 2026', days: 139, urgency: 'normal', uplift: '+210%' },
+      { name: 'Christmas / New Year',  date: 'Dec 25, 2026', days: 183, urgency: 'normal', uplift: '+130%' },
+    ],
+    history: [
+      { event: 'Ramadan 2026',  shopee: '+155%', tt: '+135%', combined: '+145%' },
+      { event: 'Eid 2026',      shopee: '+160%', tt: '+170%', combined: '+165%' },
+      { event: '11.11 2025',    shopee: '+195%', tt: '+225%', combined: '+210%' },
+      { event: '12.12 2025',    shopee: '+170%', tt: '+190%', combined: '+180%' },
+      { event: '7.7 2025',      shopee: '+75%',  tt: '+95%',  combined: '+85%'  },
+    ],
+  },
+};
+
+/* ════════════════════════════════════════════════════════════════
+ * SUPABASE CLIENT
+ * ════════════════════════════════════════════════════════════════ */
+const _sb = supabase.createClient(
+  'https://sgyrqofwcwkbcnmrardf.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNneXJxb2Z3Y3drYmNubXJhcmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2OTQ3MzgsImV4cCI6MjA5ODI3MDczOH0.yDcwD9iQJePoBpLt5wR96ZkqoZvMV1VSvzEX0THp2tE'
+);
+
+/* ════════════════════════════════════════════════════════════════
+ * DATA LOADER — fetches from Supabase, falls back to MOCK_DATA
+ * ════════════════════════════════════════════════════════════════ */
+async function loadData() {
+  try {
+    const { data, error } = await _sb.from('market_intelligence').select('id, data');
+    if (error || !data || data.length === 0) return MOCK_DATA;
+    return Object.fromEntries(data.map(row => [row.id, row.data]));
+  } catch (e) {
+    return MOCK_DATA;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * HELPERS
+ * ════════════════════════════════════════════════════════════════ */
+const H = {
+  badge(type, text) {
+    if (!type) return '';
+    const cls = { red:'b-red', green:'b-green', amber:'b-amber', gray:'b-gray' }[type] || 'b-gray';
+    return `<span class="badge ${cls}">${text}</span>`;
+  },
+  statusChip(s) {
+    const map = { r:['st-r','⚠ Alert'], a:['st-a','→ Watch'], g:['st-g','✓ Good'], n:['st-n','— Stable'] };
+    const [cls, txt] = map[s] || map.n;
+    return `<span class="st ${cls}">${txt}</span>`;
+  },
+  trendCell(v) {
+    if (!v) return '—';
+    const c = v.trim().startsWith('+') ? 'tup' : v.trim().startsWith('−') || v.trim().startsWith('-') ? 'tdn' : 'tst';
+    return `<span class="${c}">${v}</span>`;
+  },
+  kpi({ lbl, val, u, trend, t }) {
+    const tc = trend === 'up' ? 'tup' : trend === 'dn' ? 'tdn' : 'tst';
+    return `<div class="kpi">
+      <div class="kpi-lbl">${lbl}</div>
+      <div class="kpi-val">${val}<span class="u"> ${u||''}</span></div>
+      ${t ? `<div class="kpi-trend ${tc}">${t}</div>` : ''}
+    </div>`;
+  },
+  kpiRow(kpis) { return `<div class="kpi-row">${kpis.map(H.kpi).join('')}</div>`; },
+  blk(title, body) { return `<div class="blk"><div class="blk-hd">${title}</div><div class="blk-body">${body}</div></div>`; },
+  table(heads, rows) {
+    const ths = heads.map(h => `<th>${h}</th>`).join('');
+    const trs = rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
+    return `<table class="tbl"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+  },
+  bars(items) {
+    return items.map(({ name, pct, cls }) => `<div class="brow">
+      <span class="blbl">${name}</span>
+      <div class="btrack"><div class="bfill ${cls||''}" style="width:${pct}%"></div></div>
+      <span class="bpct">${pct}%</span>
+    </div>`).join('');
+  },
+  callout({ type, title, body }) {
+    return `<div class="callout ${type}"><div class="c-title">${title}</div><div class="c-body">${body}</div></div>`;
+  },
+  vh(title, desc, updated, alertBadge, badgeType) {
+    const aBadge = alertBadge
+      ? H.badge(badgeType || (alertBadge.startsWith('⚠') ? 'red' : alertBadge.startsWith('✓') ? 'green' : alertBadge.startsWith('🔥') ? 'amber' : 'gray'), alertBadge)
+      : '';
+    return `<div class="vh">
+      <div class="vh-top">
+        <div class="vh-title">${title}</div>
+        <div class="vh-badges">${H.badge('gray','Updated '+updated)}${aBadge}</div>
+      </div>
+      <div class="vh-desc">${desc}</div>
+    </div>`;
+  },
+};
+
+/* ════════════════════════════════════════════════════════════════
+ * VIEW RENDERERS
+ * ════════════════════════════════════════════════════════════════ */
+
+function vReviewScore(d) {
+  const platformRows = d.byPlatform.map(p => [
+    `<span class="fw">${p.name}</span>`,
+    `<span class="fw">${p.score}</span> / 5`,
+    p.reviews.toLocaleString(),
+    H.trendCell(p.mom),
+    H.statusChip(p.st),
+  ]);
+  const productRows = d.byProduct.map(p => [
+    p.name,
+    `<span class="fw">${p.score}</span> / 5`,
+    p.reviews.toLocaleString(),
+    H.trendCell(p.mom),
+    H.statusChip(p.st),
+  ]);
+  return H.vh('Review Score', d.desc, d.updated, d.alertBadge)
+    + H.callout(d.alert)
+    + H.kpiRow(d.kpis)
+    + H.blk('By Platform', H.table(['Platform','Score','Reviews','MoM Change','Status'], platformRows))
+    + H.blk('By Product', H.table(['Product','Score','Reviews','MoM Change','Status'], productRows));
+}
+
+function vRepurchaseRate(d) {
+  const rows = d.rows.map(r => [
+    r.name,
+    `<span class="fw">${r.shopee}%</span>`,
+    `<span class="fw">${r.tt}%</span>`,
+    H.trendCell(r.mom),
+    H.statusChip(r.st),
+  ]);
+  return H.vh('Repurchase Rate', d.desc, d.updated, d.alertBadge)
+    + H.callout(d.alert)
+    + H.kpiRow(d.kpis)
+    + H.blk('Repurchase Rate by Product', H.table(['Product','Shopee Rate','TikTok Rate','MoM Trend','Status'], rows));
+}
+
+function vProductsSentiment(d) {
+  const bars = H.bars(d.attrs.map(a => ({ name: a.name, pct: a.pct, cls: a.cls })));
+  const quotes = d.quotes.map(q =>
+    `<div class="quote ${q.type}"><div class="q-text">"${q.text}"</div><div class="q-meta">${q.meta}</div></div>`
+  ).join('');
+  return H.vh('Products Sentiment', d.desc, d.updated, d.alertBadge)
+    + H.callout(d.alert)
+    + H.kpiRow(d.kpis)
+    + H.blk('Sentiment by Attribute — % Positive Reviews', bars)
+    + H.blk('Representative Customer Quotes', quotes);
+}
+
+function vSocialListening(d) {
+  const topicRows = d.topics.map(t => [
+    t.topic,
+    `<span class="fw">${t.mentions.toLocaleString()}</span>`,
+    t.trend,
+  ]);
+  const painList = d.pain.map(p => `<div class="quote neg"><div class="q-text">${p}</div></div>`).join('');
+  return H.vh('Social Listening', d.desc, d.updated, d.alertBadge)
+    + H.callout(d.viral)
+    + H.kpiRow(d.kpis)
+    + H.blk('Top Discussed Topics', H.table(['Topic','Mentions','Trend'], topicRows))
+    + H.blk('Common Pain Points', painList);
+}
+
+function vCompetitorAlerts(d) {
+  const alerts = d.alerts.map(a =>
+    `<div class="callout ${a.type}">
+      <div class="c-title">${a.comp} — ${a.product}</div>
+      <div class="c-body">${a.change}</div>
+    </div>`
+  ).join('');
+  const rows = d.table.map(r => [
+    `<span class="fw">${r.comp}</span>`,
+    r.product,
+    r.platform,
+    r.rank,
+    H.trendCell(r.mom),
+    r.price,
+    H.statusChip(r.st),
+  ]);
+  return H.vh('Competitor Alerts', d.desc, d.updated, d.alertBadge)
+    + H.kpiRow(d.kpis)
+    + H.blk('Active Alerts', alerts)
+    + H.blk('Competitor Overview', H.table(['Brand','Product','Platform','Rank','Sales MoM','Price','Status'], rows));
+}
+
+function vCompetitorSentiments(d) {
+  const bars = d.attrs.map(attr => {
+    const ftiLow = attr.fti < attr.sk && attr.fti < attr.so;
+    return `<div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:#333;margin-bottom:6px">${attr.name}</div>
+      <div class="brow"><span class="blbl" style="min-width:80px">FTI</span>
+        <div class="btrack"><div class="bfill ${ftiLow ? 'danger' : ''}" style="width:${attr.fti}%"></div></div>
+        <span class="bpct">${attr.fti}%</span></div>
+      <div class="brow"><span class="blbl" style="min-width:80px">Skintific</span>
+        <div class="btrack"><div class="bfill" style="width:${attr.sk}%;background:#7B68EE"></div></div>
+        <span class="bpct">${attr.sk}%</span></div>
+      <div class="brow"><span class="blbl" style="min-width:80px">Somethinc</span>
+        <div class="btrack"><div class="bfill" style="width:${attr.so}%;background:#20B2AA"></div></div>
+        <span class="bpct">${attr.so}%</span></div>
+    </div>`;
+  }).join('');
+  const legend = `<div style="display:flex;gap:16px;margin-bottom:14px;font-size:11.5px;font-weight:600">
+    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--olive);margin-right:5px;vertical-align:middle"></span>FTI</span>
+    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#7B68EE;margin-right:5px;vertical-align:middle"></span>Skintific</span>
+    <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#20B2AA;margin-right:5px;vertical-align:middle"></span>Somethinc</span>
+  </div>`;
+  return H.vh('Competitor Sentiments', d.desc, d.updated, d.alertBadge)
+    + H.callout(d.alert)
+    + H.kpiRow(d.kpis)
+    + H.blk('Attribute Sentiment Comparison — % Positive', legend + bars);
+}
+
+function vTrendsSignals(d) {
+  const mkTable = rows => H.table(
+    ['Trend Name', 'Momentum Score', 'MoM Change', 'Status'],
+    rows.map(r => [
+      `<span class="fw">${r.name}</span>`,
+      `<span class="fw">${r.score}</span> / 100`,
+      H.trendCell(r.mom),
+      r.score >= 80 ? `<span class="st st-r">${r.status}</span>` : r.score >= 65 ? `<span class="st st-a">${r.status}</span>` : `<span class="st st-n">${r.status}</span>`,
+    ])
+  );
+  return H.vh('Trends Signals', d.desc, d.updated, d.alertBadge)
+    + H.kpiRow(d.kpis)
+    + `<div class="two-col">
+        ${H.blk('🌍 Global Beauty Trends', mkTable(d.global))}
+        ${H.blk('🇮🇩 Indonesia Trends', mkTable(d.indonesia))}
+      </div>`;
+}
+
+function vRelevanceScore(d) {
+  const catBars = H.bars(d.categories.map(c => ({
+    name: `${c.name} <small style="color:var(--muted);font-weight:400">${c.note}</small>`,
+    pct: c.score,
+    cls: c.score < 60 ? 'danger' : c.score < 70 ? 'warn' : '',
+  })));
+  const gapRows = d.gaps.map(g => [
+    `<span class="fw">${g.trend}</span>`,
+    g.trendScore,
+    `<span class="${g.ftiScore < 50 ? 'tdn fw' : 'tst'}">${g.ftiScore}</span>`,
+    g.opp === 'High' ? `<span class="st st-r">High</span>` : `<span class="st st-a">Medium</span>`,
+  ]);
+  const recList = d.recs.map(r => `<div class="quote pos"><div class="q-text">${r}</div></div>`).join('');
+  const bigScore = `<div class="blk">
+    <div class="score-wrap">
+      <div class="score-num">${d.kpis[0].val}<span class="score-den"> /100</span></div>
+      <div class="score-lbl">Overall FTI Trend Alignment Score — June 2026</div>
+    </div>
+  </div>`;
+  return H.vh('FTI Relevance Score', d.desc, d.updated, d.alertBadge)
+    + H.callout(d.alert)
+    + H.kpiRow(d.kpis)
+    + bigScore
+    + H.blk('Score by Trend Category', catBars)
+    + H.blk('High-Opportunity Gaps (FTI Under-indexed)', H.table(['Trend','Trend Score','FTI Score','Opportunity'], gapRows))
+    + H.blk('Recommendations', recList);
+}
+
+function vCategory(d) {
+  const subcatRows = d.subcats.map(s => [
+    s.name,
+    s.size,
+    `<span class="fw tup">+${s.growth}%</span>`,
+  ]);
+  return H.vh(d.catName, d.desc, d.updated, d.alertBadge)
+    + H.kpiRow(d.kpis)
+    + H.blk(`${d.catName} — Top Growing Sub-Categories`, H.table(['Sub-Category', 'Est. Market Size', 'YoY Growth'], subcatRows))
+    + H.blk('Market Summary', `<div class="ai-box"><div class="ai-lbl">Summary</div><div class="ai-text">${d.summary}</div></div>`);
+}
+
+function vConsumerConfidence(d) {
+  const histRows = d.history.map(h => [h.month, h.cci, h.beauty]);
+  return H.vh('Consumer Confidence', d.desc, d.updated, d.alertBadge)
+    + H.kpiRow(d.kpis)
+    + H.blk('CCI Historical (Last 6 Months)', H.table(['Month','CCI','Beauty Spend YoY'], histRows))
+    + H.blk('AI Insight', `<div class="ai-box"><div class="ai-lbl">AI Summary</div><div class="ai-text">${d.ai}</div></div>`);
+}
+
+function vInflationRate(d) {
+  const histRows = d.history.map(h => [h.month, h.rate + '%', h.impact]);
+  return H.vh('Inflation Rate', d.desc, d.updated, d.alertBadge)
+    + H.kpiRow(d.kpis)
+    + `<div class="callout green"><div class="c-title">✓ Within Safe Range — No Immediate Impact on Beauty Spending</div><div class="c-body">Current rate of 2.8% is 1.2pp below the alert threshold of 4.0%. Stable for the past 3 months.</div></div>`
+    + H.blk('Inflation Rate Historical', H.table(['Month','Rate','Beauty Impact'], histRows))
+    + H.blk('AI Insight', `<div class="ai-box"><div class="ai-lbl">AI Summary</div><div class="ai-text">${d.ai}</div></div>`);
+}
+
+function vPeakSeason(d) {
+  const cards = d.events.map(e => `
+    <div class="cd-card ${e.urgency}">
+      <div class="cd-event">${e.name}</div>
+      <div class="cd-date">${e.date}</div>
+      <div class="cd-num">${e.days} <span class="cd-unit">days</span></div>
+      <div class="cd-uplift">Avg uplift ${e.uplift}</div>
+    </div>`).join('');
+  const histRows = d.history.map(h => [h.event, h.shopee, h.tt, h.combined]);
+  return H.vh('Peak Season Alert', d.desc, d.updated, d.alertBadge)
+    + H.callout(d.alert)
+    + H.kpiRow(d.kpis)
+    + H.blk('Upcoming Peak Events', `<div class="cd-grid">${cards}</div>`)
+    + H.blk('Historical Sales Uplift', H.table(['Event','Shopee','TikTok Shop','Combined'], histRows));
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * ROUTER
+ * ════════════════════════════════════════════════════════════════ */
+const VIEWS = {
+  'review-score':         d => vReviewScore(d),
+  'repurchase-rate':      d => vRepurchaseRate(d),
+  'products-sentiment':   d => vProductsSentiment(d),
+  'social-listening':     d => vSocialListening(d),
+  'competitor-alerts':    d => vCompetitorAlerts(d),
+  'competitor-sentiments':d => vCompetitorSentiments(d),
+  'trends-signals':       d => vTrendsSignals(d),
+  'fti-relevance-score':  d => vRelevanceScore(d),
+  'self-care':            d => vCategory(d),
+  'makeup':               d => vCategory(d),
+  'lifestyle-merchandise':d => vCategory(d),
+  'consumer-confidence':  d => vConsumerConfidence(d),
+  'inflation-rate':       d => vInflationRate(d),
+  'peak-season-alert':    d => vPeakSeason(d),
+};
+
+let DATA = {};
+let activeId = null;
+
+const CUSTOMER_IDS = ['review-score', 'repurchase-rate', 'products-sentiment', 'social-listening'];
+
+function navigate(id) {
+  if (!DATA[id]) return;
+  activeId = id;
+  document.querySelectorAll('.sb-item').forEach(el =>
+    el.classList.toggle('active', el.dataset.id === id)
+  );
+  const content = document.getElementById('content');
+  content.innerHTML = VIEWS[id](DATA[id]);
+  if (CUSTOMER_IDS.includes(id)) {
+    content.querySelectorAll('.kpi, .blk-body').forEach(el => {
+      el.classList.add('wip-el');
+      const label = document.createElement('div');
+      label.className = 'wip-label';
+      label.textContent = 'On Progress';
+      el.appendChild(label);
+    });
+  }
+  content.scrollTop = 0;
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * SIDEBAR RENDER
+ * ════════════════════════════════════════════════════════════════ */
+function renderSidebar() {
+  document.getElementById('sidebar').innerHTML = SIDEBAR.map(group => `
+    <div class="sb-group" id="grp-${group.id}">
+      <div class="sb-hd" onclick="toggleGroup('${group.id}')">
+        <span class="sb-num">${group.num}</span>
+        <span class="sb-name">${group.name}</span>
+        <span class="sb-chev">▼</span>
+      </div>
+      <div class="sb-items">
+        ${group.items.map(item => `
+          <div class="sb-item" data-id="${item.id}" onclick="navigate('${item.id}')">
+            ${item.label}
+            ${item.alert ? '<span class="sb-dot"></span>' : ''}
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function toggleGroup(id) {
+  document.getElementById('grp-' + id).classList.toggle('closed');
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * INIT
+ * ════════════════════════════════════════════════════════════════ */
+async function init() {
+  // Nav tabs
+  document.getElementById('nav-tabs').innerHTML = NAV_TABS
+    .map(t => `<li class="nav-tab${t.active ? ' active' : ''}">${t.label}</li>`)
+    .join('');
+
+  // Sidebar
+  renderSidebar();
+
+  // Load data
+  DATA = await loadData();
+
+  // Default to first view
+  navigate('review-score');
+}
+
+init();
+</script>
+</body>
+</html>
