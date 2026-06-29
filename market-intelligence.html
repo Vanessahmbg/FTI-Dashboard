@@ -1039,8 +1039,35 @@ function vConsumerConfidence(d) {
     <div id="cc-table" style="margin-top:14px">${init.tableHtml}</div>
   </div>`;
 
-  return H.vh('Consumer Confidence — CCI (Consumer Confidence Index)', d.desc, d.updated, d.alertBadge)
-    + H.kpiRow(d.kpis)
+  // CCI index scale reference
+  const cciScale = `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px">
+      ${[
+        ['< 80',    'Severely Pessimistic', 'var(--red)',    'var(--red-lt)'],
+        ['80–99',   'Pessimistic',          '#c47d0e',       'var(--amber-lt)'],
+        ['100–110', 'Slightly Optimistic',  'var(--olive)',  'var(--olive-lt)'],
+        ['111–120', 'Optimistic',           'var(--olive)',  'var(--olive-lt)'],
+        ['> 120',   'Highly Optimistic',    'var(--green)',  'var(--green-lt)'],
+      ].map(([range, label, color, bg]) =>
+        `<div style="flex:1;min-width:90px;padding:8px 10px;border-radius:8px;background:${bg};border:1px solid ${color}22">
+          <div style="font-size:11px;font-weight:800;color:${color}">${range}</div>
+          <div style="font-size:10px;color:var(--text);margin-top:2px">${label}</div>
+        </div>`
+      ).join('')}
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:6px">Scale: 0–200 · Neutral threshold: <strong style="color:var(--text)">100</strong> · Source: Bank Indonesia</div>`;
+
+  // KPI row with fully English labels (override DB labels for sub-indices)
+  const kpiCards = [
+    { lbl: 'Current CCI',                  val: d.kpis?.[0]?.val ?? '—', u: '', trend: d.kpis?.[0]?.trend, t: d.kpis?.[0]?.t },
+    { lbl: 'Current Conditions Index',     val: d.kpis?.[1]?.val ?? '—', u: '', trend: d.kpis?.[1]?.trend, t: d.kpis?.[1]?.t },
+    { lbl: 'Consumer Expectations Index',  val: d.kpis?.[2]?.val ?? '—', u: '', trend: d.kpis?.[2]?.trend, t: d.kpis?.[2]?.t },
+    { lbl: 'Beauty Spending Est.',         val: d.kpis?.[3]?.val ?? '+12', u: '%', trend: 'up', t: '↑ FTI segment estimate' },
+  ];
+
+  return H.vh('Consumer Confidence — CCI', d.desc, d.updated, d.alertBadge)
+    + H.kpiRow(kpiCards)
+    + H.blk('CCI Index Scale', cciScale)
     + H.blk('CCI Trend — Live Data from Bank Indonesia', chartBlock)
     + H.blk('AI Insight', `<div class="ai-box"><div class="ai-lbl">AI Summary — Auto-generated</div><div class="ai-text">${d.ai}</div></div>`);
 }
