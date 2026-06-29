@@ -1113,12 +1113,227 @@ function vConsumerConfidence(d) {
 }
 
 function vInflationRate(d) {
-  const histRows = d.history.map(h => [h.month, h.rate + '%', h.impact]);
-  return H.vh('Inflation Rate', d.desc, d.updated, d.alertBadge)
+  const allHistory = d.history || [];
+  window.__irHistory = allHistory;
+
+  window.irHover = function(evt) {
+    const svg = document.getElementById('ir-svg');
+    const tip = document.getElementById('ir-tip');
+    const cross = document.getElementById('ir-cross');
+    const hdot = document.getElementById('ir-hdot');
+    if (!svg || !tip) return;
+    const rect = svg.getBoundingClientRect();
+    const mx = (evt.clientX - rect.left) * (560 / rect.width);
+    const data = window.__irPts || [];
+    if (!data.length) return;
+    let near = data[0];
+    data.forEach(p => { if (Math.abs(p.x - mx) < Math.abs(near.x - mx)) near = p; });
+    if (cross) { cross.setAttribute('x1', near.x); cross.setAttribute('x2', near.x); cross.setAttribute('opacity','0.5'); }
+    if (hdot)  { hdot.setAttribute('cx', near.x); hdot.setAttribute('cy', near.y); hdot.setAttribute('opacity','1'); }
+    const wrap = document.getElementById('ir-wrap');
+    const wr = wrap ? wrap.getBoundingClientRect() : rect;
+    let lft = evt.clientX - wr.left + 14;
+    let top = evt.clientY - wr.top - 58;
+    if (lft + 120 > wr.width) lft -= 140;
+    const col = near.rate <= 3.5 ? 'var(--olive)' : near.rate <= 5 ? 'var(--amber)' : 'var(--red)';
+    const st  = near.rate <= 1.5 ? 'Below Target' : near.rate <= 3.5 ? 'Within BI Target' : near.rate <= 5 ? 'Above Target' : 'High Inflation';
+    tip.style.cssText = `display:block;position:absolute;left:${lft}px;top:${top}px;background:white;border:1.5px solid var(--g3);border-radius:8px;padding:6px 10px;box-shadow:0 2px 10px rgba(0,0,0,.1);pointer-events:none;z-index:99`;
+    tip.innerHTML = `<div style="font-size:10px;color:var(--muted);font-weight:600">${near.month}</div><div style="font-size:15px;font-weight:800;color:${col}">${near.rate}%</div><div style="font-size:9px;color:var(--muted);margin-top:1px">${st}</div>`;
+  };
+  window.irHoverOut = function() {
+    const tip = document.getElementById('ir-tip');
+    const cross = document.getElementById('ir-cross');
+    const hdot = document.getElementById('ir-hdot');
+    if (tip)   tip.style.display = 'none';
+    if (cross) cross.setAttribute('opacity','0');
+    if (hdot)  hdot.setAttribute('opacity','0');
+  };
+
+  function renderIRPeriod(period) {
+    let filtered = allHistory;
+    if      (period === '1m') filtered = allHistory.slice(-1);
+    else if (period === '3m') filtered = allHistory.slice(-3);
+    else if (period === '1y') filtered = allHistory.slice(-12);
+    let history = filtered.slice().reverse(); // latest first for table, but chart uses chronological order
+    const chronological = filtered; // chronological for chart
+
+    const rates    = chronological.map(h => Number(h.rate)).filter(v => !isNaN(v));
+    const avgRate  = rates.length ? (rates.reduce((a,b)=>a+b,0)/rates.length).toFixed(2) : '—';
+    const maxRate  = rates.length ? Math.max(...rates).toFixed(2) : '—';
+    const minRate  = rates.length ? Math.min(...rates).toFixed(2) : '—';
+    const latestRate = rates.length ? rates[rates.length-1].toFixed(2) : '—';
+
+    const W=560, CH=110, PAD_L=36, PAD_R=14, PAD_T=12, PAD_B=24;
+    const innerW = W - PAD_L - PAD_R;
+    const innerH = CH - PAD_T - PAD_B;
+    const yMin = Math.max(0, Math.min(...rates, 1.0) - 0.3);
+    const yMax = Math.max(...rates, 4.0) + 0.3;
+    const xS = i => PAD_L + (rates.length > 1 ? (i/(rates.length-1))*innerW : innerW/2);
+    const yS = v => PAD_T + (1 - (v-yMin)/(yMax-yMin)) * innerH;
+    const y35 = yS(3.5);  // BI upper target threshold
+    const y15 = yS(1.5);  // BI lower target threshold
+
+    window.__irPts = chronological.map((h,i) => ({
+      x: parseFloat(xS(i).toFixed(1)),
+      y: parseFloat(yS(Number(h.rate)).toFixed(1)),
+      rate: Number(h.rate),
+      month: h.month,
+    }));
+
+    const pts = chronological.map((h,i) => `${xS(i).toFixed(1)},${yS(Number(h.rate)).toFixed(1)}`).join(' ');
+    const fillPts = chronological.length > 1
+      ? `${xS(0).toFixed(1)},${(PAD_T+innerH).toFixed(1)} ${pts} ${xS(chronological.length-1).toFixed(1)},${(PAD_T+innerH).toFixed(1)}`
+      : '';
+
+    const dotColor = r => r <= 3.5 ? '#7A8B5E' : r <= 5 ? '#C47D0E' : '#C0392B';
+    const dots = chronological.map((h,i) => {
+      const cx=xS(i).toFixed(1), cy=yS(Number(h.rate)).toFixed(1);
+      return `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${dotColor(Number(h.rate))}" stroke="white" stroke-width="1.5" style="pointer-events:none"/>`;
+    }).join('');
+
+    const xLabels = chronological.map((h,i) => {
+      const lbl = rates.length > 8 ? (i % 2 === 0 ? h.month.replace(' 20','\'') : '') : h.month.replace(' 20','\'');
+      return `<text x="${xS(i).toFixed(1)}" y="${CH-4}" text-anchor="middle" font-size="8.5" fill="#888" style="pointer-events:none">${lbl}</text>`;
+    }).join('');
+
+    const yTicks = [Math.round(yMin*10)/10, 1.5, 3.5, Math.round(yMax*10)/10].filter((v,i,a)=>a.indexOf(v)===i).map(v => {
+      const y=yS(v).toFixed(1);
+      return `<text x="${PAD_L-4}" y="${parseFloat(y)+3}" text-anchor="end" font-size="8" fill="#aaa" style="pointer-events:none">${v}</text>
+        <line x1="${PAD_L}" y1="${y}" x2="${W-PAD_R}" y2="${y}" stroke="#eee" stroke-width="1" style="pointer-events:none"/>`;
+    }).join('');
+
+    const svgChart = rates.length
+      ? `<div id="ir-wrap" style="position:relative">
+          <div id="ir-tip" style="display:none"></div>
+          <svg id="ir-svg" viewBox="0 0 ${W} ${CH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible;cursor:crosshair"
+            onmousemove="irHover(event)" onmouseleave="irHoverOut()">
+            <defs>
+              <linearGradient id="irGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#7A8B5E" stop-opacity="0.15"/>
+                <stop offset="100%" stop-color="#7A8B5E" stop-opacity="0.01"/>
+              </linearGradient>
+            </defs>
+            ${yTicks}
+            <line x1="${PAD_L}" y1="${y35.toFixed(1)}" x2="${W-PAD_R}" y2="${y35.toFixed(1)}" stroke="#C0392B" stroke-width="1" stroke-dasharray="5,3" opacity="0.4" style="pointer-events:none"/>
+            <text x="${W-PAD_R+2}" y="${(y35+3).toFixed(1)}" font-size="7.5" fill="#C0392B" opacity="0.6" style="pointer-events:none">3.5%</text>
+            <line x1="${PAD_L}" y1="${y15.toFixed(1)}" x2="${W-PAD_R}" y2="${y15.toFixed(1)}" stroke="#7A8B5E" stroke-width="1" stroke-dasharray="3,2" opacity="0.3" style="pointer-events:none"/>
+            <text x="${W-PAD_R+2}" y="${(y15+3).toFixed(1)}" font-size="7.5" fill="#7A8B5E" opacity="0.5" style="pointer-events:none">1.5%</text>
+            ${fillPts ? `<polygon points="${fillPts}" fill="url(#irGrad)" style="pointer-events:none"/>` : ''}
+            <polyline points="${pts}" fill="none" stroke="#7A8B5E" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="pointer-events:none"/>
+            ${dots}
+            ${xLabels}
+            <line id="ir-cross" x1="0" y1="${PAD_T}" x2="0" y2="${PAD_T+innerH}" stroke="#333" stroke-width="1" stroke-dasharray="3,2" opacity="0" style="pointer-events:none"/>
+            <circle id="ir-hdot" cx="0" cy="0" r="5.5" fill="white" stroke="#333" stroke-width="2" opacity="0" style="pointer-events:none"/>
+            <rect x="${PAD_L}" y="${PAD_T}" width="${innerW}" height="${innerH}" fill="transparent"/>
+          </svg>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted)">
+          <span>BI target band: <strong style="color:var(--olive)">1.5%</strong> – <strong style="color:var(--red)">3.5%</strong></span>
+          <span>
+            <span style="display:inline-block;width:8px;height:8px;background:var(--olive);border-radius:2px;margin-right:3px;vertical-align:middle"></span>Within Target
+            <span style="display:inline-block;width:8px;height:8px;background:var(--amber);border-radius:2px;margin:0 3px 0 8px;vertical-align:middle"></span>Above Target
+            <span style="display:inline-block;width:8px;height:8px;background:var(--red);border-radius:2px;margin:0 3px 0 8px;vertical-align:middle"></span>High Inflation
+          </span>
+        </div>`
+      : `<div style="color:var(--muted);font-size:12px;padding:12px 0">No historical data yet.</div>`;
+
+    const statsHtml = `<div style="display:flex;gap:8px;margin-bottom:10px">
+      <div style="flex:1;padding:8px 10px;background:var(--g1);border-radius:8px;border:1px solid var(--g2)">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">Average</div>
+        <div style="font-size:18px;font-weight:800;color:var(--text);line-height:1.2">${avgRate}%</div>
+        <div style="font-size:9px;color:var(--muted)">${rates.length} month${rates.length!==1?'s':''}</div>
+      </div>
+      <div style="flex:1;padding:8px 10px;background:var(--g1);border-radius:8px;border:1px solid var(--g2)">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">Highest</div>
+        <div style="font-size:18px;font-weight:800;color:var(--red);line-height:1.2">${maxRate}%</div>
+      </div>
+      <div style="flex:1;padding:8px 10px;background:var(--g1);border-radius:8px;border:1px solid var(--g2)">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">Lowest</div>
+        <div style="font-size:18px;font-weight:800;color:var(--olive);line-height:1.2">${minRate}%</div>
+      </div>
+      <div style="flex:1;padding:8px 10px;background:var(--g1);border-radius:8px;border:1px solid var(--g2)">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">Latest</div>
+        <div style="font-size:18px;font-weight:800;color:var(--text);line-height:1.2">${latestRate}%</div>
+        <div style="font-size:9px;color:${Number(latestRate)<=3.5?'var(--green)':'var(--amber)'}">${Number(latestRate)<=3.5?'✓ Within BI Target':'⚠ Above Target'}</div>
+      </div>
+    </div>`;
+
+    const tableRows = history.map(h => {
+      const v = Number(h.rate);
+      const isLast = h === history[0];
+      const stLabel = v <= 1.5 ? '<span class="st st-a">Below Target</span>'
+                    : v <= 3.5 ? '<span class="st st-g">✓ Within BI Target</span>'
+                    : v <= 5.0 ? '<span class="st st-a">⚠ Above Target</span>'
+                    : '<span class="st st-r">🔴 High Inflation</span>';
+      return [
+        isLast ? `<strong>${h.month}</strong>` : h.month,
+        `<span class="fw ${v<=3.5?'tup':'tdn'}">${v.toFixed(2)}%</span>`,
+        stLabel,
+      ];
+    });
+    tableRows.push([
+      '<span style="font-weight:700;color:var(--muted)">Average</span>',
+      `<span class="fw">${avgRate}%</span>`, '',
+    ]);
+
+    return { statsHtml, svgChart, tableHtml: H.table(['Month','CPI Rate','BI Target Status'], tableRows) };
+  }
+
+  window.setIRPeriod = (period) => {
+    const el = document.getElementById('ir-area');
+    if (!el) return;
+    const { statsHtml, svgChart, tableHtml } = renderIRPeriod(period);
+    el.querySelector('#ir-stats').innerHTML = statsHtml;
+    el.querySelector('#ir-chart').innerHTML = svgChart;
+    el.querySelector('#ir-table').innerHTML = tableHtml;
+    el.querySelectorAll('.ir-btn').forEach(b => {
+      const active = b.dataset.p === period;
+      b.style.background = active ? 'var(--olive)' : 'transparent';
+      b.style.color = active ? 'white' : 'var(--olive-dk)';
+    });
+  };
+
+  const init = renderIRPeriod('all');
+  const periods = [['1m','1 Month'],['3m','3 Months'],['1y','1 Year'],['all','All']];
+  const btnRow = periods.map(([p,lbl]) =>
+    `<button class="ir-btn" data-p="${p}" onclick="setIRPeriod('${p}')"
+      style="padding:3px 12px;border-radius:99px;border:1.5px solid var(--olive);cursor:pointer;
+      font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.4px;transition:all .15s;
+      background:${p==='all'?'var(--olive)':'transparent'};color:${p==='all'?'white':'var(--olive-dk)'}">${lbl}</button>`
+  ).join('');
+
+  const chartBlock = `<div id="ir-area">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:10px;color:var(--muted)">Hover over the chart to inspect each month · Source: Trading Economics / BPS</span>
+      <div style="display:flex;gap:5px">${btnRow}</div>
+    </div>
+    <div id="ir-stats">${init.statsHtml}</div>
+    <div id="ir-chart" style="margin-top:6px">${init.svgChart}</div>
+    <div id="ir-table" style="margin-top:10px">${init.tableHtml}</div>
+  </div>`;
+
+  const inflationScale = `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px">
+      ${[
+        ['< 0%',     'Deflation Risk',   'var(--red)',   'var(--red-lt)'],
+        ['0–1.5%',   'Below BI Target',  '#c47d0e',      'var(--amber-lt)'],
+        ['1.5–3.5%', 'BI Target Range',  'var(--green)', 'var(--green-lt)'],
+        ['3.5–5%',   'Above Target',     '#c47d0e',      'var(--amber-lt)'],
+        ['> 5%',     'High Inflation',   'var(--red)',   'var(--red-lt)'],
+      ].map(([range, label, color, bg]) =>
+        `<div style="flex:1;min-width:90px;padding:8px 10px;border-radius:8px;background:${bg};border:1px solid ${color}22">
+          <div style="font-size:11px;font-weight:800;color:${color}">${range}</div>
+          <div style="font-size:10px;color:var(--text);margin-top:2px">${label}</div>
+        </div>`
+      ).join('')}
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:6px">Bank Indonesia target: <strong style="color:var(--olive)">1.5–3.5%</strong> (2025–2026) · Source: Statistics Indonesia (BPS) via Trading Economics</div>`;
+
+  return H.vh('Inflation Rate — CPI', d.desc, d.updated, d.alertBadge)
     + H.kpiRow(d.kpis)
-    + `<div class="callout green"><div class="c-title">✓ Within Safe Range — No Immediate Impact on Beauty Spending</div><div class="c-body">Current rate of 2.8% is 1.2pp below the alert threshold of 4.0%. Stable for the past 3 months.</div></div>`
-    + H.blk('Inflation Rate Historical', H.table(['Month','Rate','Beauty Impact'], histRows))
-    + H.blk('AI Insight', `<div class="ai-box"><div class="ai-lbl">AI Summary</div><div class="ai-text">${d.ai}</div></div>`);
+    + H.blk('Inflation Rate Scale', inflationScale)
+    + H.blk('CPI Trend — Live Data from Trading Economics / BPS', chartBlock)
+    + H.blk('AI Insight', `<div class="ai-box"><div class="ai-lbl">AI Summary — Auto-generated</div><div class="ai-text">${d.ai}</div></div>`);
 }
 
 function vPeakSeason(d) {
@@ -1165,7 +1380,7 @@ const WIP_IDS = [
   'competitor-alerts', 'competitor-sentiments',
   'trends-signals', 'fti-relevance-score',
   'self-care', 'makeup', 'lifestyle-merchandise',
-  'inflation-rate', 'peak-season-alert',
+  'peak-season-alert',
 ];
 
 function navigate(id) {
