@@ -898,10 +898,11 @@ function vConsumerConfidence(d) {
   window.__ccHistory = allHistory;
 
   function renderCCPeriod(period) {
-    let history = allHistory;
-    if      (period === '1m') history = allHistory.slice(-1);
-    else if (period === '3m') history = allHistory.slice(-3);
-    else if (period === '1y') history = allHistory.slice(-12);
+    let filtered = allHistory;
+    if      (period === '1m') filtered = allHistory.slice(-1);
+    else if (period === '3m') filtered = allHistory.slice(-3);
+    else if (period === '1y') filtered = allHistory.slice(-12);
+    let history = filtered.slice().reverse(); // latest first
 
     const cciVals  = history.map(h => Number(h.cci)).filter(Boolean);
     const avgCCI   = cciVals.length ? (cciVals.reduce((a,b)=>a+b,0)/cciVals.length).toFixed(1) : '—';
