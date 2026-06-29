@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -641,14 +642,25 @@ const MOCK_DATA = {
 };
 
 /* ════════════════════════════════════════════════════════════════
- * DATA LOADER
- * TODO: Replace with fetch() when backend is ready.
- *   async function loadData() {
- *     const res = await fetch('/api/market-intelligence');
- *     return res.json();
- *   }
+ * SUPABASE CLIENT
  * ════════════════════════════════════════════════════════════════ */
-async function loadData() { return MOCK_DATA; }
+const _sb = supabase.createClient(
+  'https://sgyrqofwcwkbcnmrardf.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNneXJxb2Z3Y3drYmNubXJhcmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2OTQ3MzgsImV4cCI6MjA5ODI3MDczOH0.yDcwD9iQJePoBpLt5wR96ZkqoZvMV1VSvzEX0THp2tE'
+);
+
+/* ════════════════════════════════════════════════════════════════
+ * DATA LOADER — fetches from Supabase, falls back to MOCK_DATA
+ * ════════════════════════════════════════════════════════════════ */
+async function loadData() {
+  try {
+    const { data, error } = await _sb.from('market_intelligence').select('id, data');
+    if (error || !data || data.length === 0) return MOCK_DATA;
+    return Object.fromEntries(data.map(row => [row.id, row.data]));
+  } catch (e) {
+    return MOCK_DATA;
+  }
+}
 
 /* ════════════════════════════════════════════════════════════════
  * HELPERS
