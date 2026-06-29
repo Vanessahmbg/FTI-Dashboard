@@ -894,88 +894,154 @@ function vCategory(d) {
 }
 
 function vConsumerConfidence(d) {
-  const history = d.history || [];
+  const allHistory = d.history || [];
+  window.__ccHistory = allHistory;
 
-  // Averages
-  const cciVals   = history.map(h => Number(h.cci)).filter(Boolean);
-  const avgCCI    = cciVals.length ? (cciVals.reduce((a,b) => a+b,0) / cciVals.length).toFixed(1) : '—';
-  const maxCCI    = cciVals.length ? Math.max(...cciVals).toFixed(1) : '—';
-  const minCCI    = cciVals.length ? Math.min(...cciVals).toFixed(1) : '—';
-  const latestCCI = cciVals.length ? cciVals[cciVals.length - 1].toFixed(1) : d.kpis?.[0]?.val ?? '—';
+  function renderCCPeriod(period) {
+    let history = allHistory;
+    if      (period === '1m') history = allHistory.slice(-1);
+    else if (period === '3m') history = allHistory.slice(-3);
+    else if (period === '1y') history = allHistory.slice(-12);
 
-  const avgBadge = cciVals.length
-    ? `<div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-        <div class="kpi" style="flex:1;min-width:100px">
-          <div class="kpi-lbl">Average IKK</div>
-          <div class="kpi-val">${avgCCI}</div>
-          <div class="kpi-trend tst">Avg over ${cciVals.length} months</div>
-        </div>
-        <div class="kpi" style="flex:1;min-width:100px">
-          <div class="kpi-lbl">Highest</div>
-          <div class="kpi-val tup">${maxCCI}</div>
-        </div>
-        <div class="kpi" style="flex:1;min-width:100px">
-          <div class="kpi-lbl">Lowest</div>
-          <div class="kpi-val tdn">${minCCI}</div>
-        </div>
-        <div class="kpi" style="flex:1;min-width:100px">
-          <div class="kpi-lbl">Latest (${history[history.length-1]?.month ?? ''})</div>
-          <div class="kpi-val">${latestCCI}</div>
-          <div class="kpi-trend ${Number(latestCCI) >= 100 ? 'tup' : 'tdn'}">${Number(latestCCI) >= 100 ? '✓ Zona Optimis' : '⚠ Zona Pesimis'}</div>
-        </div>
-      </div>`
-    : '';
+    const cciVals  = history.map(h => Number(h.cci)).filter(Boolean);
+    const avgCCI   = cciVals.length ? (cciVals.reduce((a,b)=>a+b,0)/cciVals.length).toFixed(1) : '—';
+    const maxCCI   = cciVals.length ? Math.max(...cciVals).toFixed(1) : '—';
+    const minCCI   = cciVals.length ? Math.min(...cciVals).toFixed(1) : '—';
+    const latestCCI= cciVals.length ? cciVals[cciVals.length-1].toFixed(1) : '—';
 
-  // Spark bar chart inline
-  const sparkMax = Math.max(...cciVals, 100) * 1.05;
-  const sparkBars = history.map(h => {
-    const val   = Number(h.cci);
-    const pct   = ((val / sparkMax) * 100).toFixed(1);
-    const color = val >= 100 ? 'var(--olive)' : 'var(--red)';
-    const isLast = h === history[history.length - 1];
-    return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px">
-      <div style="font-size:10px;font-weight:700;color:${color}">${val}</div>
-      <div style="width:100%;background:var(--g2);border-radius:3px;height:60px;display:flex;align-items:flex-end">
-        <div style="width:100%;height:${pct}%;background:${color};border-radius:3px;${isLast ? 'opacity:1' : 'opacity:0.65'}"></div>
+    // SVG line chart
+    const W=560, CH=150, PAD_L=36, PAD_R=12, PAD_T=16, PAD_B=28;
+    const innerW = W - PAD_L - PAD_R;
+    const innerH = CH - PAD_T - PAD_B;
+    const yMin = Math.max(0, Math.min(...cciVals, 95) - 2);
+    const yMax = Math.max(...cciVals, 130) + 2;
+    const xS = i => PAD_L + (cciVals.length > 1 ? (i/(cciVals.length-1))*innerW : innerW/2);
+    const yS = v => PAD_T + (1 - (v-yMin)/(yMax-yMin)) * innerH;
+
+    const y100 = yS(100);
+    const pts  = history.map((h,i) => `${xS(i).toFixed(1)},${yS(Number(h.cci)).toFixed(1)}`).join(' ');
+
+    // gradient fill area
+    const fillPts = history.length > 1
+      ? `${xS(0).toFixed(1)},${(PAD_T+innerH).toFixed(1)} ${pts} ${xS(history.length-1).toFixed(1)},${(PAD_T+innerH).toFixed(1)}`
+      : '';
+
+    const dots = history.map((h,i) => {
+      const cx=xS(i).toFixed(1), cy=yS(Number(h.cci)).toFixed(1);
+      const isLast = i===history.length-1;
+      const col = Number(h.cci)>=100 ? '#7A8B5E' : '#C0392B';
+      return `<circle cx="${cx}" cy="${cy}" r="${isLast?5:3.5}" fill="${col}" stroke="white" stroke-width="1.5"/>
+        ${isLast ? `<text x="${cx}" y="${parseFloat(cy)-9}" text-anchor="middle" font-size="10" font-weight="800" fill="${col}">${Number(h.cci)}</text>` : ''}`;
+    }).join('');
+
+    const xLabels = history.map((h,i) => {
+      const cx=xS(i).toFixed(1);
+      return `<text x="${cx}" y="${CH-4}" text-anchor="middle" font-size="8.5" fill="#888">${h.month}</text>`;
+    }).join('');
+
+    // y-axis tick labels
+    const yTicks = [Math.round(yMin), 100, Math.round(yMax)].map(v => {
+      const y=yS(v).toFixed(1);
+      return `<text x="${PAD_L-4}" y="${parseFloat(y)+3}" text-anchor="end" font-size="8" fill="#aaa">${v}</text>
+        <line x1="${PAD_L}" y1="${y}" x2="${W-PAD_R}" y2="${y}" stroke="#eee" stroke-width="1"/>`;
+    }).join('');
+
+    const svgChart = cciVals.length
+      ? `<svg viewBox="0 0 ${W} ${CH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">
+          <defs>
+            <linearGradient id="ccGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7A8B5E" stop-opacity="0.18"/>
+              <stop offset="100%" stop-color="#7A8B5E" stop-opacity="0.01"/>
+            </linearGradient>
+          </defs>
+          ${yTicks}
+          <line x1="${PAD_L}" y1="${y100.toFixed(1)}" x2="${W-PAD_R}" y2="${y100.toFixed(1)}" stroke="#C0392B" stroke-width="1" stroke-dasharray="5,3" opacity="0.4"/>
+          <text x="${W-PAD_R+2}" y="${(y100+3).toFixed(1)}" font-size="7.5" fill="#C0392B" opacity="0.6">100</text>
+          ${fillPts ? `<polygon points="${fillPts}" fill="url(#ccGrad)"/>` : ''}
+          <polyline points="${pts}" fill="none" stroke="#7A8B5E" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+          ${dots}
+          ${xLabels}
+        </svg>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted)">
+          <span>Threshold optimis: <strong style="color:var(--text)">100</strong></span>
+          <span>
+            <span style="display:inline-block;width:9px;height:9px;background:var(--olive);border-radius:2px;margin-right:3px;vertical-align:middle"></span>Optimis
+            <span style="display:inline-block;width:9px;height:9px;background:var(--red);border-radius:2px;margin:0 3px 0 10px;vertical-align:middle"></span>Pesimis
+          </span>
+        </div>`
+      : `<div style="color:var(--muted);font-size:12px;padding:20px 0">Belum ada data historis.</div>`;
+
+    const statsHtml = `<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <div class="kpi" style="flex:1;min-width:90px">
+        <div class="kpi-lbl">Average IKK</div>
+        <div class="kpi-val">${avgCCI}</div>
+        <div class="kpi-trend tst">${cciVals.length} bulan</div>
       </div>
-      <div style="font-size:9px;color:var(--muted);text-align:center;line-height:1.2">${h.month}</div>
+      <div class="kpi" style="flex:1;min-width:90px">
+        <div class="kpi-lbl">Highest</div>
+        <div class="kpi-val tup">${maxCCI}</div>
+      </div>
+      <div class="kpi" style="flex:1;min-width:90px">
+        <div class="kpi-lbl">Lowest</div>
+        <div class="kpi-val tdn">${minCCI}</div>
+      </div>
+      <div class="kpi" style="flex:1;min-width:90px">
+        <div class="kpi-lbl">Latest</div>
+        <div class="kpi-val">${latestCCI}</div>
+        <div class="kpi-trend ${Number(latestCCI)>=100?'tup':'tdn'}">${Number(latestCCI)>=100?'✓ Optimis':'⚠ Pesimis'}</div>
+      </div>
     </div>`;
-  }).join('');
 
-  const sparkChart = history.length
-    ? `<div style="display:flex;gap:6px;align-items:flex-end;padding:8px 0 4px">${sparkBars}</div>
-       <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10.5px">
-         <span style="color:var(--muted)">Threshold optimis: <strong>100</strong></span>
-         <span><span style="display:inline-block;width:10px;height:10px;background:var(--olive);border-radius:2px;margin-right:4px"></span>Optimis
-         <span style="display:inline-block;width:10px;height:10px;background:var(--red);border-radius:2px;margin:0 4px 0 10px"></span>Pesimis</span>
-       </div>`
-    : '<div style="color:var(--muted);font-size:12px">Belum ada data historis.</div>';
+    const tableRows = history.map(h => {
+      const v=Number(h.cci); const isLast=h===history[history.length-1];
+      return [
+        isLast?`<strong>${h.month}</strong>`:h.month,
+        `<span class="fw ${v>=100?'tup':'tdn'}">${v}</span>`,
+        v>=100?'<span class="st st-g">✓ Optimis</span>':'<span class="st st-r">⚠ Pesimis</span>',
+        h.beauty||'—',
+      ];
+    });
+    tableRows.push([
+      '<span style="font-weight:700;color:var(--muted)">Average</span>',
+      `<span class="fw">${avgCCI}</span>`,'','',
+    ]);
 
-  // Table with average row
-  const avgBeauty = history.map(h => h.beauty).filter(Boolean);
-  const histRows = history.map(h => {
-    const v = Number(h.cci);
-    const isLast = h === history[history.length - 1];
-    return [
-      isLast ? `<strong>${h.month}</strong>` : h.month,
-      `<span class="fw ${v >= 100 ? 'tup' : 'tdn'}">${v}</span>`,
-      v >= 100 ? '<span class="st st-g">✓ Optimis</span>' : '<span class="st st-r">⚠ Pesimis</span>',
-      h.beauty || '—',
-    ];
-  });
-  // Append average summary row
-  histRows.push([
-    '<span style="font-weight:700;color:var(--muted)">Average</span>',
-    `<span class="fw">${avgCCI}</span>`,
-    '',
-    '',
-  ]);
+    return { statsHtml, svgChart, tableHtml: H.table(['Bulan','IKK','Status','Beauty Spend YoY'], tableRows) };
+  }
+
+  window.setCCPeriod = (period) => {
+    const el = document.getElementById('cc-area');
+    if (!el) return;
+    const { statsHtml, svgChart, tableHtml } = renderCCPeriod(period);
+    el.querySelector('#cc-stats').innerHTML = statsHtml;
+    el.querySelector('#cc-chart').innerHTML = svgChart;
+    el.querySelector('#cc-table').innerHTML = tableHtml;
+    el.querySelectorAll('.cc-btn').forEach(b => {
+      const active = b.dataset.p === period;
+      b.style.background = active ? 'var(--olive)' : 'transparent';
+      b.style.color = active ? 'white' : 'var(--olive-dk)';
+    });
+  };
+
+  const init = renderCCPeriod('all');
+  const periods = [['1m','1 Month'],['3m','3 Months'],['1y','1 Year'],['all','All']];
+  const btnRow = periods.map(([p,lbl]) =>
+    `<button class="cc-btn" data-p="${p}" onclick="setCCPeriod('${p}')"
+      style="padding:4px 13px;border-radius:99px;border:1.5px solid var(--olive);cursor:pointer;
+      font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.4px;transition:all .15s;
+      background:${p==='all'?'var(--olive)':'transparent'};color:${p==='all'?'white':'var(--olive-dk)'}">${lbl}</button>`
+  ).join('');
+
+  const chartBlock = `<div id="cc-area">
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:14px">${btnRow}</div>
+    <div id="cc-stats">${init.statsHtml}</div>
+    <div id="cc-chart" style="margin-top:4px">${init.svgChart}</div>
+    <div id="cc-table" style="margin-top:14px">${init.tableHtml}</div>
+  </div>`;
 
   return H.vh('Consumer Confidence — IKK Bank Indonesia', d.desc, d.updated, d.alertBadge)
     + H.kpiRow(d.kpis)
-    + H.blk('Ringkasan Statistik', avgBadge)
-    + H.blk('Tren IKK — Data Live dari Bank Indonesia', sparkChart)
-    + H.blk('Riwayat IKK Bulanan', H.table(['Bulan','IKK','Status','Beauty Spend YoY'], histRows))
+    + H.blk('Tren IKK — Data Live dari Bank Indonesia', chartBlock)
     + H.blk('AI Insight', `<div class="ai-box"><div class="ai-lbl">AI Summary — Auto-generated</div><div class="ai-text">${d.ai}</div></div>`);
 }
 
