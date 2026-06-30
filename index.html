@@ -945,7 +945,7 @@ function vSelfCare(d) {
     const W=560,CH=210,PL=60,PR=50,PT=24,PB=38;
     const cW=W-PL-PR, cH=CH-PT-PB, n=data.length;
     const step=cW/n, barW=Math.max(12,step*0.52);
-    const maxSize=Math.max(...data.map(r=>r.size))*1.14;
+    const maxSize=Math.max(...data.map(r=>r.size))*1.05;
     const yoys=data.filter(r=>r.yoy!==null).map(r=>r.yoy);
     const minY=Math.min(...yoys)-4, maxY=Math.max(...yoys)+4;
     const xOf=i=>PL+step*i+step/2;
@@ -1021,7 +1021,7 @@ function vSelfCare(d) {
   }
 
   function buildDonut(segs) {
-    const W=300, H=215, cx=150, cy=97, ro=79, ri=46;
+    const W=400, H=195, cx=200, cy=90, ro=76, ri=44;
     const cols=['var(--olive)','#C8A040','#9A8A6A'];
     const shortNames=['Self-Care','Makeup','Lifestyle'];
     let paths='',lbls='',start=-90;
@@ -1043,9 +1043,9 @@ function vSelfCare(d) {
     let legend='';
     const itemW=W/3;
     segs.forEach((s,i)=>{
-      const lx=i*itemW+5;
-      legend+=`<rect x="${lx}" y="183" width="9" height="9" fill="${cols[i%cols.length]}" opacity="${i===0?1:0.65}" rx="2"/>
-        <text x="${lx+13}" y="191" font-size="9.5" fill="var(--text)" font-weight="${i===0?'700':'500'}">${shortNames[i]} ${s.pct}%</text>`;
+      const lx=i*itemW+8;
+      legend+=`<rect x="${lx}" y="175" width="9" height="9" fill="${cols[i%cols.length]}" opacity="${i===0?1:0.65}" rx="2"/>
+        <text x="${lx+13}" y="183" font-size="9.5" fill="var(--text)" font-weight="${i===0?'700':'500'}">${shortNames[i]} ${s.pct}%</text>`;
     });
     return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
       ${paths}${lbls}${legend}
