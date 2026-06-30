@@ -552,44 +552,78 @@ const MOCK_DATA = {
 
   /* ── 4b. MAKEUP ─────────────────────────────────────────── */
   'makeup': {
-    updated: 'Q1 2026', alertBadge: null,
+    updated: 'Q2 2026', alertBadge: null,
     catName: 'Makeup',
-    desc: 'Market size and growth data for the makeup category in Indonesia.',
+    desc: 'Market size, growth trajectory, and top-growing subcategories for the Indonesia makeup category.',
     kpis: [
-      { lbl: 'Market Size',           val: 'IDR 6,200', u: 'bn', trend: 'up', t: '↑ YoY growth' },
-      { lbl: 'YoY Growth',            val: '8.5',  u: '%',  trend: 'up', t: '↑ vs 6.1% last yr' },
-      { lbl: '3Y CAGR',               val: '7.2',  u: '%',  trend: null },
-      { lbl: 'Beauty Industry Share', val: '25',   u: '%',  trend: 'st', t: '→ Stable' },
+      { lbl: 'Market Size (2024)', val: 'IDR 5,700', u: 'bn', trend: 'up', t: '↑ +12.6% YoY' },
+      { lbl: 'YoY Growth',         val: '12.6', u: '%', trend: 'up', t: '↑ vs 24.9% in 2023' },
+      { lbl: '3Y CAGR (2021–24)',  val: '14.2', u: '%', trend: 'up', t: '→ Post-COVID recovery' },
+      { lbl: 'Beauty Category Share', val: '29', u: '%', trend: 'st', t: '→ 2nd largest category' },
+    ],
+    history: [
+      { year: 2018, size: 3200, yoy: null,  proj: false },
+      { year: 2019, size: 3620, yoy: 13.1,  proj: false },
+      { year: 2020, size: 2820, yoy: -22.1, proj: false },
+      { year: 2021, size: 3350, yoy: 18.8,  proj: false },
+      { year: 2022, size: 4100, yoy: 22.4,  proj: false },
+      { year: 2023, size: 5060, yoy: 23.4,  proj: false },
+      { year: 2024, size: 5700, yoy: 12.6,  proj: false },
+      { year: 2025, size: 6330, yoy: 11.1,  proj: true  },
+      { year: 2026, size: 6980, yoy: 10.3,  proj: true  },
+      { year: 2027, size: 7680, yoy: 10.0,  proj: true  },
     ],
     subcats: [
-      { name: 'Eyebrow Products',  growth: 18, size: 'IDR 540bn' },
-      { name: 'Lip Products',      growth: 15, size: 'IDR 1,860bn' },
-      { name: 'BB / CC Cream',     growth: 12, size: 'IDR 1,240bn' },
-      { name: 'Blush / Bronzer',   growth: 11, size: 'IDR 680bn' },
-      { name: 'Foundation',        growth:  6, size: 'IDR 1,880bn' },
+      { name: 'Lip Color / Lip Gloss',   growth: 24, size: 'IDR 1,120bn' },
+      { name: 'Cushion / BB Cream',       growth: 21, size: 'IDR 980bn'   },
+      { name: 'Eyebrow Products',         growth: 18, size: 'IDR 640bn'   },
+      { name: 'Blush / Highlighter',      growth: 15, size: 'IDR 580bn'   },
+      { name: 'Foundation / Base Makeup', growth: 11, size: 'IDR 1,380bn' },
+      { name: 'Eyeliner / Eye Pencil',    growth:  9, size: 'IDR 420bn'   },
+      { name: 'Mascara',                  growth:  7, size: 'IDR 350bn'   },
+      { name: 'Eye Shadow Palette',       growth:  6, size: 'IDR 480bn'   },
+      { name: 'Concealer',                growth:  5, size: 'IDR 380bn'   },
+      { name: 'Setting Powder / Spray',   growth:  3, size: 'IDR 340bn'   },
     ],
-    summary: 'Makeup growth is solid but slower than self-care. Lip products and eyebrow are the fastest risers, aligned with post-pandemic social activity recovery. Foundation remains the largest subcategory but is growing at a slower clip.',
+    ai: 'Indonesia\'s makeup market reached **IDR 5,700bn** in 2024, recovering strongly from the COVID-19 dip with a 3Y CAGR of **14.2%**. Growth is normalising at **+12.6% YoY** as post-lockdown revenge-beauty demand matures.\n\n**FTI Action Items:**\n1. **Double down on lip and cushion** — fastest-growing at +24% and +21% respectively. High-repurchase, high-margin SKUs ideal for repeat campaigns and subscription bundles.\n2. **Leverage occasion-based marketing** — makeup purchasing peaks ahead of Lebaran, graduation, and social events. Launch 4–6 weeks prior with "ready for the occasion" messaging.\n3. **Bundle base makeup with skincare** — foundation + SPF serum bundles tap two high-growth categories simultaneously and drive higher AOV.\n4. **Invest in shade inclusivity** — Indonesia\'s diverse skin tones remain underserved by most brands. A broader shade range in foundation is a meaningful differentiation lever with low competition.\n5. **Watch eyebrow products** (+18%) — early-stage but strong momentum driven by K-beauty influence. Seed with micro-influencers before the subcategory saturates.',
   },
 
   /* ── 4c. LIFESTYLE & MERCHANDISE ───────────────────────── */
   'lifestyle-merchandise': {
-    updated: 'Q1 2026', alertBadge: null,
+    updated: 'Q2 2026', alertBadge: null,
     catName: 'Lifestyle & Merchandise',
-    desc: 'Market data for branded lifestyle and merchandise products (tote bags, pouches, accessories) in Indonesia.',
+    desc: 'Market size, growth trajectory, and top-growing subcategories for Indonesia lifestyle & branded merchandise.',
     kpis: [
-      { lbl: 'Market Size',          val: 'IDR 2,100', u: 'bn', trend: 'up', t: '↑ YoY growth' },
-      { lbl: 'YoY Growth',           val: '22.3', u: '%',  trend: 'up', t: '↑ Fastest growing' },
-      { lbl: '3Y CAGR',              val: '19.1', u: '%',  trend: null },
-      { lbl: 'Purchase Penetration', val: '18',   u: '%',  trend: 'up', t: '↑ vs 13% last yr' },
+      { lbl: 'Market Size (2024)', val: 'IDR 5,470', u: 'bn', trend: 'up', t: '↑ +12.8% YoY' },
+      { lbl: 'YoY Growth',         val: '12.8', u: '%', trend: 'up', t: '↑ vs 24.4% in 2023' },
+      { lbl: '3Y CAGR (2021–24)',  val: '17.0', u: '%', trend: 'up', t: '→ Fastest 3Y CAGR' },
+      { lbl: 'Beauty Category Share', val: '28', u: '%', trend: 'up', t: '↑ 3rd & rising' },
+    ],
+    history: [
+      { year: 2018, size: 3100, yoy: null,  proj: false },
+      { year: 2019, size: 3350, yoy:  8.1,  proj: false },
+      { year: 2020, size: 3080, yoy: -8.1,  proj: false },
+      { year: 2021, size: 3420, yoy: 11.0,  proj: false },
+      { year: 2022, size: 3900, yoy: 14.0,  proj: false },
+      { year: 2023, size: 4850, yoy: 24.4,  proj: false },
+      { year: 2024, size: 5470, yoy: 12.8,  proj: false },
+      { year: 2025, size: 6020, yoy: 10.1,  proj: true  },
+      { year: 2026, size: 6560, yoy:  9.0,  proj: true  },
+      { year: 2027, size: 7110, yoy:  8.4,  proj: true  },
     ],
     subcats: [
-      { name: 'Branded Tote Bags',    growth: 34, size: 'IDR 620bn' },
-      { name: 'Cosmetic Pouches',     growth: 28, size: 'IDR 480bn' },
-      { name: 'Accessories & Charms', growth: 21, size: 'IDR 340bn' },
-      { name: 'Apparel Collabs',      growth: 18, size: 'IDR 410bn' },
-      { name: 'Stationery / Prints',  growth: 12, size: 'IDR 250bn' },
+      { name: 'Branded Tote Bags',        growth: 34, size: 'IDR 620bn' },
+      { name: 'Beauty Pouches / Cases',   growth: 28, size: 'IDR 480bn' },
+      { name: 'Accessories & Charms',     growth: 22, size: 'IDR 340bn' },
+      { name: 'Apparel Collaborations',   growth: 18, size: 'IDR 410bn' },
+      { name: 'Limited Ed. Collectibles', growth: 15, size: 'IDR 280bn' },
+      { name: 'Lifestyle Stationery',     growth: 12, size: 'IDR 250bn' },
+      { name: 'Home Fragrance / Candles', growth:  9, size: 'IDR 320bn' },
+      { name: 'Travel Accessories',       growth:  6, size: 'IDR 380bn' },
+      { name: 'Branded Apparel',          growth:  4, size: 'IDR 260bn' },
+      { name: 'Novelty / Seasonal Items', growth:  2, size: 'IDR 130bn' },
     ],
-    summary: 'Lifestyle and merchandise is the smallest but fastest-growing category. Brand-led collaborations and limited edition drops are key drivers. Purchase penetration jumped 5pp YoY, suggesting the audience for lifestyle extensions is maturing quickly.',
+    ai: 'Indonesia\'s lifestyle & merchandise market grew to **IDR 5,470bn** in 2024, up **+12.8% YoY**, driven by rising brand consciousness and the aspirational "beauty lifestyle" identity emerging strongly in Gen Z and Millennial cohorts.\n\n**FTI Action Items:**\n1. **Lead with branded totes and pouches** — top two subcategories at +34% and +28%. Consumers actively want to carry and display brand identity; prioritise quality materials and clean design.\n2. **Activate limited-edition drops** — scarcity and exclusivity drive disproportionate social media attention. A quarterly limited-edition collab can anchor the lifestyle narrative and generate organic buzz.\n3. **Bundle merch with beauty purchases** — GWP (Gift With Purchase) strategy using branded pouches or accessories increases basket size and brand visibility simultaneously.\n4. **Build the lifestyle ecosystem** — consumers who buy lifestyle merch spend 2–3× more on core beauty SKUs. Treat merch as a loyalty and acquisition tool, not just a revenue line.\n5. **Watch apparel collabs** (+18%) — early but growing. A capsule collection with a local fashion label can cross audiences and position FTI as a true lifestyle brand beyond beauty.',
   },
 
   /* ── 5a. CONSUMER CONFIDENCE ────────────────────────────── */
@@ -1057,7 +1091,7 @@ function vSelfCare(d) {
   return H.vh(d.catName,d.desc,d.updated,d.alertBadge)
     + H.kpiRow(d.kpis)
     + `<div style="display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:16px;margin-bottom:12px">
-        ${H.blk('Market Size & Growth Rate — Indonesia Self-Care',`<div id="sc-chart-block">${renderChart('all')}</div>`)}
+        ${H.blk(`Market Size & Growth Rate — Indonesia ${d.catName}`,`<div id="sc-chart-block">${renderChart('all')}</div>`)}
         ${H.blk('Top-Growing Sub-Categories — YoY %',buildSubcats(d.subcats||[]))}
       </div>`
     + H.blk('AI Quarterly Insight',`<div class="ai-box"><div class="ai-lbl">Q2 2026 Analysis</div><div class="ai-text">${aiText}</div></div>`);
@@ -1581,8 +1615,8 @@ const VIEWS = {
   'trends-signals':       d => vTrendsSignals(d),
   'fti-relevance-score':  d => vRelevanceScore(d),
   'self-care':            d => vSelfCare(d),
-  'makeup':               d => vCategory(d),
-  'lifestyle-merchandise':d => vCategory(d),
+  'makeup':               d => vSelfCare(d),
+  'lifestyle-merchandise':d => vSelfCare(d),
   'consumer-confidence':  d => vConsumerConfidence(d),
   'inflation-rate':       d => vInflationRate(d),
   'peak-season-alert':    d => vPeakSeason(d),
@@ -1595,7 +1629,6 @@ const WIP_IDS = [
   'review-score', 'repurchase-rate', 'products-sentiment', 'social-listening',
   'competitor-alerts', 'competitor-sentiments',
   'trends-signals', 'fti-relevance-score',
-  'makeup', 'lifestyle-merchandise',
   'peak-season-alert',
 ];
 
