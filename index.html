@@ -1007,7 +1007,7 @@ function vSelfCare(d) {
 
     return `<div style="position:relative">
       <div id="sc-tip" style="display:none"></div>
-      <svg id="sc-svg" viewBox="0 0 ${W} ${CH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible;cursor:crosshair">
+      <svg id="sc-svg" viewBox="0 0 ${W} ${CH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:660px;display:block;overflow:visible;cursor:crosshair">
         <defs><pattern id="sc-hatch" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="rgba(90,138,90,0.6)" stroke-width="2"/></pattern></defs>
         ${leg}${yaxL}${projL}${bars}${topL}
         <polyline points="${line}" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linejoin="round"/>
