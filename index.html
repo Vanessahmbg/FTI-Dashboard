@@ -1007,7 +1007,7 @@ function vSelfCare(d) {
 
     return `<div style="position:relative">
       <div id="sc-tip" style="display:none"></div>
-      <svg id="sc-svg" viewBox="0 0 ${W} ${CH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${W}px;display:block;overflow:visible;cursor:crosshair">
+      <svg id="sc-svg" viewBox="0 0 ${W} ${CH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible;cursor:crosshair">
         <defs><pattern id="sc-hatch" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="rgba(90,138,90,0.6)" stroke-width="2"/></pattern></defs>
         ${leg}${yaxL}${projL}${bars}${topL}
         <polyline points="${line}" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linejoin="round"/>
@@ -1024,6 +1024,24 @@ function vSelfCare(d) {
     const W=400, H=195, cx=200, cy=90, ro=76, ri=44;
     const cols=['var(--olive)','#C8A040','#9A8A6A'];
     const shortNames=['Self-Care','Makeup','Lifestyle'];
+
+    window.scDonutHover = function(evt, name, pct, col) {
+      const tip = document.getElementById('sc-donut-tip');
+      if (!tip) return;
+      const wrap = document.getElementById('sc-donut-wrap');
+      const wr = wrap ? wrap.getBoundingClientRect() : {left:0, top:0, width:400};
+      let lft = evt.clientX - wr.left + 14;
+      let top = evt.clientY - wr.top - 60;
+      if (lft + 145 > wr.width) lft -= 160;
+      if (top < 4) top = 4;
+      tip.style.cssText = `display:block;position:absolute;left:${lft}px;top:${top}px;background:white;border:1.5px solid var(--g3);border-radius:8px;padding:8px 12px;box-shadow:0 2px 10px rgba(0,0,0,.1);pointer-events:none;z-index:99`;
+      tip.innerHTML = `<div style="font-size:10px;color:var(--muted);font-weight:600">Beauty Split 2024</div><div style="display:flex;align-items:center;gap:6px;margin-top:3px"><div style="width:10px;height:10px;background:${col};border-radius:2px;flex-shrink:0"></div><div style="font-size:12px;font-weight:700;color:var(--text)">${name}</div></div><div style="font-size:20px;font-weight:800;color:${col};margin-top:1px">${pct}%</div><div style="font-size:9px;color:var(--muted);margin-top:1px">of beauty industry</div>`;
+    };
+    window.scDonutOut = function() {
+      const tip = document.getElementById('sc-donut-tip');
+      if (tip) tip.style.display = 'none';
+    };
+
     let paths='',lbls='',start=-90;
     segs.forEach((s,i)=>{
       const deg=(s.pct/100)*360, end=start+deg;
@@ -1034,10 +1052,11 @@ function vSelfCare(d) {
       const x2=(cx+ox+ro*Math.cos(er)).toFixed(2),y2=(cy+oy+ro*Math.sin(er)).toFixed(2);
       const x3=(cx+ox+ri*Math.cos(er)).toFixed(2),y3=(cy+oy+ri*Math.sin(er)).toFixed(2);
       const x4=(cx+ox+ri*Math.cos(sr)).toFixed(2),y4=(cy+oy+ri*Math.sin(sr)).toFixed(2);
-      paths+=`<path d="M${x1},${y1} A${ro},${ro} 0 ${lg},1 ${x2},${y2} L${x3},${y3} A${ri},${ri} 0 ${lg},0 ${x4},${y4}Z" fill="${cols[i%cols.length]}" opacity="${hl?1:0.65}"/>`;
+      const col=cols[i%cols.length], baseOp=hl?1:0.65, name=s.name||shortNames[i];
+      paths+=`<path d="M${x1},${y1} A${ro},${ro} 0 ${lg},1 ${x2},${y2} L${x3},${y3} A${ri},${ri} 0 ${lg},0 ${x4},${y4}Z" fill="${col}" opacity="${baseOp}" style="cursor:pointer;transition:opacity .15s" onmouseenter="this.setAttribute('opacity','1');window.scDonutHover(event,'${name}',${s.pct},'${col}')" onmouseleave="this.setAttribute('opacity','${baseOp}');window.scDonutOut()"/>`;
       const ma=(sr+er)/2, lr=(ro+ri)/2;
       const lx=(cx+ox+lr*Math.cos(ma)).toFixed(1),ly=(cy+oy+lr*Math.sin(ma)).toFixed(1);
-      lbls+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="white">${s.pct}%</text>`;
+      lbls+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="white" style="pointer-events:none">${s.pct}%</text>`;
       start=end;
     });
     let legend='';
@@ -1047,12 +1066,15 @@ function vSelfCare(d) {
       legend+=`<rect x="${lx}" y="175" width="9" height="9" fill="${cols[i%cols.length]}" opacity="${i===0?1:0.65}" rx="2"/>
         <text x="${lx+13}" y="183" font-size="9.5" fill="var(--text)" font-weight="${i===0?'700':'500'}">${shortNames[i]} ${s.pct}%</text>`;
     });
-    return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
-      ${paths}${lbls}${legend}
-      <text x="${cx}" y="${cy-8}" text-anchor="middle" font-size="10" fill="var(--muted)">Beauty</text>
-      <text x="${cx}" y="${cy+6}" text-anchor="middle" font-size="10" fill="var(--muted)">Split</text>
-      <text x="${cx}" y="${cy+20}" text-anchor="middle" font-size="9" fill="var(--muted)">(2024)</text>
-    </svg>`;
+    return `<div id="sc-donut-wrap" style="position:relative">
+      <div id="sc-donut-tip" style="display:none"></div>
+      <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+        ${paths}${lbls}${legend}
+        <text x="${cx}" y="${cy-8}" text-anchor="middle" font-size="10" fill="var(--muted)">Beauty</text>
+        <text x="${cx}" y="${cy+6}" text-anchor="middle" font-size="10" fill="var(--muted)">Split</text>
+        <text x="${cx}" y="${cy+20}" text-anchor="middle" font-size="9" fill="var(--muted)">(2024)</text>
+      </svg>
+    </div>`;
   }
 
   function buildSubcats(subcats) {
