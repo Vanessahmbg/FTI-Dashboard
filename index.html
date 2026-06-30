@@ -1020,63 +1020,6 @@ function vSelfCare(d) {
     </div>`;
   }
 
-  function buildDonut(segs) {
-    const W=400, H=195, cx=200, cy=90, ro=76, ri=44;
-    const cols=['var(--olive)','#C8A040','#9A8A6A'];
-    const shortNames=['Self-Care','Makeup','Lifestyle'];
-
-    window.scDonutHover = function(evt, name, pct, col) {
-      const tip = document.getElementById('sc-donut-tip');
-      if (!tip) return;
-      const wrap = document.getElementById('sc-donut-wrap');
-      const wr = wrap ? wrap.getBoundingClientRect() : {left:0, top:0, width:400};
-      let lft = evt.clientX - wr.left + 14;
-      let top = evt.clientY - wr.top - 60;
-      if (lft + 145 > wr.width) lft -= 160;
-      if (top < 4) top = 4;
-      tip.style.cssText = `display:block;position:absolute;left:${lft}px;top:${top}px;background:white;border:1.5px solid var(--g3);border-radius:8px;padding:8px 12px;box-shadow:0 2px 10px rgba(0,0,0,.1);pointer-events:none;z-index:99`;
-      tip.innerHTML = `<div style="font-size:10px;color:var(--muted);font-weight:600">Beauty Split 2024</div><div style="display:flex;align-items:center;gap:6px;margin-top:3px"><div style="width:10px;height:10px;background:${col};border-radius:2px;flex-shrink:0"></div><div style="font-size:12px;font-weight:700;color:var(--text)">${name}</div></div><div style="font-size:20px;font-weight:800;color:${col};margin-top:1px">${pct}%</div><div style="font-size:9px;color:var(--muted);margin-top:1px">of beauty industry</div>`;
-    };
-    window.scDonutOut = function() {
-      const tip = document.getElementById('sc-donut-tip');
-      if (tip) tip.style.display = 'none';
-    };
-
-    let paths='',lbls='',start=-90;
-    segs.forEach((s,i)=>{
-      const deg=(s.pct/100)*360, end=start+deg;
-      const sr=start*Math.PI/180, er=end*Math.PI/180;
-      const lg=deg>180?1:0;
-      const hl=i===0, ox=hl?Math.cos((sr+er)/2)*6:0, oy=hl?Math.sin((sr+er)/2)*6:0;
-      const x1=(cx+ox+ro*Math.cos(sr)).toFixed(2),y1=(cy+oy+ro*Math.sin(sr)).toFixed(2);
-      const x2=(cx+ox+ro*Math.cos(er)).toFixed(2),y2=(cy+oy+ro*Math.sin(er)).toFixed(2);
-      const x3=(cx+ox+ri*Math.cos(er)).toFixed(2),y3=(cy+oy+ri*Math.sin(er)).toFixed(2);
-      const x4=(cx+ox+ri*Math.cos(sr)).toFixed(2),y4=(cy+oy+ri*Math.sin(sr)).toFixed(2);
-      const col=cols[i%cols.length], baseOp=hl?1:0.65, name=s.name||shortNames[i];
-      paths+=`<path d="M${x1},${y1} A${ro},${ro} 0 ${lg},1 ${x2},${y2} L${x3},${y3} A${ri},${ri} 0 ${lg},0 ${x4},${y4}Z" fill="${col}" opacity="${baseOp}" style="cursor:pointer;transition:opacity .15s" onmouseenter="this.setAttribute('opacity','1');window.scDonutHover(event,'${name}',${s.pct},'${col}')" onmouseleave="this.setAttribute('opacity','${baseOp}');window.scDonutOut()"/>`;
-      const ma=(sr+er)/2, lr=(ro+ri)/2;
-      const lx=(cx+ox+lr*Math.cos(ma)).toFixed(1),ly=(cy+oy+lr*Math.sin(ma)).toFixed(1);
-      lbls+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="800" fill="white" style="pointer-events:none">${s.pct}%</text>`;
-      start=end;
-    });
-    let legend='';
-    const itemW=W/3;
-    segs.forEach((s,i)=>{
-      const lx=i*itemW+8;
-      legend+=`<rect x="${lx}" y="175" width="9" height="9" fill="${cols[i%cols.length]}" opacity="${i===0?1:0.65}" rx="2"/>
-        <text x="${lx+13}" y="183" font-size="9.5" fill="var(--text)" font-weight="${i===0?'700':'500'}">${shortNames[i]} ${s.pct}%</text>`;
-    });
-    return `<div id="sc-donut-wrap" style="position:relative">
-      <div id="sc-donut-tip" style="display:none"></div>
-      <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
-        ${paths}${lbls}${legend}
-        <text x="${cx}" y="${cy-8}" text-anchor="middle" font-size="10" fill="var(--muted)">Beauty</text>
-        <text x="${cx}" y="${cy+6}" text-anchor="middle" font-size="10" fill="var(--muted)">Split</text>
-        <text x="${cx}" y="${cy+20}" text-anchor="middle" font-size="9" fill="var(--muted)">(2024)</text>
-      </svg>
-    </div>`;
-  }
-
   function buildSubcats(subcats) {
     const sorted=[...subcats].sort((a,b)=>b.growth-a.growth);
     const maxG=sorted[0].growth;
@@ -1113,9 +1056,8 @@ function vSelfCare(d) {
 
   return H.vh(d.catName,d.desc,d.updated,d.alertBadge)
     + H.kpiRow(d.kpis)
-    + H.blk('Market Size & Growth Rate — Indonesia Self-Care',`<div id="sc-chart-block">${renderChart('all')}</div>`)
-    + `<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-bottom:12px">
-        ${H.blk('Beauty Category Share (2024)',buildDonut(d.catShare||[]))}
+    + `<div style="display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:16px;margin-bottom:12px">
+        ${H.blk('Market Size & Growth Rate — Indonesia Self-Care',`<div id="sc-chart-block">${renderChart('all')}</div>`)}
         ${H.blk('Top-Growing Sub-Categories — YoY %',buildSubcats(d.subcats||[]))}
       </div>`
     + H.blk('AI Quarterly Insight',`<div class="ai-box"><div class="ai-lbl">Q2 2026 Analysis</div><div class="ai-text">${aiText}</div></div>`);
