@@ -1661,40 +1661,45 @@ function vPeakSeason(d) {
   const MS = 86400000;
   const diff = dt => Math.ceil((dt - today) / MS);
   const fmtD = dt => dt.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  // Dates stored in Supabase as "YYYY-MM-DD"; parse in local time to avoid UTC-offset shift
+  const pDate = s => { const [y,m,d2] = s.split('-').map(Number); return new Date(y, m-1, d2); };
 
-  const EVENTS = [
-    { name:'Tahun Baru Masehi',      short:'New Year',      date:new Date(2026,0,1),   type:'holiday', icon:'🎆', uplift:'+35%'  },
-    { name:'Isra Mikraj',            short:'Isra Mikraj',   date:new Date(2026,0,16),  type:'holiday', icon:'☪️',  uplift:'+15%'  },
-    { name:'2.2 Sale',               short:'2.2',           date:new Date(2026,1,2),   type:'sale',    icon:'🛍', uplift:'+30%'  },
-    { name:"Valentine's Day",        short:'Valentine',     date:new Date(2026,1,14),  type:'retail',  icon:'💝', uplift:'+25%'  },
-    { name:'Tahun Baru Imlek',       short:'Imlek',         date:new Date(2026,1,17),  type:'holiday', icon:'🧧', uplift:'+45%'  },
-    { name:'3.3 Sale',               short:'3.3',           date:new Date(2026,2,3),   type:'sale',    icon:'🛍', uplift:'+40%'  },
-    { name:'Hari Suci Nyepi',        short:'Nyepi',         date:new Date(2026,2,19),  type:'holiday', icon:'🕯️', uplift:'+10%'  },
-    { name:'Idul Fitri (Lebaran)',   short:'Lebaran',       date:new Date(2026,2,21),  type:'holiday', icon:'🌙', uplift:'+160%' },
-    { name:'Wafat Yesus Kristus',    short:'Good Friday',   date:new Date(2026,3,3),   type:'holiday', icon:'✝️',  uplift:'+20%'  },
-    { name:'4.4 Sale',               short:'4.4',           date:new Date(2026,3,4),   type:'sale',    icon:'🛍', uplift:'+45%'  },
-    { name:'Hari Buruh Nasional',    short:'Labor Day',     date:new Date(2026,4,1),   type:'holiday', icon:'⚒️',  uplift:'+20%'  },
-    { name:'5.5 Sale',               short:'5.5',           date:new Date(2026,4,5),   type:'sale',    icon:'🛍', uplift:'+55%'  },
-    { name:'Kenaikan Yesus Kristus', short:'Ascension Day', date:new Date(2026,4,14),  type:'holiday', icon:'✝️',  uplift:'+15%'  },
-    { name:'Idul Adha',              short:'Idul Adha',     date:new Date(2026,4,27),  type:'holiday', icon:'🐑', uplift:'+55%'  },
-    { name:'Hari Waisak',            short:'Waisak',        date:new Date(2026,4,31),  type:'holiday', icon:'☸️',  uplift:'+10%'  },
-    { name:'Hari Pancasila',         short:'Pancasila',     date:new Date(2026,5,1),   type:'holiday', icon:'🇮🇩', uplift:'+15%'  },
-    { name:'6.6 Sale',               short:'6.6',           date:new Date(2026,5,6),   type:'sale',    icon:'🛍', uplift:'+60%'  },
-    { name:'Tahun Baru Islam 1448H', short:'Tahun Baru Islam', date:new Date(2026,5,16), type:'holiday', icon:'☪️', uplift:'+20%' },
-    { name:'7.7 Sale',               short:'7.7',           date:new Date(2026,6,7),   type:'sale',    icon:'🛍', uplift:'+85%'  },
-    { name:'8.8 Sale',               short:'8.8',           date:new Date(2026,7,8),   type:'sale',    icon:'🛍', uplift:'+70%'  },
-    { name:'Kemerdekaan RI ke-81',   short:'17 Agustus',    date:new Date(2026,7,17),  type:'holiday', icon:'🇮🇩', uplift:'+40%'  },
-    { name:'Maulid Nabi SAW',        short:'Maulid Nabi',   date:new Date(2026,7,25),  type:'holiday', icon:'☪️',  uplift:'+20%'  },
-    { name:'9.9 Sale',               short:'9.9',           date:new Date(2026,8,9),   type:'sale',    icon:'🛍', uplift:'+95%'  },
-    { name:'10.10 Sale',             short:'10.10',         date:new Date(2026,9,10),  type:'sale',    icon:'🛍', uplift:'+115%' },
-    { name:'11.11 Harbolnas',        short:'11.11',         date:new Date(2026,10,11), type:'sale',    icon:'🛒', uplift:'+210%' },
-    { name:'Black Friday',           short:'Black Friday',  date:new Date(2026,10,27), type:'retail',  icon:'🖤', uplift:'+75%'  },
-    { name:'Cyber Monday',           short:'Cyber Monday',  date:new Date(2026,10,30), type:'retail',  icon:'💻', uplift:'+55%'  },
-    { name:'12.12 Harbolnas',        short:'12.12',         date:new Date(2026,11,12), type:'sale',    icon:'🛒', uplift:'+160%' },
-    { name:'Hari Ibu',               short:'Hari Ibu',      date:new Date(2026,11,22), type:'holiday', icon:'💝', uplift:'+30%'  },
-    { name:'Cuti Bersama Natal',     short:'Cuti Natal',    date:new Date(2026,11,24), type:'holiday', icon:'🎄', uplift:'+120%' },
-    { name:'Hari Natal',             short:'Christmas',     date:new Date(2026,11,25), type:'holiday', icon:'🎄', uplift:'+130%' },
+  // Prefer events from Supabase (updated yearly); fall back to 2026 hardcoded list
+  const FALLBACK_2026 = [
+    { name:'Tahun Baru Masehi',      short:'New Year',         date:'2026-01-01', type:'holiday', icon:'🎆', uplift:'+35%'  },
+    { name:'Isra Mikraj',            short:'Isra Mikraj',      date:'2026-01-16', type:'holiday', icon:'☪️',  uplift:'+15%'  },
+    { name:'2.2 Sale',               short:'2.2',              date:'2026-02-02', type:'sale',    icon:'🛍', uplift:'+30%'  },
+    { name:"Valentine's Day",        short:'Valentine',        date:'2026-02-14', type:'retail',  icon:'💝', uplift:'+25%'  },
+    { name:'Tahun Baru Imlek',       short:'Imlek',            date:'2026-02-17', type:'holiday', icon:'🧧', uplift:'+45%'  },
+    { name:'3.3 Sale',               short:'3.3',              date:'2026-03-03', type:'sale',    icon:'🛍', uplift:'+40%'  },
+    { name:'Hari Suci Nyepi',        short:'Nyepi',            date:'2026-03-19', type:'holiday', icon:'🕯️', uplift:'+10%'  },
+    { name:'Idul Fitri (Lebaran)',   short:'Lebaran',          date:'2026-03-21', type:'holiday', icon:'🌙', uplift:'+160%' },
+    { name:'Wafat Yesus Kristus',    short:'Good Friday',      date:'2026-04-03', type:'holiday', icon:'✝️',  uplift:'+20%'  },
+    { name:'4.4 Sale',               short:'4.4',              date:'2026-04-04', type:'sale',    icon:'🛍', uplift:'+45%'  },
+    { name:'Hari Buruh Nasional',    short:'Labor Day',        date:'2026-05-01', type:'holiday', icon:'⚒️',  uplift:'+20%'  },
+    { name:'5.5 Sale',               short:'5.5',              date:'2026-05-05', type:'sale',    icon:'🛍', uplift:'+55%'  },
+    { name:'Kenaikan Yesus Kristus', short:'Ascension Day',   date:'2026-05-14', type:'holiday', icon:'✝️',  uplift:'+15%'  },
+    { name:'Idul Adha',              short:'Idul Adha',        date:'2026-05-27', type:'holiday', icon:'🐑', uplift:'+55%'  },
+    { name:'Hari Waisak',            short:'Waisak',           date:'2026-05-31', type:'holiday', icon:'☸️',  uplift:'+10%'  },
+    { name:'Hari Pancasila',         short:'Pancasila',        date:'2026-06-01', type:'holiday', icon:'🇮🇩', uplift:'+15%'  },
+    { name:'6.6 Sale',               short:'6.6',              date:'2026-06-06', type:'sale',    icon:'🛍', uplift:'+60%'  },
+    { name:'Tahun Baru Islam 1448H', short:'Tahun Baru Islam', date:'2026-06-16', type:'holiday', icon:'☪️', uplift:'+20%'  },
+    { name:'7.7 Sale',               short:'7.7',              date:'2026-07-07', type:'sale',    icon:'🛍', uplift:'+85%'  },
+    { name:'8.8 Sale',               short:'8.8',              date:'2026-08-08', type:'sale',    icon:'🛍', uplift:'+70%'  },
+    { name:'Kemerdekaan RI ke-81',   short:'17 Agustus',       date:'2026-08-17', type:'holiday', icon:'🇮🇩', uplift:'+40%'  },
+    { name:'Maulid Nabi SAW',        short:'Maulid Nabi',      date:'2026-08-25', type:'holiday', icon:'☪️',  uplift:'+20%'  },
+    { name:'9.9 Sale',               short:'9.9',              date:'2026-09-09', type:'sale',    icon:'🛍', uplift:'+95%'  },
+    { name:'10.10 Sale',             short:'10.10',            date:'2026-10-10', type:'sale',    icon:'🛍', uplift:'+115%' },
+    { name:'11.11 Harbolnas',        short:'11.11',            date:'2026-11-11', type:'sale',    icon:'🛒', uplift:'+210%' },
+    { name:'Black Friday',           short:'Black Friday',     date:'2026-11-27', type:'retail',  icon:'🖤', uplift:'+75%'  },
+    { name:'Cyber Monday',           short:'Cyber Monday',     date:'2026-11-30', type:'retail',  icon:'💻', uplift:'+55%'  },
+    { name:'12.12 Harbolnas',        short:'12.12',            date:'2026-12-12', type:'sale',    icon:'🛒', uplift:'+160%' },
+    { name:'Hari Ibu',               short:'Hari Ibu',         date:'2026-12-22', type:'holiday', icon:'💝', uplift:'+30%'  },
+    { name:'Cuti Bersama Natal',     short:'Cuti Natal',       date:'2026-12-24', type:'holiday', icon:'🎄', uplift:'+120%' },
+    { name:'Hari Natal',             short:'Christmas',        date:'2026-12-25', type:'holiday', icon:'🎄', uplift:'+130%' },
   ];
+  const raw = (d.events && d.events.length) ? d.events : FALLBACK_2026;
+  const EVENTS = raw.map(e => ({ ...e, date: pDate(e.date) }));
 
   const sorted = [...EVENTS].sort((a,b) => a.date - b.date);
   const withMeta = sorted.map(e => {
