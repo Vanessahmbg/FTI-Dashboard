@@ -230,6 +230,15 @@
       text-transform: uppercase; color: var(--olive-dk);
       background: rgba(255,255,255,0.45);
     }
+    .cal-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+    .cal-tab { padding: 5px 13px; font-size: 11px; font-weight: 700; border: 1.5px solid var(--g2); background: var(--white); border-radius: 20px; cursor: pointer; color: var(--muted); transition: all 0.15s; }
+    .cal-tab:hover { border-color: var(--olive); color: var(--olive-dk); background: var(--olive-lt); }
+    .cal-tab.active { border-color: var(--olive); background: var(--olive-lt); color: var(--olive-dk); }
+    .cal-pg { display: flex; align-items: center; gap: 10px; margin-top: 10px; justify-content: flex-end; }
+    .cal-pg button { padding: 4px 12px; font-size: 11px; font-weight: 700; border: 1.5px solid var(--g2); background: var(--white); border-radius: 6px; cursor: pointer; color: var(--text); }
+    .cal-pg button:hover:not(:disabled) { border-color: var(--olive); color: var(--olive-dk); background: var(--olive-lt); }
+    .cal-pg button:disabled { opacity: 0.35; cursor: default; }
+    .cal-pg span { font-size: 11px; color: var(--muted); font-weight: 600; }
   </style>
 </head>
 <body>
@@ -1733,22 +1742,34 @@ function vPeakSeason(d) {
     </div>`;
   }).join('');
 
-  const calRows = withMeta.map(e => {
-    const past = e.days < 0;
-    const dim  = 'color:var(--muted)';
-    const tc   = past ? 'var(--muted)' : tColor[e.type];
-    return [
-      `<span style="${past ? dim : e.urgency==='urgent'?'font-weight:700':''}">${e.icon} ${e.name}</span>`,
-      `<span style="${past ? dim : ''}">${e.dateStr}</span>`,
-      `<span style="font-size:9px;font-weight:700;text-transform:uppercase;color:${tc}">${tLabel[e.type]}</span>`,
-      past
-        ? `<span style="${dim};font-size:11px">✓ Passed</span>`
-        : e.days === 0
-          ? `<span class="st st-r" style="font-size:10px">TODAY</span>`
-          : `<span style="font-weight:700;color:${e.urgency==='urgent'?'var(--red)':e.urgency==='medium'?'var(--amber)':'var(--text)'}">${e.days}d</span>`,
-      `<span style="${past ? dim : 'font-weight:600;color:var(--green)'}">${e.uplift}</span>`,
-    ];
-  });
+  // Build categorised calendar — past (newest first), soon (≤60d), later (>60d)
+  const calPast  = withMeta.filter(e => e.days < 0).reverse();
+  const calSoon  = withMeta.filter(e => e.days >= 0 && e.days <= 60);
+  const calLater = withMeta.filter(e => e.days > 60);
+  window._calEvents = { past: calPast, soon: calSoon, later: calLater };
+  window._calPage   = 0;
+  window._calTab    = calSoon.length ? 'soon' : calLater.length ? 'later' : 'past';
+
+  const initTab   = window._calTab;
+  const initEvts  = window._calEvents[initTab];
+  const initTotal = Math.ceil(initEvts.length / 10);
+  const initRows  = _calRows(initEvts.slice(0, 10));
+
+  const calWidget = `
+    <div class="cal-tabs">
+      <button id="cal-tab-past"  class="cal-tab${initTab==='past' ?' active':''}" onclick="switchCalTab('past')">✓ Already Passed (${calPast.length})</button>
+      <button id="cal-tab-soon"  class="cal-tab${initTab==='soon' ?' active':''}" onclick="switchCalTab('soon')">⚡ Upcoming Soon (${calSoon.length})</button>
+      <button id="cal-tab-later" class="cal-tab${initTab==='later'?' active':''}" onclick="switchCalTab('later')">📅 Upcoming Later (${calLater.length})</button>
+    </div>
+    <table class="tbl"><thead><tr>
+      <th>Event</th><th>Date</th><th>Type</th><th>Days Away</th><th>Est. Uplift</th>
+    </tr></thead>
+    <tbody id="cal-tbody">${initRows}</tbody></table>
+    <div class="cal-pg">
+      <button id="cal-prev" onclick="calPageNav(-1)" disabled>← Prev</button>
+      <span id="cal-pg-info">${initTotal > 1 ? `Page 1 / ${initTotal}` : ''}</span>
+      <button id="cal-next" onclick="calPageNav(1)" ${initTotal <= 1 ? 'disabled' : ''}>Next →</button>
+    </div>`;
 
   const histRows = (d?.history||[]).map(h => [h.event, H.trendCell(h.shopee), H.trendCell(h.tt), H.trendCell(h.combined)]);
 
@@ -1756,8 +1777,61 @@ function vPeakSeason(d) {
     + H.callout({ type:alertType, title:alertTitle, body:alertBody })
     + H.kpiRow(kpis)
     + H.blk('Next 6 Upcoming Events', `<div class="cd-grid">${cards}</div>`)
-    + H.blk('📅 Full 2026 Event Calendar', H.table(['Event','Date','Type','Days Away','Est. Uplift'], calRows))
+    + H.blk('📅 Full 2026 Event Calendar', calWidget)
     + (histRows.length ? H.blk('Historical Sales Uplift Reference', H.table(['Event','Shopee','TikTok Shop','Combined'], histRows)) : '');
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * INTERACTIVE CALENDAR HELPERS (Peak Season Alert)
+ * ════════════════════════════════════════════════════════════════ */
+function _calRows(evts) {
+  const tColor = { sale:'var(--olive)', holiday:'var(--amber)', retail:'#7B68EE' };
+  const tLabel = { sale:'SALE', holiday:'LIBUR NASIONAL', retail:'RETAIL EVENT' };
+  if (!evts || !evts.length) return `<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:20px;font-size:12px">No events in this category</td></tr>`;
+  return evts.map(e => {
+    const past = e.days < 0;
+    const dim  = 'color:var(--muted)';
+    const tc   = past ? 'var(--muted)' : tColor[e.type];
+    const daysCell = past
+      ? `<span style="${dim};font-size:11px">✓ Passed</span>`
+      : e.days === 0
+        ? `<span class="st st-r" style="font-size:10px">TODAY</span>`
+        : `<span style="font-weight:700;color:${e.urgency==='urgent'?'var(--red)':e.urgency==='medium'?'var(--amber)':'var(--text)'}">${e.days}d</span>`;
+    return `<tr>
+      <td><span style="${past ? dim : e.urgency==='urgent'?'font-weight:700':''}">${e.icon} ${e.name}</span></td>
+      <td><span style="${past ? dim : ''}">${e.dateStr}</span></td>
+      <td><span style="font-size:9px;font-weight:700;text-transform:uppercase;color:${tc}">${tLabel[e.type]}</span></td>
+      <td>${daysCell}</td>
+      <td><span style="${past ? dim : 'font-weight:600;color:var(--green)'}">${e.uplift}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function _calRefresh() {
+  const tab   = window._calTab || 'soon';
+  const evts  = ((window._calEvents || {})[tab]) || [];
+  const page  = window._calPage || 0;
+  const total = Math.ceil(evts.length / 10);
+  const slice = evts.slice(page * 10, (page + 1) * 10);
+  ['past','soon','later'].forEach(t => {
+    const b = document.getElementById('cal-tab-' + t);
+    if (b) b.className = 'cal-tab' + (t === tab ? ' active' : '');
+  });
+  const tbody = document.getElementById('cal-tbody');
+  if (tbody) tbody.innerHTML = _calRows(slice);
+  const info = document.getElementById('cal-pg-info');
+  if (info) info.textContent = total > 1 ? `Page ${page + 1} / ${total}` : '';
+  const prev = document.getElementById('cal-prev');
+  const next = document.getElementById('cal-next');
+  if (prev) prev.disabled = page <= 0;
+  if (next) next.disabled = page >= total - 1;
+}
+
+function switchCalTab(tab) { window._calTab = tab; window._calPage = 0; _calRefresh(); }
+function calPageNav(dir) {
+  const evts = ((window._calEvents || {})[window._calTab]) || [];
+  window._calPage = Math.max(0, Math.min((window._calPage || 0) + dir, Math.ceil(evts.length / 10) - 1));
+  _calRefresh();
 }
 
 /* ════════════════════════════════════════════════════════════════
