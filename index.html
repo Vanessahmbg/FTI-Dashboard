@@ -467,18 +467,21 @@ const MOCK_DATA = {
       { rank: 10, keyword: 'Bold Graphic Liner',       category: 'makeup',     momentum: '📉 Declining', description: 'Peak 2023 aesthetic softening as natural dewy looks dominate',     mentions: 9  },
     ],
     sources: ['Vogue Beauty', 'Business of Fashion', 'Glossy', 'Beauty Independent', 'BeautyMatter', 'Allure', 'Elle Beauty', "Harper's Bazaar"],
-    sitesScraped: 8,
-    totalHeadlines: 240,
+    indonesia_sources: ['Elle Indonesia', 'Dewi Magazine', 'Beauty Journal', 'Beautynesia', 'Cosmopolitan ID', 'Female Daily', "Harper's Bazaar ID"],
+    sitesScraped: 15,
+    totalHeadlines: 390,
     coverage: '30 days',
-    indonesia: [
-      { name: 'Glass Skin',                   score: 95, mom: '↑ +5', status: 'Peak' },
-      { name: 'Natural / Herbal Ingredients', score: 90, mom: '↑ +7', status: 'Rising fast' },
-      { name: 'SPF Awareness',                score: 87, mom: '↑ +8', status: 'Rising fast' },
-      { name: 'Halal Certified Skincare',     score: 80, mom: '↑ +3', status: 'Rising' },
-      { name: 'Skinimalism',                  score: 72, mom: '↑ +6', status: 'Rising' },
-      { name: 'Skincare for Hijab Wearers',   score: 68, mom: '↑ +4', status: 'Niche rising' },
-      { name: 'Heavy Powder Makeup',          score: 38, mom: '↓ −8', status: 'Declining fast' },
-      { name: 'Multi-step AM routine',        score: 55, mom: '↓ −4', status: 'Declining' },
+    indonesia_trends: [
+      { rank: 1,  keyword: 'Glass Skin K-Beauty',       category: 'skincare',   momentum: '📈 Peak',      description: 'K-beauty glass skin remains the top Indonesian beauty aspiration',   mentions: 45 },
+      { rank: 2,  keyword: 'Halal Certified Skincare',  category: 'lifestyle',  momentum: '🔥 Rising',    description: 'Halal certification becomes a key purchase driver for IDN consumers', mentions: 40 },
+      { rank: 3,  keyword: 'SPF Tropical Protection',   category: 'skincare',   momentum: '🔥 Rising',    description: 'Everyday SPF adapted for tropical heat and humidity conditions',       mentions: 37 },
+      { rank: 4,  keyword: 'Niacinamide Brightening',   category: 'ingredient', momentum: '📈 Peak',      description: 'Niacinamide dominates as the #1 brightening ingredient in Indonesia',  mentions: 33 },
+      { rank: 5,  keyword: 'Natural Herbal Ingredients',category: 'ingredient', momentum: '🔥 Rising',    description: 'Local botanical ingredients driving trust and product differentiation', mentions: 30 },
+      { rank: 6,  keyword: 'Hijab-Friendly Skincare',   category: 'skincare',   momentum: '⭐ Emerging',  description: 'Sweat-resistant and breathable formulas tailored for hijab wearers',    mentions: 25 },
+      { rank: 7,  keyword: 'Affordable Local Brands',   category: 'lifestyle',  momentum: '🔥 Rising',    description: 'Domestic brands gain loyalty vs premium imports post-pandemic',         mentions: 22 },
+      { rank: 8,  keyword: 'Skinimalism Routine',       category: 'skincare',   momentum: '⭐ Emerging',  description: 'Simplified routines gaining ground especially among younger consumers', mentions: 18 },
+      { rank: 9,  keyword: 'Tinted Moisturiser SPF',    category: 'makeup',     momentum: '⭐ Emerging',  description: 'Hybrid tinted SPF replaces heavy foundation in humid climates',         mentions: 14 },
+      { rank: 10, keyword: 'Heavy Powder Foundation',   category: 'makeup',     momentum: '📉 Declining', description: 'Full-coverage powder looks fading in favour of skin-first aesthetics',  mentions: 8  },
     ],
   },
 
@@ -904,49 +907,35 @@ function vTrendsSignals(d) {
   };
   const momCol = m => m && m.includes('Rising') ? '#2d7a2d' : m && m.includes('Peak') ? 'var(--amber)' : m && m.includes('Emerging') ? 'var(--olive)' : 'var(--muted)';
 
-  const trends = d.trends || [];
-  const trendsHTML = trends.map((t, i) => {
-    const col = catCol[t.category] || 'var(--muted)';
-    const mc = momCol(t.momentum);
-    return `<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 0;${i < trends.length - 1 ? 'border-bottom:1px solid var(--g2)' : ''}">
-      <span style="font-size:11px;font-weight:800;color:var(--muted);width:22px;flex-shrink:0;padding-top:2px">${String(i + 1).padStart(2, '0')}</span>
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
-          <span style="font-size:13px;font-weight:700;color:var(--text)">${t.keyword}</span>
-          <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:${col}22;color:${col};text-transform:uppercase;letter-spacing:0.5px">${t.category}</span>
+  const buildTrendList = (trendArr, sourceArr) => {
+    if (!trendArr || !trendArr.length) return `<div style="color:var(--muted);font-size:12px;padding:20px 0">Live data will appear after the edge function runs.</div>`;
+    const rows = trendArr.map((t, i) => {
+      const col = catCol[t.category] || 'var(--muted)';
+      const mc = momCol(t.momentum);
+      return `<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 0;${i < trendArr.length - 1 ? 'border-bottom:1px solid var(--g2)' : ''}">
+        <span style="font-size:11px;font-weight:800;color:var(--muted);width:22px;flex-shrink:0;padding-top:2px">${String(i + 1).padStart(2, '0')}</span>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
+            <span style="font-size:13px;font-weight:700;color:var(--text)">${t.keyword}</span>
+            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:${col}22;color:${col};text-transform:uppercase;letter-spacing:0.5px">${t.category}</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.4">${t.description}</div>
         </div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.4">${t.description}</div>
-      </div>
-      <div style="text-align:right;flex-shrink:0;padding-left:8px">
-        <div style="font-size:11px;color:${mc};font-weight:600;white-space:nowrap">${t.momentum}</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:1px">${t.mentions} articles</div>
-      </div>
-    </div>`;
-  }).join('');
-
-  const sourcesHTML = (d.sources || []).map(s =>
-    `<span style="font-size:10px;background:var(--g2);padding:3px 8px;border-radius:20px;color:var(--muted)">${s}</span>`
-  ).join('');
-
-  const globalContent = trends.length > 0
-    ? `${trendsHTML}<div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--g2);display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:10px;color:var(--muted);font-weight:600;margin-right:2px">Sources:</span>${sourcesHTML}</div>`
-    : `<div style="color:var(--muted);font-size:12px;padding:20px 0">Live data will appear after the edge function runs.</div>`;
-
-  const mkTable = rows => H.table(
-    ['Trend Name', 'Momentum Score', 'MoM Change', 'Status'],
-    rows.map(r => [
-      `<span class="fw">${r.name}</span>`,
-      `<span class="fw">${r.score}</span> / 100`,
-      H.trendCell(r.mom),
-      r.score >= 80 ? `<span class="st st-r">${r.status}</span>` : r.score >= 65 ? `<span class="st st-a">${r.status}</span>` : `<span class="st st-n">${r.status}</span>`,
-    ])
-  );
+        <div style="text-align:right;flex-shrink:0;padding-left:8px">
+          <div style="font-size:11px;color:${mc};font-weight:600;white-space:nowrap">${t.momentum}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:1px">${t.mentions} articles</div>
+        </div>
+      </div>`;
+    }).join('');
+    const chips = (sourceArr || []).map(s => `<span style="font-size:10px;background:var(--g2);padding:3px 8px;border-radius:20px;color:var(--muted)">${s}</span>`).join('');
+    return `${rows}<div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--g2);display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:10px;color:var(--muted);font-weight:600;margin-right:2px">Sources:</span>${chips}</div>`;
+  };
 
   return H.vh('Trends Signals', d.desc, d.updated, d.alertBadge)
     + H.kpiRow(d.kpis)
-    + `<div style="display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:16px;margin-bottom:12px">
-        ${H.blk('🌐 Global Beauty Trends — AI-Scraped Top 10', globalContent)}
-        ${H.blk('🇮🇩 Indonesia Trends', d.indonesia ? mkTable(d.indonesia) : '<div style="color:var(--muted);font-size:12px">Coming soon</div>')}
+    + `<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-bottom:12px">
+        ${H.blk('🌐 Global Beauty Trends — AI Top 10', buildTrendList(trends, d.sources))}
+        ${H.blk('🇮🇩 Indonesia Trends — AI Top 10', buildTrendList(d.indonesia_trends, d.indonesia_sources))}
       </div>`;
 }
 
