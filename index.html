@@ -447,23 +447,29 @@ const MOCK_DATA = {
   /* ── 3a. TRENDS SIGNALS ─────────────────────────────────── */
   'trends-signals': {
     updated: 'June 2026', alertBadge: null,
-    desc: 'Monthly trend intelligence from global and Indonesian beauty publications and social channels.',
+    desc: 'Top 10 trending beauty keywords scraped monthly from 8 global beauty and fashion publications, analysed by AI.',
     kpis: [
-      { lbl: 'Global Trends Rising',  val: '8',  u: '', trend: 'up', t: '↑ vs 5 last month' },
-      { lbl: 'Global Trends Falling', val: '3',  u: '', trend: null },
-      { lbl: 'IDN Trends Rising',     val: '6',  u: '', trend: 'up', t: '↑ vs 4 last month' },
-      { lbl: 'FTI Alignment',         val: '67', u: '%', trend: 'st', t: '→ See Relevance Score' },
+      { lbl: 'Trends Tracked',  val: '10',  u: '',      trend: 'st', t: '→ Updated June 2026' },
+      { lbl: 'Rising / Peak',   val: '7',   u: '/ 10',  trend: 'up', t: '↑ Active trends this month' },
+      { lbl: 'Sources Scraped', val: '8',   u: '/ 8',   trend: 'st', t: '→ Global beauty press' },
+      { lbl: 'Headlines Read',  val: '240', u: '',       trend: 'st', t: '→ Articles analysed by AI' },
     ],
-    global: [
-      { name: 'Peptide Skincare',          score: 92, mom: '↑ +8', status: 'Rising fast' },
-      { name: 'Skin Barrier Repair',       score: 88, mom: '↑ +6', status: 'Rising fast' },
-      { name: 'Skinimalism',               score: 84, mom: '↑ +4', status: 'Rising' },
-      { name: 'Glass Skin',                score: 81, mom: '→  0', status: 'Stable peak' },
-      { name: 'SPF Everyday Wear',         score: 79, mom: '↑ +5', status: 'Rising' },
-      { name: 'Clean / Waterless Beauty',  score: 74, mom: '↑ +3', status: 'Rising' },
-      { name: 'Bold Colour Makeup',        score: 63, mom: '↓ −5', status: 'Declining' },
-      { name: 'Heavy Foundation',          score: 42, mom: '↓ −9', status: 'Declining fast' },
+    trends: [
+      { rank: 1,  keyword: 'Peptide Barrier Serums',   category: 'ingredient', momentum: '🔥 Rising',    description: 'Consumer demand for ceramide-peptide combos surging globally',   mentions: 42 },
+      { rank: 2,  keyword: 'Skin Barrier Repair',      category: 'skincare',   momentum: '🔥 Rising',    description: 'Post-winter repair routines dominate editorial and social content', mentions: 38 },
+      { rank: 3,  keyword: 'SPF Daily Protection',     category: 'skincare',   momentum: '📈 Peak',      description: 'Year-round SPF becomes mainstream across all demographics',        mentions: 35 },
+      { rank: 4,  keyword: 'Glass Skin Aesthetic',     category: 'skincare',   momentum: '📈 Peak',      description: 'K-beauty glass skin remains the aspirational beauty standard',      mentions: 31 },
+      { rank: 5,  keyword: 'Skinimalism Movement',     category: 'skincare',   momentum: '🔥 Rising',    description: 'Fewer products, better ingredients as minimalism approach peaks',    mentions: 28 },
+      { rank: 6,  keyword: 'Tinted SPF Hybrid',        category: 'makeup',     momentum: '⭐ Emerging',  description: 'SPF-makeup crossover formats gaining strong retail traction',       mentions: 24 },
+      { rank: 7,  keyword: 'Clean Beauty Formulation', category: 'lifestyle',  momentum: '🔥 Rising',    description: 'Transparent ingredient sourcing demanded by Gen Z shoppers',        mentions: 22 },
+      { rank: 8,  keyword: 'Retinol Alternatives',     category: 'ingredient', momentum: '⭐ Emerging',  description: 'Bakuchiol and retinal replacing classic retinol in new formulas',    mentions: 19 },
+      { rank: 9,  keyword: 'Scalp Care Wellness',      category: 'wellness',   momentum: '⭐ Emerging',  description: 'Scalp health bridges hair and skincare as a new category',           mentions: 16 },
+      { rank: 10, keyword: 'Bold Graphic Liner',       category: 'makeup',     momentum: '📉 Declining', description: 'Peak 2023 aesthetic softening as natural dewy looks dominate',     mentions: 9  },
     ],
+    sources: ['Vogue Beauty', 'Business of Fashion', 'Glossy', 'Beauty Independent', 'BeautyMatter', 'Allure', 'Elle Beauty', "Harper's Bazaar"],
+    sitesScraped: 8,
+    totalHeadlines: 240,
+    coverage: '30 days',
     indonesia: [
       { name: 'Glass Skin',                   score: 95, mom: '↑ +5', status: 'Peak' },
       { name: 'Natural / Herbal Ingredients', score: 90, mom: '↑ +7', status: 'Rising fast' },
@@ -892,6 +898,40 @@ function vCompetitorSentiments(d) {
 }
 
 function vTrendsSignals(d) {
+  const catCol = {
+    skincare: 'var(--olive)', makeup: 'var(--amber)', lifestyle: '#9A8A6A',
+    ingredient: '#5a8a5a', wellness: '#7a9a8a',
+  };
+  const momCol = m => m && m.includes('Rising') ? '#2d7a2d' : m && m.includes('Peak') ? 'var(--amber)' : m && m.includes('Emerging') ? 'var(--olive)' : 'var(--muted)';
+
+  const trends = d.trends || [];
+  const trendsHTML = trends.map((t, i) => {
+    const col = catCol[t.category] || 'var(--muted)';
+    const mc = momCol(t.momentum);
+    return `<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 0;${i < trends.length - 1 ? 'border-bottom:1px solid var(--g2)' : ''}">
+      <span style="font-size:11px;font-weight:800;color:var(--muted);width:22px;flex-shrink:0;padding-top:2px">${String(i + 1).padStart(2, '0')}</span>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
+          <span style="font-size:13px;font-weight:700;color:var(--text)">${t.keyword}</span>
+          <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:${col}22;color:${col};text-transform:uppercase;letter-spacing:0.5px">${t.category}</span>
+        </div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.4">${t.description}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;padding-left:8px">
+        <div style="font-size:11px;color:${mc};font-weight:600;white-space:nowrap">${t.momentum}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:1px">${t.mentions} articles</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const sourcesHTML = (d.sources || []).map(s =>
+    `<span style="font-size:10px;background:var(--g2);padding:3px 8px;border-radius:20px;color:var(--muted)">${s}</span>`
+  ).join('');
+
+  const globalContent = trends.length > 0
+    ? `${trendsHTML}<div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--g2);display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:10px;color:var(--muted);font-weight:600;margin-right:2px">Sources:</span>${sourcesHTML}</div>`
+    : `<div style="color:var(--muted);font-size:12px;padding:20px 0">Live data will appear after the edge function runs.</div>`;
+
   const mkTable = rows => H.table(
     ['Trend Name', 'Momentum Score', 'MoM Change', 'Status'],
     rows.map(r => [
@@ -901,11 +941,12 @@ function vTrendsSignals(d) {
       r.score >= 80 ? `<span class="st st-r">${r.status}</span>` : r.score >= 65 ? `<span class="st st-a">${r.status}</span>` : `<span class="st st-n">${r.status}</span>`,
     ])
   );
+
   return H.vh('Trends Signals', d.desc, d.updated, d.alertBadge)
     + H.kpiRow(d.kpis)
-    + `<div class="two-col">
-        ${H.blk('🌍 Global Beauty Trends', mkTable(d.global))}
-        ${H.blk('🇮🇩 Indonesia Trends', mkTable(d.indonesia))}
+    + `<div style="display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:16px;margin-bottom:12px">
+        ${H.blk('🌐 Global Beauty Trends — AI-Scraped Top 10', globalContent)}
+        ${H.blk('🇮🇩 Indonesia Trends', d.indonesia ? mkTable(d.indonesia) : '<div style="color:var(--muted);font-size:12px">Coming soon</div>')}
       </div>`;
 }
 
@@ -1628,7 +1669,7 @@ let activeId = null;
 const WIP_IDS = [
   'review-score', 'repurchase-rate', 'products-sentiment', 'social-listening',
   'competitor-alerts', 'competitor-sentiments',
-  'trends-signals', 'fti-relevance-score',
+  'fti-relevance-score',
   'peak-season-alert',
 ];
 
