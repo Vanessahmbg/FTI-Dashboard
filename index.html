@@ -694,29 +694,14 @@ const MOCK_DATA = {
 
   /* ── 5c. PEAK SEASON ALERT ──────────────────────────────── */
   'peak-season-alert': {
-    updated: 'June 2026', alertBadge: '⚠ 7.7 Sale in 12 Days',
-    desc: 'Upcoming peak shopping periods with historical sales uplift data and demand forecasts per platform.',
-    kpis: [
-      { lbl: 'Next Peak',        val: '7.7 Sale', u: '',   trend: 'dn', t: '↓ Jul 7 — 12 days' },
-      { lbl: 'Exp. Uplift',      val: '+85',      u: '%',  trend: null },
-      { lbl: 'Biggest Ever',     val: '11.11',    u: '',   trend: null },
-      { lbl: '11.11 Uplift',     val: '+210',     u: '%',  trend: 'up', t: '↑ Historical avg' },
-    ],
-    alert: { type: 'red', title: '7.7 Sale — 12 Days Away', body: 'Prepare campaign assets, stock buffer, and TikTok live-selling slots now. Historical 7.7 uplift is +85% on TikTok Shop. Last year FTI stocked out of Brightening Serum within 6 hours of the sale start.' },
-    events: [
-      { name: '7.7 Sale',              date: 'Jul 7, 2026',  days: 12,  urgency: 'urgent', uplift: '+85%'  },
-      { name: '8.8 Sale',              date: 'Aug 8, 2026',  days: 44,  urgency: 'medium', uplift: '+70%'  },
-      { name: '9.9 Sale',              date: 'Sep 9, 2026',  days: 76,  urgency: 'normal', uplift: '+95%'  },
-      { name: '10.10 Sale',            date: 'Oct 10, 2026', days: 107, urgency: 'normal', uplift: '+115%' },
-      { name: '11.11 Sale',            date: 'Nov 11, 2026', days: 139, urgency: 'normal', uplift: '+210%' },
-      { name: 'Christmas / New Year',  date: 'Dec 25, 2026', days: 183, urgency: 'normal', uplift: '+130%' },
-    ],
     history: [
-      { event: 'Ramadan 2026',  shopee: '+155%', tt: '+135%', combined: '+145%' },
-      { event: 'Eid 2026',      shopee: '+160%', tt: '+170%', combined: '+165%' },
-      { event: '11.11 2025',    shopee: '+195%', tt: '+225%', combined: '+210%' },
-      { event: '12.12 2025',    shopee: '+170%', tt: '+190%', combined: '+180%' },
-      { event: '7.7 2025',      shopee: '+75%',  tt: '+95%',  combined: '+85%'  },
+      { event: 'Lebaran 2026',   shopee: '+160%', tt: '+170%', combined: '+165%' },
+      { event: 'Ramadan 2026',   shopee: '+155%', tt: '+135%', combined: '+145%' },
+      { event: '11.11 2025',     shopee: '+195%', tt: '+225%', combined: '+210%' },
+      { event: '12.12 2025',     shopee: '+170%', tt: '+190%', combined: '+180%' },
+      { event: '9.9 2025',       shopee: '+88%',  tt: '+102%', combined: '+95%'  },
+      { event: '7.7 2025',       shopee: '+75%',  tt: '+95%',  combined: '+85%'  },
+      { event: 'Black Fri 2025', shopee: '+65%',  tt: '+85%',  combined: '+75%'  },
     ],
   },
 };
@@ -1663,19 +1648,116 @@ function vInflationRate(d) {
 }
 
 function vPeakSeason(d) {
-  const cards = d.events.map(e => `
-    <div class="cd-card ${e.urgency}">
+  const today = new Date(); today.setHours(0,0,0,0);
+  const MS = 86400000;
+  const diff = dt => Math.ceil((dt - today) / MS);
+  const fmtD = dt => dt.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+
+  const EVENTS = [
+    { name:'Tahun Baru Masehi',      short:'New Year',      date:new Date(2026,0,1),   type:'holiday', icon:'🎆', uplift:'+35%'  },
+    { name:'Isra Mikraj',            short:'Isra Mikraj',   date:new Date(2026,0,16),  type:'holiday', icon:'☪️',  uplift:'+15%'  },
+    { name:'2.2 Sale',               short:'2.2',           date:new Date(2026,1,2),   type:'sale',    icon:'🛍', uplift:'+30%'  },
+    { name:"Valentine's Day",        short:'Valentine',     date:new Date(2026,1,14),  type:'retail',  icon:'💝', uplift:'+25%'  },
+    { name:'Tahun Baru Imlek',       short:'Imlek',         date:new Date(2026,1,17),  type:'holiday', icon:'🧧', uplift:'+45%'  },
+    { name:'3.3 Sale',               short:'3.3',           date:new Date(2026,2,3),   type:'sale',    icon:'🛍', uplift:'+40%'  },
+    { name:'Hari Suci Nyepi',        short:'Nyepi',         date:new Date(2026,2,19),  type:'holiday', icon:'🕯️', uplift:'+10%'  },
+    { name:'Idul Fitri (Lebaran)',   short:'Lebaran',       date:new Date(2026,2,21),  type:'holiday', icon:'🌙', uplift:'+160%' },
+    { name:'Wafat Yesus Kristus',    short:'Good Friday',   date:new Date(2026,3,3),   type:'holiday', icon:'✝️',  uplift:'+20%'  },
+    { name:'4.4 Sale',               short:'4.4',           date:new Date(2026,3,4),   type:'sale',    icon:'🛍', uplift:'+45%'  },
+    { name:'Hari Buruh Nasional',    short:'Labor Day',     date:new Date(2026,4,1),   type:'holiday', icon:'⚒️',  uplift:'+20%'  },
+    { name:'5.5 Sale',               short:'5.5',           date:new Date(2026,4,5),   type:'sale',    icon:'🛍', uplift:'+55%'  },
+    { name:'Kenaikan Yesus Kristus', short:'Ascension Day', date:new Date(2026,4,14),  type:'holiday', icon:'✝️',  uplift:'+15%'  },
+    { name:'Idul Adha',              short:'Idul Adha',     date:new Date(2026,4,27),  type:'holiday', icon:'🐑', uplift:'+55%'  },
+    { name:'Hari Waisak',            short:'Waisak',        date:new Date(2026,4,31),  type:'holiday', icon:'☸️',  uplift:'+10%'  },
+    { name:'Hari Pancasila',         short:'Pancasila',     date:new Date(2026,5,1),   type:'holiday', icon:'🇮🇩', uplift:'+15%'  },
+    { name:'6.6 Sale',               short:'6.6',           date:new Date(2026,5,6),   type:'sale',    icon:'🛍', uplift:'+60%'  },
+    { name:'Tahun Baru Islam 1448H', short:'Tahun Baru Islam', date:new Date(2026,5,16), type:'holiday', icon:'☪️', uplift:'+20%' },
+    { name:'7.7 Sale',               short:'7.7',           date:new Date(2026,6,7),   type:'sale',    icon:'🛍', uplift:'+85%'  },
+    { name:'8.8 Sale',               short:'8.8',           date:new Date(2026,7,8),   type:'sale',    icon:'🛍', uplift:'+70%'  },
+    { name:'Kemerdekaan RI ke-81',   short:'17 Agustus',    date:new Date(2026,7,17),  type:'holiday', icon:'🇮🇩', uplift:'+40%'  },
+    { name:'Maulid Nabi SAW',        short:'Maulid Nabi',   date:new Date(2026,7,25),  type:'holiday', icon:'☪️',  uplift:'+20%'  },
+    { name:'9.9 Sale',               short:'9.9',           date:new Date(2026,8,9),   type:'sale',    icon:'🛍', uplift:'+95%'  },
+    { name:'10.10 Sale',             short:'10.10',         date:new Date(2026,9,10),  type:'sale',    icon:'🛍', uplift:'+115%' },
+    { name:'11.11 Harbolnas',        short:'11.11',         date:new Date(2026,10,11), type:'sale',    icon:'🛒', uplift:'+210%' },
+    { name:'Black Friday',           short:'Black Friday',  date:new Date(2026,10,27), type:'retail',  icon:'🖤', uplift:'+75%'  },
+    { name:'Cyber Monday',           short:'Cyber Monday',  date:new Date(2026,10,30), type:'retail',  icon:'💻', uplift:'+55%'  },
+    { name:'12.12 Harbolnas',        short:'12.12',         date:new Date(2026,11,12), type:'sale',    icon:'🛒', uplift:'+160%' },
+    { name:'Hari Ibu',               short:'Hari Ibu',      date:new Date(2026,11,22), type:'holiday', icon:'💝', uplift:'+30%'  },
+    { name:'Cuti Bersama Natal',     short:'Cuti Natal',    date:new Date(2026,11,24), type:'holiday', icon:'🎄', uplift:'+120%' },
+    { name:'Hari Natal',             short:'Christmas',     date:new Date(2026,11,25), type:'holiday', icon:'🎄', uplift:'+130%' },
+  ];
+
+  const sorted = [...EVENTS].sort((a,b) => a.date - b.date);
+  const withMeta = sorted.map(e => {
+    const days = diff(e.date);
+    const urgency = days < 0 ? 'past' : days === 0 ? 'urgent' : days <= 14 ? 'urgent' : days <= 45 ? 'medium' : 'normal';
+    return { ...e, days, urgency, dateStr: fmtD(e.date) };
+  });
+
+  const upcoming  = withMeta.filter(e => e.days >= 0);
+  const next      = upcoming[0];
+  const harbolnas = withMeta.find(e => e.short === '11.11');
+
+  const tColor = { sale:'var(--olive)', holiday:'var(--amber)', retail:'#7B68EE' };
+  const tLabel = { sale:'SALE', holiday:'LIBUR NASIONAL', retail:'RETAIL EVENT' };
+
+  const todayLabel = today.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  const kpis = [
+    { lbl:'Next Peak',        val: next ? next.short : '—',          u:'',                                                  trend: null },
+    { lbl:'Days Away',        val: next ? String(next.days) : '—',   u: next && next.days !== 1 ? 'days' : 'day',           trend: next && next.days <= 7 ? 'dn' : 'st', t: next ? `↓ ${next.dateStr}` : '' },
+    { lbl:'Events Remaining', val: String(upcoming.length),           u:'in 2026',                                           trend: 'st' },
+    { lbl:'11.11 Harbolnas',  val: harbolnas && harbolnas.days >= 0 ? String(harbolnas.days) : '✓', u: harbolnas && harbolnas.days >= 0 ? 'days away' : 'Done this year', trend: null },
+  ];
+
+  const alertType  = !next ? 'green' : next.days <= 7 ? 'red' : next.days <= 14 ? 'amber' : 'green';
+  const alertTitle = !next ? 'All 2026 Events Completed' : next.days === 0 ? `TODAY: ${next.name}` : `${next.name} — ${next.days} Day${next.days !== 1 ? 's' : ''} Away`;
+  const alertBody  = !next ? 'Great work — all 2026 peak dates are done!' : {
+    sale:    `Prepare campaign assets, inventory buffer, and TikTok live-selling slots for ${next.name}. Estimated FTI uplift: ${next.uplift}. Review best-selling SKUs and ensure fulfilment readiness 7 days before.`,
+    holiday: `${next.name} is a national public holiday. Plan themed content and pre-holiday promotions. Average FTI sales uplift: ${next.uplift}.`,
+    retail:  `${next.name} is a major retail event with strong IDN e-commerce traction. Align promotions with platform campaigns early for estimated ${next.uplift} uplift.`,
+  }[next.type];
+
+  const cardEvents = upcoming.slice(0, 6);
+  const cards = cardEvents.map(e => {
+    const tc = tColor[e.type];
+    return `<div class="cd-card ${e.urgency}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <span style="font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:${tc};background:${tc}18;padding:2px 7px;border-radius:20px">${tLabel[e.type]}</span>
+        <span style="font-size:16px">${e.icon}</span>
+      </div>
       <div class="cd-event">${e.name}</div>
-      <div class="cd-date">${e.date}</div>
-      <div class="cd-num">${e.days} <span class="cd-unit">days</span></div>
-      <div class="cd-uplift">Avg uplift ${e.uplift}</div>
-    </div>`).join('');
-  const histRows = d.history.map(h => [h.event, h.shopee, h.tt, h.combined]);
-  return H.vh('Peak Season Alert', d.desc, d.updated, d.alertBadge)
-    + H.callout(d.alert)
-    + H.kpiRow(d.kpis)
-    + H.blk('Upcoming Peak Events', `<div class="cd-grid">${cards}</div>`)
-    + H.blk('Historical Sales Uplift', H.table(['Event','Shopee','TikTok Shop','Combined'], histRows));
+      <div class="cd-date">${e.dateStr}</div>
+      <div class="cd-num">${e.days}<span class="cd-unit"> day${e.days !== 1 ? 's' : ''}</span></div>
+      <div class="cd-uplift">Est. uplift ${e.uplift}</div>
+    </div>`;
+  }).join('');
+
+  const calRows = withMeta.map(e => {
+    const past = e.days < 0;
+    const dim  = 'color:var(--muted)';
+    const tc   = past ? 'var(--muted)' : tColor[e.type];
+    return [
+      `<span style="${past ? dim : e.urgency==='urgent'?'font-weight:700':''}">${e.icon} ${e.name}</span>`,
+      `<span style="${past ? dim : ''}">${e.dateStr}</span>`,
+      `<span style="font-size:9px;font-weight:700;text-transform:uppercase;color:${tc}">${tLabel[e.type]}</span>`,
+      past
+        ? `<span style="${dim};font-size:11px">✓ Passed</span>`
+        : e.days === 0
+          ? `<span class="st st-r" style="font-size:10px">TODAY</span>`
+          : `<span style="font-weight:700;color:${e.urgency==='urgent'?'var(--red)':e.urgency==='medium'?'var(--amber)':'var(--text)'}">${e.days}d</span>`,
+      `<span style="${past ? dim : 'font-weight:600;color:var(--green)'}">${e.uplift}</span>`,
+    ];
+  });
+
+  const histRows = (d?.history||[]).map(h => [h.event, H.trendCell(h.shopee), H.trendCell(h.tt), H.trendCell(h.combined)]);
+
+  return H.vh('Peak Season Alert', 'Indonesia 2026 — national holidays, double-date sales & retail events. Countdown refreshes daily based on your local date.', todayLabel, next ? `⚠ ${next.short} in ${next.days}d` : '✓ All Clear')
+    + H.callout({ type:alertType, title:alertTitle, body:alertBody })
+    + H.kpiRow(kpis)
+    + H.blk('Next 6 Upcoming Events', `<div class="cd-grid">${cards}</div>`)
+    + H.blk('📅 Full 2026 Event Calendar', H.table(['Event','Date','Type','Days Away','Est. Uplift'], calRows))
+    + (histRows.length ? H.blk('Historical Sales Uplift Reference', H.table(['Event','Shopee','TikTok Shop','Combined'], histRows)) : '');
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -1704,7 +1786,6 @@ let activeId = null;
 const WIP_IDS = [
   'review-score', 'repurchase-rate', 'products-sentiment', 'social-listening',
   'competitor-alerts', 'competitor-sentiments',
-  'peak-season-alert',
 ];
 
 function navigate(id) {
