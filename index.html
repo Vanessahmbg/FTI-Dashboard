@@ -487,32 +487,31 @@ const MOCK_DATA = {
 
   /* ── 3b. FTI RELEVANCE SCORE ────────────────────────────── */
   'fti-relevance-score': {
-    updated: 'June 2026', alertBadge: '⚠ Gaps Found',
-    desc: 'AI-generated score measuring how closely FTI\'s product portfolio aligns with today\'s top beauty trends.',
+    updated: 'July 2026', alertBadge: '⚠ 2 Gaps Found',
+    desc: "AI-generated score measuring how closely FTI's product portfolio aligns with today's top global and Indonesian beauty trends.",
     kpis: [
-      { lbl: 'Overall Score',      val: '67', u: '/100', trend: 'dn', t: '↓ −3pts MoM' },
-      { lbl: 'Highest Category',   val: 'Packaging', u: '', trend: null },
-      { lbl: 'Lowest Category',    val: 'Ingredients', u: '', trend: null },
-      { lbl: 'Urgent Gaps',        val: '3', u: '', trend: 'dn', t: '↓ Peptide, Barrier, SPF' },
+      { lbl: 'Overall Score',    val: '71', u: '/100', trend: 'up', t: '↑ +4pts MoM' },
+      { lbl: 'Highest Category', val: 'Natural Ingredients', u: '', trend: null },
+      { lbl: 'Lowest Category',  val: 'Advanced Actives', u: '', trend: null },
+      { lbl: 'Urgent Gaps',      val: '2', u: '', trend: 'dn', t: '↓ Action needed' },
     ],
-    alert: { type: 'amber', title: 'Score Declined 3pts — Peptide & Barrier Repair Gap Widening', body: 'Global peptide and barrier repair trends grew 8pts this month while FTI has no peptide-forward product. Score will continue declining unless portfolio gap is addressed.' },
+    alert: { type: 'amber', title: 'Strong Botanicals Story — Peptide & Halal Gaps Remain', body: "FTI's tropical ingredient range aligns strongly with natural/herbal ingredient trends dominating both global and Indonesian press. However, no peptide product and no halal certification are leaving high-momentum opportunities uncaptured." },
     categories: [
-      { name: 'Packaging',       score: 74, note: 'Minimalist aesthetic aligns well' },
-      { name: 'Claims',          score: 72, note: 'Brightening claims align with glass skin trend' },
-      { name: 'Product Format',  score: 70, note: 'Serum & toner formats are on-trend' },
-      { name: 'Consumer Need',   score: 68, note: 'Hydration and brightening needs covered' },
-      { name: 'Ingredients',     score: 55, note: 'No peptide, limited niacinamide SKUs' },
+      { name: 'Natural Ingredients',        score: 88, note: 'Tropical botanicals match herbal trend perfectly' },
+      { name: 'SPF & Sun Protection',       score: 78, note: 'White Tea Sun Serum directly covers SPF trend' },
+      { name: 'Brightening & Glass Skin',   score: 75, note: 'Mangosteen Serum + AHA address glass skin demand' },
+      { name: 'Barrier Repair Technology',  score: 58, note: 'Guava Moisture Gel partially covers barrier trend' },
+      { name: 'Advanced Actives (Peptides)',score: 32, note: 'No peptide, no retinol-alt product in portfolio' },
     ],
     gaps: [
-      { trend: 'Peptide Skincare',    trendScore: 92, ftiScore: 38, opp: 'High' },
-      { trend: 'Skin Barrier Repair', trendScore: 88, ftiScore: 42, opp: 'High' },
-      { trend: 'SPF Everyday Wear',   trendScore: 87, ftiScore: 55, opp: 'Medium' },
-      { trend: 'Halal Certified',     trendScore: 80, ftiScore: 60, opp: 'Medium' },
+      { trend: 'Peptide Barrier Serums',    trendScore: 92, ftiScore: 32, opp: 'High' },
+      { trend: 'Halal Certified Skincare',  trendScore: 80, ftiScore: 40, opp: 'High' },
+      { trend: 'Skin Barrier Repair',       trendScore: 88, ftiScore: 58, opp: 'Medium' },
     ],
     recs: [
-      'Develop a peptide-active serum SKU — aligns with top global & IDN trends',
-      'Add barrier repair claims to Hydra Toner marketing and reformulate for ceramide inclusion',
-      'Consider SPF 30+ version of Daily Moisturizer (SPF Awareness trend growing 8pts IDN)',
+      'Develop a peptide + ceramide serum — top unmet gap across global and IDN trends',
+      'Pursue halal certification for skincare range — critical Indonesia growth driver',
+      'Reposition Guava Moisture Gel with explicit barrier repair claims and ceramide addition',
     ],
   },
 
@@ -957,7 +956,7 @@ function vRelevanceScore(d) {
   const bigScore = `<div class="blk">
     <div class="score-wrap">
       <div class="score-num">${d.kpis[0].val}<span class="score-den"> /100</span></div>
-      <div class="score-lbl">Overall FTI Trend Alignment Score — June 2026</div>
+      <div class="score-lbl">Overall FTI Trend Alignment Score — ${d.updated}</div>
     </div>
   </div>`;
   return H.vh('FTI Relevance Score', d.desc, d.updated, d.alertBadge)
@@ -1660,7 +1659,6 @@ let activeId = null;
 const WIP_IDS = [
   'review-score', 'repurchase-rate', 'products-sentiment', 'social-listening',
   'competitor-alerts', 'competitor-sentiments',
-  'fti-relevance-score',
   'peak-season-alert',
 ];
 
