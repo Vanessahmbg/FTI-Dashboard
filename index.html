@@ -757,12 +757,12 @@ const H = {
   kpiRow(kpis) { return `<div class="kpi-row">${(kpis||[]).map(H.kpi).join('')}</div>`; },
   blk(title, body) { return `<div class="blk"><div class="blk-hd">${title}</div><div class="blk-body">${body}</div></div>`; },
   table(heads, rows) {
-    const ths = heads.map(h => `<th>${h}</th>`).join('');
-    const trs = rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
+    const ths = (heads||[]).map(h => `<th>${h}</th>`).join('');
+    const trs = (rows||[]).map(r => `<tr>${(r||[]).map(c => `<td>${c??''}</td>`).join('')}</tr>`).join('');
     return `<table class="tbl"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
   },
   bars(items) {
-    return items.map(({ name, pct, cls }) => `<div class="brow">
+    return (items||[]).map(({ name, pct, cls }) => `<div class="brow">
       <span class="blbl">${name}</span>
       <div class="btrack"><div class="bfill ${cls||''}" style="width:${pct}%"></div></div>
       <span class="bpct">${pct}%</span>
@@ -1799,7 +1799,7 @@ function navigate(id) {
     content.innerHTML = VIEWS[id](DATA[id]);
   } catch (e) {
     console.error('Render error for', id, e);
-    content.innerHTML = `<div style="padding:32px;color:var(--red);font-size:13px">Failed to render this section. Please hard-refresh (Ctrl+Shift+R) and try again.<br><small style="color:var(--muted)">${e.message}</small></div>`;
+    content.innerHTML = `<div style="padding:32px;color:var(--red);font-size:13px">Failed to render this section. Please hard-refresh (Ctrl+Shift+R) and try again.<br><small style="color:var(--muted)">${e.message}</small><br><small style="color:var(--muted);font-size:10px;white-space:pre-wrap">${(e.stack||'').slice(0,400)}</small></div>`;
     return;
   }
   if (WIP_IDS.includes(id)) {
