@@ -488,20 +488,36 @@ const MOCK_DATA = {
   /* ── 3b. FTI RELEVANCE SCORE ────────────────────────────── */
   'fti-relevance-score': {
     updated: 'July 2026', alertBadge: '⚠ 2 Gaps Found',
-    desc: "AI-generated score measuring how closely FTI's product portfolio aligns with today's top global and Indonesian beauty trends.",
+    desc: "AI-generated score measuring how closely each FTI product aligns with today's top global and Indonesian beauty trends. Overall score is the average across all 21 products.",
     kpis: [
-      { lbl: 'Overall Score',    val: '71', u: '/100', trend: 'up', t: '↑ +4pts MoM' },
-      { lbl: 'Highest Category', val: 'Natural Ingredients', u: '', trend: null },
-      { lbl: 'Lowest Category',  val: 'Advanced Actives', u: '', trend: null },
-      { lbl: 'Urgent Gaps',      val: '2', u: '', trend: 'dn', t: '↓ Action needed' },
+      { lbl: 'Overall Score',  val: '55', u: '/100', trend: 'st', t: '→ Avg. across 21 products' },
+      { lbl: 'Best Product',   val: 'Mangosteen Serum', u: '', trend: null },
+      { lbl: 'Needs Work',     val: 'Apparel Range', u: '', trend: null },
+      { lbl: 'Urgent Gaps',   val: '2', u: '', trend: 'dn', t: '↓ Action needed' },
     ],
     alert: { type: 'amber', title: 'Strong Botanicals Story — Peptide & Halal Gaps Remain', body: "FTI's tropical ingredient range aligns strongly with natural/herbal ingredient trends dominating both global and Indonesian press. However, no peptide product and no halal certification are leaving high-momentum opportunities uncaptured." },
-    categories: [
-      { name: 'Natural Ingredients',        score: 88, note: 'Tropical botanicals match herbal trend perfectly' },
-      { name: 'SPF & Sun Protection',       score: 78, note: 'White Tea Sun Serum directly covers SPF trend' },
-      { name: 'Brightening & Glass Skin',   score: 75, note: 'Mangosteen Serum + AHA address glass skin demand' },
-      { name: 'Barrier Repair Technology',  score: 58, note: 'Guava Moisture Gel partially covers barrier trend' },
-      { name: 'Advanced Actives (Peptides)',score: 32, note: 'No peptide, no retinol-alt product in portfolio' },
+    products: [
+      { name: 'Mangosteen Brightening Serum',           category: 'skincare',   score: 85, note: 'Glass skin & brightening — top global + IDN trend' },
+      { name: 'White Tea Ultra-Light Sun Serum',        category: 'skincare',   score: 83, note: 'Directly addresses SPF daily protection trend' },
+      { name: 'Sugarcane AHA Exfoliating Solution',     category: 'skincare',   score: 80, note: 'Exfoliation aligns with glass skin & resurfacing trend' },
+      { name: 'Tropical Guava Barrier Moisture Gel',    category: 'skincare',   score: 76, note: 'Barrier repair — partially covers skin barrier trend' },
+      { name: 'Papua Red Fruit Potent Plumping Serum',  category: 'skincare',   score: 74, note: 'Natural actives, anti-aging — strong botanicals story' },
+      { name: 'Papua Red Fruit Plumping Cream',         category: 'skincare',   score: 72, note: 'Repair & replump aligns with barrier and anti-aging trend' },
+      { name: 'Papua Red Fruit Potent Oil',             category: 'skincare',   score: 70, note: 'Face oil trend rising; natural ingredient story strong' },
+      { name: 'Bali Green Coffee Espresso Eye Cream',   category: 'skincare',   score: 67, note: 'Eye care niche; caffeine ingredient on-trend' },
+      { name: 'Blue Pea Purifying Micellar Water',      category: 'skincare',   score: 63, note: 'Gentle cleansing aligns with skinimalism trend' },
+      { name: 'Java Black Tea Soothing Gel Cleanser',   category: 'skincare',   score: 60, note: 'Antioxidant cleansing; moderate trend alignment' },
+      { name: 'Illipe Plumping Lip Butter',             category: 'makeup',     score: 68, note: 'Lip butter format aligns with skin-first makeup trend' },
+      { name: 'Blurring Lip Butter Pod',                category: 'makeup',     score: 62, note: 'Blurring/tinted finish; mid-range trend relevance' },
+      { name: 'Blurring Silicone Brush',                category: 'lifestyle',  score: 45, note: 'Beauty tool; limited direct trend alignment' },
+      { name: 'Retractable Lip Precision Brush',        category: 'lifestyle',  score: 42, note: 'Makeup accessory; niche utility item' },
+      { name: 'Puffy Pillow Travel Pouch',              category: 'lifestyle',  score: 35, note: 'Lifestyle accessory; brand identity play' },
+      { name: 'Pillow Duffle Bag',                      category: 'lifestyle',  score: 33, note: 'Lifestyle accessory; brand identity play' },
+      { name: 'From This Island Scarf',                 category: 'lifestyle',  score: 30, note: 'Branded apparel; no beauty trend alignment' },
+      { name: 'Baseball Cap',                           category: 'lifestyle',  score: 28, note: 'Branded apparel; no beauty trend alignment' },
+      { name: 'Crewneck',                               category: 'lifestyle',  score: 26, note: 'Branded apparel; no beauty trend alignment' },
+      { name: 'Oversized Quarter Zip Sweater',          category: 'lifestyle',  score: 25, note: 'Branded apparel; no beauty trend alignment' },
+      { name: 'Full Zip Sweater',                       category: 'lifestyle',  score: 25, note: 'Branded apparel; no beauty trend alignment' },
     ],
     gaps: [
       { trend: 'Peptide Barrier Serums',    trendScore: 92, ftiScore: 32, opp: 'High' },
@@ -941,29 +957,56 @@ function vTrendsSignals(d) {
 }
 
 function vRelevanceScore(d) {
-  const catBars = H.bars(d.categories.map(c => ({
-    name: `${c.name} <small style="color:var(--muted);font-weight:400">${c.note}</small>`,
-    pct: c.score,
-    cls: c.score < 60 ? 'danger' : c.score < 70 ? 'warn' : '',
-  })));
-  const gapRows = d.gaps.map(g => [
+  const products = d.products || [];
+  const byGroup = { skincare: [], makeup: [], lifestyle: [] };
+  products.forEach(p => {
+    const g = (p.category||'lifestyle').toLowerCase();
+    (byGroup[g] || byGroup.lifestyle).push(p);
+  });
+
+  const sCol = s => s >= 75 ? 'var(--olive)' : s >= 55 ? 'var(--amber)' : 'var(--red)';
+  const sCls = s => s >= 75 ? 'st-r' : s >= 55 ? 'st-a' : 'st-n';
+  const sLbl = s => s >= 75 ? 'Strong' : s >= 55 ? 'Mid' : 'Weak';
+
+  const pRow = p => `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--g2)">
+    <div style="flex:0 0 190px;font-size:12px;font-weight:600;color:var(--text);line-height:1.3">${p.name}</div>
+    <div style="flex:1;background:var(--g2);border-radius:4px;height:7px;min-width:40px">
+      <div style="width:${p.score}%;height:7px;background:${sCol(p.score)};border-radius:4px"></div>
+    </div>
+    <div style="flex:0 0 28px;font-size:13px;font-weight:800;color:${sCol(p.score)};text-align:right">${p.score}</div>
+    <span class="st ${sCls(p.score)}" style="font-size:9px;flex:0 0 42px;text-align:center">${sLbl(p.score)}</span>
+    <div style="flex:0 0 180px;font-size:10px;color:var(--muted);line-height:1.3">${p.note}</div>
+  </div>`;
+
+  const pGroup = (lbl, items) => !items.length ? '' : `
+    <div style="margin-bottom:16px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px">${lbl}</div>
+      ${items.map(pRow).join('')}
+    </div>`;
+
+  const productGrid = products.length > 0
+    ? pGroup('Skincare', byGroup.skincare) + pGroup('Makeup', byGroup.makeup) + pGroup('Lifestyle & Accessories', byGroup.lifestyle)
+    : `<div style="color:var(--muted);font-size:12px;padding:16px 0">Run the edge function to populate product scores.</div>`;
+
+  const gapRows = (d.gaps||[]).map(g => [
     `<span class="fw">${g.trend}</span>`,
     g.trendScore,
     `<span class="${g.ftiScore < 50 ? 'tdn fw' : 'tst'}">${g.ftiScore}</span>`,
     g.opp === 'High' ? `<span class="st st-r">High</span>` : `<span class="st st-a">Medium</span>`,
   ]);
-  const recList = d.recs.map(r => `<div class="quote pos"><div class="q-text">${r}</div></div>`).join('');
+  const recList = (d.recs||[]).map(r => `<div class="quote pos"><div class="q-text">${r}</div></div>`).join('');
   const bigScore = `<div class="blk">
     <div class="score-wrap">
       <div class="score-num">${d.kpis[0].val}<span class="score-den"> /100</span></div>
-      <div class="score-lbl">Overall FTI Trend Alignment Score — ${d.updated}</div>
+      <div class="score-lbl">Avg. Trend Alignment across ${products.length || 21} Products — ${d.updated}</div>
     </div>
   </div>`;
+
   return H.vh('FTI Relevance Score', d.desc, d.updated, d.alertBadge)
     + H.callout(d.alert)
     + H.kpiRow(d.kpis)
     + bigScore
-    + H.blk('Score by Trend Category', catBars)
+    + H.blk('Product Trend Relevance Scores', productGrid)
     + H.blk('High-Opportunity Gaps (FTI Under-indexed)', H.table(['Trend','Trend Score','FTI Score','Opportunity'], gapRows))
     + H.blk('Recommendations', recList);
 }
