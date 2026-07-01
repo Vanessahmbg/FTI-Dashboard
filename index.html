@@ -931,6 +931,8 @@ function vTrendsSignals(d) {
     return `${rows}<div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--g2);display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:10px;color:var(--muted);font-weight:600;margin-right:2px">Sources:</span>${chips}</div>`;
   };
 
+  const trends = d.trends || [];
+
   return H.vh('Trends Signals', d.desc, d.updated, d.alertBadge)
     + H.kpiRow(d.kpis)
     + `<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-bottom:12px">
