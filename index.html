@@ -769,7 +769,7 @@ const H = {
       ${t ? `<div class="kpi-trend ${tc}">${t}</div>` : ''}
     </div>`;
   },
-  kpiRow(kpis) { return `<div class="kpi-row">${kpis.map(H.kpi).join('')}</div>`; },
+  kpiRow(kpis) { return `<div class="kpi-row">${(kpis||[]).map(H.kpi).join('')}</div>`; },
   blk(title, body) { return `<div class="blk"><div class="blk-hd">${title}</div><div class="blk-body">${body}</div></div>`; },
   table(heads, rows) {
     const ths = heads.map(h => `<th>${h}</th>`).join('');
@@ -783,7 +783,9 @@ const H = {
       <span class="bpct">${pct}%</span>
     </div>`).join('');
   },
-  callout({ type, title, body }) {
+  callout(a) {
+    if (!a) return '';
+    const { type, title, body } = a;
     return `<div class="callout ${type}"><div class="c-title">${title}</div><div class="c-body">${body}</div></div>`;
   },
   vh(title, desc, updated, alertBadge, badgeType) {
@@ -997,7 +999,7 @@ function vRelevanceScore(d) {
   const recList = (d.recs||[]).map(r => `<div class="quote pos"><div class="q-text">${r}</div></div>`).join('');
   const bigScore = `<div class="blk">
     <div class="score-wrap">
-      <div class="score-num">${d.kpis[0].val}<span class="score-den"> /100</span></div>
+      <div class="score-num">${d.kpis?.[0]?.val ?? '—'}<span class="score-den"> /100</span></div>
       <div class="score-lbl">Avg. Trend Alignment across ${products.length || 21} Products — ${d.updated}</div>
     </div>
   </div>`;
@@ -1712,7 +1714,13 @@ function navigate(id) {
     el.classList.toggle('active', el.dataset.id === id)
   );
   const content = document.getElementById('content');
-  content.innerHTML = VIEWS[id](DATA[id]);
+  try {
+    content.innerHTML = VIEWS[id](DATA[id]);
+  } catch (e) {
+    console.error('Render error for', id, e);
+    content.innerHTML = `<div style="padding:32px;color:var(--red);font-size:13px">Failed to render this section. Please hard-refresh (Ctrl+Shift+R) and try again.<br><small style="color:var(--muted)">${e.message}</small></div>`;
+    return;
+  }
   if (WIP_IDS.includes(id)) {
     content.querySelectorAll('.kpi, .blk-body').forEach(el => {
       el.classList.add('wip-el');
