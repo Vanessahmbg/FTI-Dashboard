@@ -1301,7 +1301,7 @@ function vConsumerConfidence(d) {
     }).join('');
 
     const xLabels = history.map((h,i) => {
-      return `<text x="${xS(i).toFixed(1)}" y="${CH-4}" text-anchor="middle" font-size="8.5" fill="#888" style="pointer-events:none">${h.month}</text>`;
+      return `<text x="${xS(i).toFixed(1)}" y="${CH-4}" text-anchor="middle" font-size="7" fill="#888" style="pointer-events:none">${h.month}</text>`;
     }).join('');
 
     const yTicks = [Math.round(yMin), 100, Math.round(yMax)].map(v => {
@@ -1425,8 +1425,8 @@ function vConsumerConfidence(d) {
         ['> 120',   'Highly Optimistic',    'var(--green)',  'var(--green-lt)'],
       ].map(([range, label, color, bg]) =>
         `<div style="flex:1;min-width:90px;padding:8px 10px;border-radius:8px;background:${bg};border:1px solid ${color}22">
-          <div style="font-size:11px;font-weight:800;color:${color}">${range}</div>
-          <div style="font-size:10px;color:var(--text);margin-top:2px">${label}</div>
+          <div style="font-size:13px;font-weight:800;color:${color}">${range}</div>
+          <div style="font-size:12px;color:var(--text);margin-top:2px">${label}</div>
         </div>`
       ).join('')}
     </div>
