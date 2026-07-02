@@ -1536,7 +1536,7 @@ function vInflationRate(d) {
     const xLabels = chronological.map((h,i) => {
       if (i % labelStep !== 0 && i !== chronological.length - 1) return '';
       const lbl = rates.length > 36 ? `'${h.year % 100}` : h.month.replace(' 20','\'');
-      return `<text x="${xS(i).toFixed(1)}" y="${CH-4}" text-anchor="middle" font-size="8.5" fill="#888" style="pointer-events:none">${lbl}</text>`;
+      return `<text x="${xS(i).toFixed(1)}" y="${CH-4}" text-anchor="middle" font-size="6" fill="#888" style="pointer-events:none">${lbl}</text>`;
     }).join('');
 
     const yTicks = [Math.round(yMin*10)/10, 1.5, 3.5, Math.round(yMax*10)/10].filter((v,i,a)=>a.indexOf(v)===i).map(v => {
