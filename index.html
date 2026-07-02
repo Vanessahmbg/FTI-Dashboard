@@ -1297,7 +1297,7 @@ function vConsumerConfidence(d) {
     const dots = history.map((h,i) => {
       const cx=xS(i).toFixed(1), cy=yS(Number(h.cci)).toFixed(1);
       const col = Number(h.cci)>=100 ? '#7A8B5E' : '#C0392B';
-      return `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${col}" stroke="white" stroke-width="1.5" style="pointer-events:none"/>`;
+      return `<circle cx="${cx}" cy="${cy}" r="2" fill="${col}" stroke="white" stroke-width="1" style="pointer-events:none"/>`;
     }).join('');
 
     const xLabels = history.map((h,i) => {
@@ -1325,11 +1325,11 @@ function vConsumerConfidence(d) {
             <line x1="${PAD_L}" y1="${y100.toFixed(1)}" x2="${W-PAD_R}" y2="${y100.toFixed(1)}" stroke="#C0392B" stroke-width="1" stroke-dasharray="5,3" opacity="0.4" style="pointer-events:none"/>
             <text x="${W-PAD_R+2}" y="${(y100+3).toFixed(1)}" font-size="7.5" fill="#C0392B" opacity="0.6" style="pointer-events:none">100</text>
             ${fillPts ? `<polygon points="${fillPts}" fill="url(#ccGrad)" style="pointer-events:none"/>` : ''}
-            <polyline points="${pts}" fill="none" stroke="#7A8B5E" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="pointer-events:none"/>
+            <polyline points="${pts}" fill="none" stroke="#7A8B5E" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="pointer-events:none"/>
             ${dots}
             ${xLabels}
             <line id="cc-cross" x1="0" y1="${PAD_T}" x2="0" y2="${PAD_T+innerH}" stroke="var(--olive-dk)" stroke-width="1" stroke-dasharray="3,2" opacity="0" style="pointer-events:none"/>
-            <circle id="cc-hdot" cx="0" cy="0" r="5.5" fill="white" stroke="var(--olive-dk)" stroke-width="2" opacity="0" style="pointer-events:none"/>
+            <circle id="cc-hdot" cx="0" cy="0" r="3.5" fill="white" stroke="var(--olive-dk)" stroke-width="1.5" opacity="0" style="pointer-events:none"/>
             <rect x="${PAD_L}" y="${PAD_T}" width="${innerW}" height="${innerH}" fill="transparent"/>
           </svg>
         </div>
@@ -1528,7 +1528,7 @@ function vInflationRate(d) {
     const dotColor = r => r <= 3.5 ? '#7A8B5E' : r <= 5 ? '#C47D0E' : '#C0392B';
     const dots = chronological.map((h,i) => {
       const cx=xS(i).toFixed(1), cy=yS(Number(h.rate)).toFixed(1);
-      return `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${dotColor(Number(h.rate))}" stroke="white" stroke-width="1.5" style="pointer-events:none"/>`;
+      return `<circle cx="${cx}" cy="${cy}" r="2" fill="${dotColor(Number(h.rate))}" stroke="white" stroke-width="1" style="pointer-events:none"/>`;
     }).join('');
 
     // Smart x-axis: every 1 month if ≤12, every 3 if ≤36, every 6 if ≤60, every 12 if >60
@@ -1562,11 +1562,11 @@ function vInflationRate(d) {
             <line x1="${PAD_L}" y1="${y15.toFixed(1)}" x2="${W-PAD_R}" y2="${y15.toFixed(1)}" stroke="#7A8B5E" stroke-width="1" stroke-dasharray="3,2" opacity="0.3" style="pointer-events:none"/>
             <text x="${W-PAD_R+2}" y="${(y15+3).toFixed(1)}" font-size="7.5" fill="#7A8B5E" opacity="0.5" style="pointer-events:none">1.5%</text>
             ${fillPts ? `<polygon points="${fillPts}" fill="url(#irGrad)" style="pointer-events:none"/>` : ''}
-            <polyline points="${pts}" fill="none" stroke="#7A8B5E" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="pointer-events:none"/>
+            <polyline points="${pts}" fill="none" stroke="#7A8B5E" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="pointer-events:none"/>
             ${dots}
             ${xLabels}
             <line id="ir-cross" x1="0" y1="${PAD_T}" x2="0" y2="${PAD_T+innerH}" stroke="#333" stroke-width="1" stroke-dasharray="3,2" opacity="0" style="pointer-events:none"/>
-            <circle id="ir-hdot" cx="0" cy="0" r="5.5" fill="white" stroke="#333" stroke-width="2" opacity="0" style="pointer-events:none"/>
+            <circle id="ir-hdot" cx="0" cy="0" r="3.5" fill="white" stroke="#333" stroke-width="1.5" opacity="0" style="pointer-events:none"/>
             <rect x="${PAD_L}" y="${PAD_T}" width="${innerW}" height="${innerH}" fill="transparent"/>
           </svg>
         </div>
