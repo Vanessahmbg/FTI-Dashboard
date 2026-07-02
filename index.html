@@ -1301,7 +1301,7 @@ function vConsumerConfidence(d) {
     }).join('');
 
     const xLabels = history.map((h,i) => {
-      return `<text x="${xS(i).toFixed(1)}" y="${CH-4}" text-anchor="middle" font-size="7" fill="#888" style="pointer-events:none">${h.month}</text>`;
+      return `<text x="${xS(i).toFixed(1)}" y="${CH-4}" text-anchor="middle" font-size="6" fill="#888" style="pointer-events:none">${h.month}</text>`;
     }).join('');
 
     const yTicks = [Math.round(yMin), 100, Math.round(yMax)].map(v => {
