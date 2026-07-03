@@ -2143,6 +2143,7 @@ async function doLogin() {
 
   document.getElementById('auth-overlay').style.display = 'none';
   document.getElementById('logout-btn').style.display = 'block';
+  resetIdleTimer();
   if (!window._dashInited) { window._dashInited = true; await init(); }
 }
 
@@ -2157,6 +2158,17 @@ async function doLogout() {
   document.getElementById('auth-err').style.display = 'none';
 }
 
+// 4-hour idle auto-logout
+const IDLE_MS = 4 * 60 * 60 * 1000;
+let _idleTimer = null;
+function resetIdleTimer() {
+  clearTimeout(_idleTimer);
+  _idleTimer = setTimeout(doLogout, IDLE_MS);
+}
+['mousemove','mousedown','keydown','touchstart','scroll'].forEach(e =>
+  document.addEventListener(e, resetIdleTimer, { passive: true })
+);
+
 // Check for existing session on load
 (async () => {
   const { data: { session } } = await _sb.auth.getSession();
@@ -2164,6 +2176,7 @@ async function doLogout() {
     document.getElementById('auth-overlay').style.display = 'none';
     document.getElementById('logout-btn').style.display = 'block';
     window._dashInited = true;
+    resetIdleTimer();
     await init();
   }
 })();
