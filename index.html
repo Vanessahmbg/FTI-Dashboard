@@ -710,21 +710,31 @@ const MOCK_DATA = {
 
   /* ── 5a. CONSUMER CONFIDENCE ────────────────────────────── */
   'consumer-confidence': {
-    updated: 'June 2026', alertBadge: null,
+    updated: 'April 2026', alertBadge: null,
     desc: 'Bank Indonesia Consumer Confidence Index (CCI) and its correlation with beauty and personal care spending.',
     kpis: [
-      { lbl: 'Current CCI',      val: '108.3', u: '',   trend: 'up', t: '↑ +1.2 vs May' },
-      { lbl: 'CCI Threshold',    val: '100',   u: '',   trend: null },
-      { lbl: 'Status',           val: 'Optimistic', u: '', trend: null },
-      { lbl: 'Beauty Spending',  val: '+12',   u: '%',  trend: 'up', t: '↑ Core FTI segment' },
+      { lbl: 'Current CCI',                 val: '123.0', u: '',  trend: 'st', t: '→ +0.1 vs Mar 2026' },
+      { lbl: 'Current Conditions Index',    val: '112.2', u: '',  trend: 'up', t: '→ Optimistic Zone' },
+      { lbl: 'Consumer Expectations Index', val: '129.7', u: '',  trend: 'up', t: '→ Optimistic Zone' },
+      { lbl: 'Beauty Spending Est.',        val: '+12',   u: '%', trend: 'up', t: '↑ FTI segment estimate' },
     ],
     history: [
-      { month: 'Jan 2026', cci: 112.1, beauty: '+14%' },
-      { month: 'Feb 2026', cci: 109.8, beauty: '+12%' },
-      { month: 'Mar 2026', cci: 106.2, beauty: '+10%' },
-      { month: 'Apr 2026', cci: 104.5, beauty: '+9%'  },
-      { month: 'May 2026', cci: 107.1, beauty: '+11%' },
-      { month: 'Jun 2026', cci: 108.3, beauty: '+12%' },
+      { month: 'Jan 2025', cci: 127.2, beauty: '+14%' },
+      { month: 'Feb 2025', cci: 126.4, beauty: '+13%' },
+      { month: 'Mar 2025', cci: 121.1, beauty: '+10%' },
+      { month: 'Apr 2025', cci: 121.7, beauty: '+11%' },
+      { month: 'May 2025', cci: 117.5, beauty: '+8%'  },
+      { month: 'Jun 2025', cci: 118.0, beauty: '+8%'  },
+      { month: 'Jul 2025', cci: 118.1, beauty: '+8%'  },
+      { month: 'Aug 2025', cci: 117.2, beauty: '+7%'  },
+      { month: 'Sep 2025', cci: 115.0, beauty: '+6%'  },
+      { month: 'Oct 2025', cci: 121.2, beauty: '+10%' },
+      { month: 'Nov 2025', cci: 124.0, beauty: '+12%' },
+      { month: 'Dec 2025', cci: 123.5, beauty: '+12%' },
+      { month: 'Jan 2026', cci: 127.0, beauty: '+14%' },
+      { month: 'Feb 2026', cci: 125.2, beauty: '+13%' },
+      { month: 'Mar 2026', cci: 122.9, beauty: '+11%' },
+      { month: 'Apr 2026', cci: 123.0, beauty: '+11%' },
     ],
     ai: 'Consumer confidence has stabilised after an April dip driven by election uncertainty, now recovering toward Q1 peaks. FTI\'s core segment (urban females 22–35) shows 12% higher purchase intent for skincare this month. A CCI above 105 has historically correlated with 10–15% beauty spend growth — current conditions are favourable. Watch for any CCI dip below 100, which has preceded spending pullbacks within 6–8 weeks.',
   },
@@ -1246,7 +1256,6 @@ function vConsumerConfidence(d) {
     let near = data[0];
     data.forEach(d => { if (Math.abs(d.x - mx) < Math.abs(near.x - mx)) near = d; });
     if (cross) { cross.setAttribute('x1', near.x); cross.setAttribute('x2', near.x); cross.setAttribute('opacity','0.5'); }
-    if (hdot)  { hdot.setAttribute('cx', near.x); hdot.setAttribute('cy', near.y); hdot.setAttribute('opacity','1'); }
     const wrap = document.getElementById('cc-wrap');
     const wr = wrap ? wrap.getBoundingClientRect() : rect;
     let lft = evt.clientX - wr.left + 14;
@@ -1258,10 +1267,8 @@ function vConsumerConfidence(d) {
   window.ccHoverOut = function() {
     const tip = document.getElementById('cc-tip');
     const cross = document.getElementById('cc-cross');
-    const hdot = document.getElementById('cc-hdot');
     if (tip)   tip.style.display = 'none';
     if (cross) cross.setAttribute('opacity','0');
-    if (hdot)  hdot.setAttribute('opacity','0');
   };
 
   function renderCCPeriod(period) {
@@ -1269,39 +1276,42 @@ function vConsumerConfidence(d) {
     if      (period === '1m') filtered = allHistory.slice(-1);
     else if (period === '3m') filtered = allHistory.slice(-3);
     else if (period === '1y') filtered = allHistory.slice(-12);
-    let history = filtered.slice().reverse(); // latest first
+    const chronological = filtered.slice();        // oldest → newest for chart
+    let history = filtered.slice().reverse();      // newest → oldest for table
 
-    const cciVals  = history.map(h => Number(h.cci)).filter(Boolean);
+    const cciVals  = chronological.map(h => Number(h.cci)).filter(Boolean);
     const avgCCI   = cciVals.length ? (cciVals.reduce((a,b)=>a+b,0)/cciVals.length).toFixed(1) : '—';
     const maxCCI   = cciVals.length ? Math.max(...cciVals).toFixed(1) : '—';
     const minCCI   = cciVals.length ? Math.min(...cciVals).toFixed(1) : '—';
     const latestCCI= cciVals.length ? cciVals[cciVals.length-1].toFixed(1) : '—';
 
-    // SVG chart — compact height
-    const W=560, CH=110, PAD_L=36, PAD_R=14, PAD_T=12, PAD_B=24;
+    // SVG bar chart
+    const W=560, CH=120, PAD_L=36, PAD_R=14, PAD_T=12, PAD_B=28;
     const innerW = W - PAD_L - PAD_R;
     const innerH = CH - PAD_T - PAD_B;
-    const yMin = Math.max(0, Math.min(...cciVals, 95) - 2);
-    const yMax = Math.max(...cciVals, 130) + 2;
-    const xS = i => PAD_L + (cciVals.length > 1 ? (i/(cciVals.length-1))*innerW : innerW/2);
+    const yMin = Math.max(0, Math.min(...cciVals, 100) - 5);
+    const yMax = Math.max(...cciVals, 130) + 3;
+    const n = chronological.length || 1;
+    const barSlot = innerW / n;
+    const barW = Math.max(3, barSlot * 0.72);
+    const xS = i => PAD_L + (i + 0.5) * barSlot;
     const yS = v => PAD_T + (1 - (v-yMin)/(yMax-yMin)) * innerH;
     const y100 = yS(100);
-    const pts  = history.map((h,i) => `${xS(i).toFixed(1)},${yS(Number(h.cci)).toFixed(1)}`).join(' ');
-    const fillPts = history.length > 1
-      ? `${xS(0).toFixed(1)},${(PAD_T+innerH).toFixed(1)} ${pts} ${xS(history.length-1).toFixed(1)},${(PAD_T+innerH).toFixed(1)}`
-      : '';
 
     // Store point data globally for hover
-    window.__ccPts = history.map((h,i) => ({ x: parseFloat(xS(i).toFixed(1)), y: parseFloat(yS(Number(h.cci)).toFixed(1)), cci: Number(h.cci), month: h.month }));
+    window.__ccPts = chronological.map((h,i) => ({ x: parseFloat(xS(i).toFixed(1)), y: parseFloat(yS(Number(h.cci)).toFixed(1)), cci: Number(h.cci), month: h.month }));
 
-    const dots = history.map((h,i) => {
-      const cx=xS(i).toFixed(1), cy=yS(Number(h.cci)).toFixed(1);
-      const col = Number(h.cci)>=100 ? '#7A8B5E' : '#C0392B';
-      return `<circle cx="${cx}" cy="${cy}" r="2" fill="${col}" stroke="white" stroke-width="1" style="pointer-events:none"/>`;
+    const bars = chronological.map((h,i) => {
+      const cx = xS(i), v = Number(h.cci);
+      const barTop = yS(v), barH = Math.max(1, (PAD_T + innerH) - barTop);
+      const col = v >= 120 ? '#5C7A3E' : v >= 100 ? '#7A8B5E' : '#C0392B';
+      return `<rect x="${(cx - barW/2).toFixed(1)}" y="${barTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" fill="${col}" opacity="0.85" rx="1.5" style="pointer-events:none"/>`;
     }).join('');
 
-    const xLabels = history.map((h,i) => {
-      return `<text x="${xS(i).toFixed(1)}" y="${CH-4}" text-anchor="middle" font-size="6" fill="#888" style="pointer-events:none">${h.month}</text>`;
+    const labelStep = n <= 12 ? 1 : n <= 24 ? 2 : 3;
+    const xLabels = chronological.map((h,i) => {
+      if (i % labelStep !== 0 && i !== n - 1) return '';
+      return `<text x="${xS(i).toFixed(1)}" y="${CH-6}" text-anchor="middle" font-size="6" fill="#888" style="pointer-events:none">${h.month}</text>`;
     }).join('');
 
     const yTicks = [Math.round(yMin), 100, Math.round(yMax)].map(v => {
@@ -1315,28 +1325,20 @@ function vConsumerConfidence(d) {
           <div id="cc-tip" style="display:none"></div>
           <svg id="cc-svg" viewBox="0 0 ${W} ${CH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible;cursor:crosshair"
             onmousemove="ccHover(event)" onmouseleave="ccHoverOut()">
-            <defs>
-              <linearGradient id="ccGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#7A8B5E" stop-opacity="0.15"/>
-                <stop offset="100%" stop-color="#7A8B5E" stop-opacity="0.01"/>
-              </linearGradient>
-            </defs>
             ${yTicks}
-            <line x1="${PAD_L}" y1="${y100.toFixed(1)}" x2="${W-PAD_R}" y2="${y100.toFixed(1)}" stroke="#C0392B" stroke-width="1" stroke-dasharray="5,3" opacity="0.4" style="pointer-events:none"/>
-            <text x="${W-PAD_R+2}" y="${(y100+3).toFixed(1)}" font-size="7.5" fill="#C0392B" opacity="0.6" style="pointer-events:none">100</text>
-            ${fillPts ? `<polygon points="${fillPts}" fill="url(#ccGrad)" style="pointer-events:none"/>` : ''}
-            <polyline points="${pts}" fill="none" stroke="#7A8B5E" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" style="pointer-events:none"/>
-            ${dots}
+            <line x1="${PAD_L}" y1="${y100.toFixed(1)}" x2="${W-PAD_R}" y2="${y100.toFixed(1)}" stroke="#C0392B" stroke-width="1" stroke-dasharray="5,3" opacity="0.35" style="pointer-events:none"/>
+            <text x="${W-PAD_R+2}" y="${(y100+3).toFixed(1)}" font-size="7" fill="#C0392B" opacity="0.6" style="pointer-events:none">100</text>
+            ${bars}
             ${xLabels}
-            <line id="cc-cross" x1="0" y1="${PAD_T}" x2="0" y2="${PAD_T+innerH}" stroke="var(--olive-dk)" stroke-width="1" stroke-dasharray="3,2" opacity="0" style="pointer-events:none"/>
-            <circle id="cc-hdot" cx="0" cy="0" r="3.5" fill="white" stroke="var(--olive-dk)" stroke-width="1.5" opacity="0" style="pointer-events:none"/>
+            <line id="cc-cross" x1="0" y1="${PAD_T}" x2="0" y2="${PAD_T+innerH}" stroke="#999" stroke-width="1" stroke-dasharray="3,2" opacity="0" style="pointer-events:none"/>
             <rect x="${PAD_L}" y="${PAD_T}" width="${innerW}" height="${innerH}" fill="transparent"/>
           </svg>
         </div>
         <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted)">
-          <span>Optimistic threshold: <strong style="color:var(--text)">100</strong></span>
+          <span>Optimistic threshold: <strong style="color:var(--text)">100</strong> · Source: Bank Indonesia via Trading Economics</span>
           <span>
-            <span style="display:inline-block;width:8px;height:8px;background:var(--olive);border-radius:2px;margin-right:3px;vertical-align:middle"></span>Optimistic
+            <span style="display:inline-block;width:8px;height:8px;background:#5C7A3E;border-radius:2px;margin-right:3px;vertical-align:middle"></span>Highly Optimistic (≥120)
+            <span style="display:inline-block;width:8px;height:8px;background:#7A8B5E;border-radius:2px;margin:0 3px 0 8px;vertical-align:middle"></span>Optimistic
             <span style="display:inline-block;width:8px;height:8px;background:var(--red);border-radius:2px;margin:0 3px 0 8px;vertical-align:middle"></span>Pessimistic
           </span>
         </div>`
