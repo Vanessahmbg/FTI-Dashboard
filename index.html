@@ -1092,16 +1092,16 @@ function vRelevanceScore(d) {
   const sLbl = s => s >= 75 ? 'Strong' : s >= 55 ? 'Mid' : 'Weak';
 
   const pRow = p => `
-    <div style="padding:8px 0;border-bottom:1px solid var(--g2)">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-        <div style="flex:1;font-size:11px;font-weight:600;color:var(--text);line-height:1.25">${p.name}</div>
-        <div style="flex:0 0 26px;font-size:13px;font-weight:800;color:${sCol(p.score)};text-align:right">${p.score}</div>
-        <span class="st ${sCls(p.score)}" style="font-size:9px;flex:0 0 42px;text-align:center">${sLbl(p.score)}</span>
+    <div style="padding:10px 0;border-bottom:1px solid var(--g2)">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+        <div style="flex:1;font-size:13px;font-weight:600;color:var(--text);line-height:1.25">${p.name}</div>
+        <div style="flex:0 0 28px;font-size:15px;font-weight:800;color:${sCol(p.score)};text-align:right">${p.score}</div>
+        <span class="st ${sCls(p.score)}" style="font-size:10px;flex:0 0 46px;text-align:center">${sLbl(p.score)}</span>
       </div>
-      <div style="background:var(--g2);border-radius:4px;height:6px;margin-bottom:4px">
-        <div style="width:${p.score}%;height:6px;background:${sCol(p.score)};border-radius:4px"></div>
+      <div style="background:var(--g2);border-radius:4px;height:7px;margin-bottom:5px">
+        <div style="width:${p.score}%;height:7px;background:${sCol(p.score)};border-radius:4px"></div>
       </div>
-      <div style="font-size:9.5px;color:var(--muted);line-height:1.35">${p.note}</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.4">${p.note}</div>
     </div>`;
 
   const pGroup = (lbl, items) => !items.length ? '' : `
