@@ -1373,7 +1373,7 @@ function vConsumerConfidence(d) {
     const bars = chronological.map((h,i) => {
       const cx = xS(i), v = Number(h.cci);
       const barTop = yS(v), barH = Math.max(1, (PAD_T + innerH) - barTop);
-      const col = v >= 120 ? '#5C7A3E' : v >= 100 ? '#7A8B5E' : '#C0392B';
+      const col = v >= 120 ? '#5C7A3E' : v >= 100 ? '#C9A84C' : '#C0392B';
       return `<rect x="${(cx - barW/2).toFixed(1)}" y="${barTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" fill="${col}" opacity="0.85" rx="1.5" style="pointer-events:none"/>`;
     }).join('');
 
@@ -1407,7 +1407,7 @@ function vConsumerConfidence(d) {
           <span>Optimistic threshold: <strong style="color:var(--text)">100</strong> · Source: Bank Indonesia via Trading Economics</span>
           <span>
             <span style="display:inline-block;width:8px;height:8px;background:#5C7A3E;border-radius:2px;margin-right:3px;vertical-align:middle"></span>Highly Optimistic (≥120)
-            <span style="display:inline-block;width:8px;height:8px;background:#7A8B5E;border-radius:2px;margin:0 3px 0 8px;vertical-align:middle"></span>Optimistic
+            <span style="display:inline-block;width:8px;height:8px;background:#C9A84C;border-radius:2px;margin:0 3px 0 8px;vertical-align:middle"></span>Optimistic
             <span style="display:inline-block;width:8px;height:8px;background:var(--red);border-radius:2px;margin:0 3px 0 8px;vertical-align:middle"></span>Pessimistic
           </span>
         </div>`
