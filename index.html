@@ -289,13 +289,51 @@
 </head>
 <body>
 
+<!-- ── LOGIN OVERLAY ─────────────────────────────────────────── -->
+<div id="auth-overlay" style="display:flex;position:fixed;inset:0;z-index:9999;background:var(--cream);align-items:center;justify-content:center;font-family:'Manrope',sans-serif">
+  <div style="width:100%;max-width:400px;padding:0 24px">
+    <div style="text-align:center;margin-bottom:40px">
+      <div style="font-size:36px;font-weight:900;color:var(--olive-dk);letter-spacing:-1.5px">FTI</div>
+      <div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-top:6px">Intelligence Hub</div>
+    </div>
+    <div style="background:white;border-radius:16px;padding:36px;box-shadow:0 4px 32px rgba(0,0,0,.09);border:1px solid var(--g2)">
+      <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px">Sign in</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:28px">Access is restricted to authorised team members.</div>
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Email</label>
+        <input id="auth-email" type="email" placeholder="your@email.com"
+          style="width:100%;padding:11px 14px;border:1.5px solid var(--g3);border-radius:8px;font-family:inherit;font-size:14px;outline:none;background:var(--g1);color:var(--text);transition:border-color .15s"
+          onfocus="this.style.borderColor='var(--olive)'" onblur="this.style.borderColor='var(--g3)'"
+          onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div style="margin-bottom:24px">
+        <label style="display:block;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Password</label>
+        <input id="auth-pw" type="password" placeholder="••••••••"
+          style="width:100%;padding:11px 14px;border:1.5px solid var(--g3);border-radius:8px;font-family:inherit;font-size:14px;outline:none;background:var(--g1);color:var(--text);transition:border-color .15s"
+          onfocus="this.style.borderColor='var(--olive)'" onblur="this.style.borderColor='var(--g3)'"
+          onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div id="auth-err" style="display:none;font-size:12px;color:var(--red);margin-bottom:16px;padding:9px 12px;background:var(--red-lt);border-radius:7px;font-weight:600"></div>
+      <button id="auth-btn" onclick="doLogin()"
+        style="width:100%;padding:13px;background:var(--olive-dk);color:white;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:opacity .15s"
+        onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+        Sign in
+      </button>
+    </div>
+    <div style="text-align:center;margin-top:20px;font-size:11px;color:var(--muted)">From This Island · Internal use only</div>
+  </div>
+</div>
+
 <nav class="nav">
   <div class="nav-l">
     <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
     <div class="logo">FTI</div>
     <ul class="nav-tabs" id="nav-tabs"></ul>
   </div>
-  <div class="nav-r">Intelligence Hub</div>
+  <div class="nav-r" style="display:flex;align-items:center;gap:12px">
+    <span>Intelligence Hub</span>
+    <button id="logout-btn" onclick="doLogout()" style="display:none;padding:4px 12px;border-radius:99px;border:1.5px solid var(--g3);background:transparent;color:var(--muted);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.4px">Sign out</button>
+  </div>
 </nav>
 
 <div class="sb-backdrop" id="sb-backdrop" onclick="closeSidebar()"></div>
@@ -2077,7 +2115,58 @@ async function init() {
   navigate('review-score');
 }
 
-init();
+/* ════════════════════════════════════════════════════════════════
+ * AUTH
+ * ════════════════════════════════════════════════════════════════ */
+async function doLogin() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pw    = document.getElementById('auth-pw').value;
+  const btn   = document.getElementById('auth-btn');
+  const err   = document.getElementById('auth-err');
+
+  if (!email || !pw) {
+    err.textContent = 'Please enter your email and password.';
+    err.style.display = 'block'; return;
+  }
+
+  btn.textContent = 'Signing in…'; btn.disabled = true;
+  err.style.display = 'none';
+
+  const { error } = await _sb.auth.signInWithPassword({ email, password: pw });
+
+  if (error) {
+    err.textContent = 'Invalid email or password.';
+    err.style.display = 'block';
+    btn.textContent = 'Sign in'; btn.disabled = false;
+    return;
+  }
+
+  document.getElementById('auth-overlay').style.display = 'none';
+  document.getElementById('logout-btn').style.display = 'block';
+  if (!window._dashInited) { window._dashInited = true; await init(); }
+}
+
+async function doLogout() {
+  await _sb.auth.signOut();
+  document.getElementById('auth-overlay').style.display = 'flex';
+  document.getElementById('logout-btn').style.display = 'none';
+  document.getElementById('auth-email').value = '';
+  document.getElementById('auth-pw').value = '';
+  document.getElementById('auth-btn').textContent = 'Sign in';
+  document.getElementById('auth-btn').disabled = false;
+  document.getElementById('auth-err').style.display = 'none';
+}
+
+// Check for existing session on load
+(async () => {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (session) {
+    document.getElementById('auth-overlay').style.display = 'none';
+    document.getElementById('logout-btn').style.display = 'block';
+    window._dashInited = true;
+    await init();
+  }
+})();
 </script>
 </body>
 </html>
