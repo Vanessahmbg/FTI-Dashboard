@@ -809,23 +809,23 @@ const MOCK_DATA = {
 
   /* ── 5b. INFLATION RATE ─────────────────────────────────── */
   'inflation-rate': {
-    updated: 'June 2026', alertBadge: '✓ Within Range',
+    updated: 'June 2026', alertBadge: '⚠ Approaching Limit',
     desc: 'National inflation rate and its projected impact on consumer purchasing power and discretionary beauty spending.',
     kpis: [
-      { lbl: 'Current Rate',     val: '2.8', u: '%', trend: 'st', t: '→ Stable MoM' },
-      { lbl: 'Alert Threshold',  val: '4.0', u: '%', trend: null },
-      { lbl: 'Headroom',         val: '1.2', u: 'pp', trend: null },
-      { lbl: 'Status',           val: 'Safe', u: '',  trend: 'up', t: '↑ No impact expected' },
+      { lbl: 'Current Rate',     val: '3.34', u: '%', trend: 'up', t: '↑ +0.54pp vs May 2026' },
+      { lbl: 'Alert Threshold',  val: '4.0',  u: '%', trend: null },
+      { lbl: 'Headroom',         val: '0.66', u: 'pp', trend: null },
+      { lbl: 'Status',           val: 'Monitor', u: '',  trend: 'st', t: '→ Within BI target, watch trend' },
     ],
     history: [
-      { month: 'Jan 2026', rate: 3.2, impact: 'Low' },
-      { month: 'Feb 2026', rate: 3.0, impact: 'Low' },
-      { month: 'Mar 2026', rate: 2.9, impact: 'Low' },
-      { month: 'Apr 2026', rate: 2.7, impact: 'Low' },
-      { month: 'May 2026', rate: 2.8, impact: 'Low' },
-      { month: 'Jun 2026', rate: 2.8, impact: 'Low' },
+      { month: 'Jan 2026', rate: 3.2,  impact: 'Low' },
+      { month: 'Feb 2026', rate: 3.0,  impact: 'Low' },
+      { month: 'Mar 2026', rate: 2.9,  impact: 'Low' },
+      { month: 'Apr 2026', rate: 2.7,  impact: 'Low' },
+      { month: 'May 2026', rate: 2.8,  impact: 'Low' },
+      { month: 'Jun 2026', rate: 3.34, impact: 'Medium' },
     ],
-    ai: 'Inflation at 2.8% remains well below the 4.0% threshold at which discretionary beauty spending historically contracts. Products in the Rp 50K–200K range (FTI\'s core price band) are showing stable demand. Premium SKUs above Rp 500K are experiencing mild 8% softening. If inflation breaches 3.5%, expect downtrading pressure on FTI\'s higher-priced items first. Current trajectory is stable — no immediate action required.',
+    ai: 'June 2026 inflation jumped to 3.34% (from 2.8% in May), driven by the Pertamax fuel price hike and weaker rupiah. Still within BI\'s 1.5–3.5% target band, but headroom to the upper bound is now only 0.16pp. Products in the Rp 50K–200K range (FTI\'s core price band) face mild pressure. If inflation breaches 3.5%, expect downtrading on premium SKUs first. Watch the July release closely — sustained fuel/transport inflation could trigger a hawkish BI response.',
   },
 
   /* ── 5c. PEAK SEASON ALERT ──────────────────────────────── */
