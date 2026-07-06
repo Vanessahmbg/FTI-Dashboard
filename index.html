@@ -551,16 +551,69 @@ const MOCK_DATA = {
       { lbl: 'Headlines Read',  val: '240', u: '',       trend: 'st', t: '→ Articles analysed by AI' },
     ],
     trends: [
-      { rank: 1,  keyword: 'Peptide Barrier Serums',   category: 'ingredient', momentum: '🔥 Rising',    description: 'Consumer demand for ceramide-peptide combos surging globally',   mentions: 42 },
-      { rank: 2,  keyword: 'Skin Barrier Repair',      category: 'skincare',   momentum: '🔥 Rising',    description: 'Post-winter repair routines dominate editorial and social content', mentions: 38 },
-      { rank: 3,  keyword: 'SPF Daily Protection',     category: 'skincare',   momentum: '📈 Peak',      description: 'Year-round SPF becomes mainstream across all demographics',        mentions: 35 },
-      { rank: 4,  keyword: 'Glass Skin Aesthetic',     category: 'skincare',   momentum: '📈 Peak',      description: 'K-beauty glass skin remains the aspirational beauty standard',      mentions: 31 },
-      { rank: 5,  keyword: 'Skinimalism Movement',     category: 'skincare',   momentum: '🔥 Rising',    description: 'Fewer products, better ingredients as minimalism approach peaks',    mentions: 28 },
-      { rank: 6,  keyword: 'Tinted SPF Hybrid',        category: 'makeup',     momentum: '⭐ Emerging',  description: 'SPF-makeup crossover formats gaining strong retail traction',       mentions: 24 },
-      { rank: 7,  keyword: 'Clean Beauty Formulation', category: 'lifestyle',  momentum: '🔥 Rising',    description: 'Transparent ingredient sourcing demanded by Gen Z shoppers',        mentions: 22 },
-      { rank: 8,  keyword: 'Retinol Alternatives',     category: 'ingredient', momentum: '⭐ Emerging',  description: 'Bakuchiol and retinal replacing classic retinol in new formulas',    mentions: 19 },
-      { rank: 9,  keyword: 'Scalp Care Wellness',      category: 'wellness',   momentum: '⭐ Emerging',  description: 'Scalp health bridges hair and skincare as a new category',           mentions: 16 },
-      { rank: 10, keyword: 'Bold Graphic Liner',       category: 'makeup',     momentum: '📉 Declining', description: 'Peak 2023 aesthetic softening as natural dewy looks dominate',     mentions: 9  },
+      { rank: 1,  keyword: 'Peptide Barrier Serums',   category: 'ingredient', momentum: '🔥 Rising',    description: 'Consumer demand for ceramide-peptide combos surging globally',   mentions: 42,
+        articles: [
+          { title: 'The Peptide Serum Wave: Every Major Brand Is Betting on Barrier', source: 'Vogue Beauty', url: 'https://www.vogue.com/search?q=peptide+barrier+serum' },
+          { title: 'Ceramide-Peptide Launches Dominate New Product Pipelines', source: 'BeautyMatter', url: 'https://beautymatter.com/?s=peptide+serum' },
+          { title: 'Why Peptide Serums Are Beauty\'s Biggest Story Right Now', source: 'Allure', url: 'https://www.allure.com/search?query=peptide+serum' },
+          { title: 'Barrier Science Is Reshaping the Prestige Skincare Market', source: 'Business of Fashion', url: 'https://www.businessoffashion.com/search/?q=peptide+barrier' },
+        ]},
+      { rank: 2,  keyword: 'Skin Barrier Repair',      category: 'skincare',   momentum: '🔥 Rising',    description: 'Post-winter repair routines dominate editorial and social content', mentions: 38,
+        articles: [
+          { title: 'The Barrier Repair Movement Has Gone Mainstream', source: "Harper's Bazaar", url: 'https://www.harpersbazaar.com/search/?q=skin+barrier+repair' },
+          { title: 'Skin Barrier Repair Is 2026\'s Most-Covered Skincare Topic', source: 'Allure', url: 'https://www.allure.com/search?query=skin+barrier+repair' },
+          { title: 'How the Barrier Trend Is Reshaping Skincare Formulation', source: 'BeautyMatter', url: 'https://beautymatter.com/?s=skin+barrier' },
+          { title: 'The Science and Business of Skin Barrier Repair', source: 'Beauty Independent', url: 'https://www.beautyindependent.com/?s=skin+barrier' },
+        ]},
+      { rank: 3,  keyword: 'SPF Daily Protection',     category: 'skincare',   momentum: '📈 Peak',      description: 'Year-round SPF becomes mainstream across all demographics',        mentions: 35,
+        articles: [
+          { title: 'Year-Round SPF Is No Longer Optional — It\'s the New Normal', source: 'Vogue Beauty', url: 'https://www.vogue.com/search?q=daily+SPF+sunscreen' },
+          { title: 'How Daily SPF Became Skincare\'s Most Essential Step', source: 'Allure', url: 'https://www.allure.com/search?query=daily+SPF+sunscreen' },
+          { title: 'The Everyday SPF Boom Is Rewriting the Suncare Category', source: 'BeautyMatter', url: 'https://beautymatter.com/?s=daily+SPF' },
+        ]},
+      { rank: 4,  keyword: 'Glass Skin Aesthetic',     category: 'skincare',   momentum: '📈 Peak',      description: 'K-beauty glass skin remains the aspirational beauty standard',      mentions: 31,
+        articles: [
+          { title: 'Glass Skin Isn\'t Over — It\'s Evolved Into Something New', source: 'Elle Beauty', url: 'https://www.elle.com/search/glass+skin/' },
+          { title: 'The Enduring Power of K-Beauty\'s Glass Skin Ideal', source: 'Vogue Beauty', url: 'https://www.vogue.com/search?q=glass+skin' },
+          { title: 'Glass Skin 2026: New Formulas and a Widening Audience', source: 'Allure', url: 'https://www.allure.com/search?query=glass+skin' },
+          { title: 'How Glass Skin Became a Multi-Billion Dollar Market Force', source: 'Business of Fashion', url: 'https://www.businessoffashion.com/search/?q=glass+skin' },
+        ]},
+      { rank: 5,  keyword: 'Skinimalism Movement',     category: 'skincare',   momentum: '🔥 Rising',    description: 'Fewer products, better ingredients as minimalism approach peaks',    mentions: 28,
+        articles: [
+          { title: 'Skinimalism\'s Hold on Beauty Is Stronger Than Ever in 2026', source: "Harper's Bazaar", url: 'https://www.harpersbazaar.com/search/?q=skinimalism' },
+          { title: 'The Minimalist Skincare Wave Isn\'t a Trend — It\'s a Permanent Shift', source: 'BeautyMatter', url: 'https://beautymatter.com/?s=skinimalism' },
+          { title: 'Gen Z Wants Skinimalism: What That Means for the Industry', source: 'Glossy', url: 'https://www.glossy.co/?s=skinimalism' },
+        ]},
+      { rank: 6,  keyword: 'Tinted SPF Hybrid',        category: 'makeup',     momentum: '⭐ Emerging',  description: 'SPF-makeup crossover formats gaining strong retail traction',       mentions: 24,
+        articles: [
+          { title: 'The Tinted SPF Takeover: Why Hybrid Formats Are Winning', source: 'Allure', url: 'https://www.allure.com/search?query=tinted+SPF' },
+          { title: 'Foundation-Free Futures: Tinted SPF as the New Base', source: 'Vogue Beauty', url: 'https://www.vogue.com/search?q=tinted+SPF' },
+          { title: 'Hybrid Skincare-Makeup Formats Dominate 2026 Launches', source: 'BeautyMatter', url: 'https://beautymatter.com/?s=tinted+SPF' },
+        ]},
+      { rank: 7,  keyword: 'Clean Beauty Formulation', category: 'lifestyle',  momentum: '🔥 Rising',    description: 'Transparent ingredient sourcing demanded by Gen Z shoppers',        mentions: 22,
+        articles: [
+          { title: 'Gen Z Demands Clean Ingredients and Brands Are Listening', source: 'Business of Fashion', url: 'https://www.businessoffashion.com/search/?q=clean+beauty' },
+          { title: 'Ingredient Transparency Is the New Competitive Advantage', source: 'Glossy', url: 'https://www.glossy.co/?s=clean+beauty' },
+          { title: 'The Clean Beauty Market Defies Expectations in 2026', source: 'BeautyMatter', url: 'https://beautymatter.com/?s=clean+beauty+formulation' },
+        ]},
+      { rank: 8,  keyword: 'Retinol Alternatives',     category: 'ingredient', momentum: '⭐ Emerging',  description: 'Bakuchiol and retinal replacing classic retinol in new formulas',    mentions: 19,
+        articles: [
+          { title: 'Bakuchiol Is Having Its Biggest Moment Yet', source: 'Allure', url: 'https://www.allure.com/search?query=bakuchiol+retinol+alternative' },
+          { title: 'The Gentler Path to Anti-Aging: Retinol Alternatives Rise', source: 'Vogue Beauty', url: 'https://www.vogue.com/search?q=retinol+alternative+bakuchiol' },
+          { title: 'Retinal and Bakuchiol Lead the Retinol Alternative Wave', source: "Harper's Bazaar", url: 'https://www.harpersbazaar.com/search/?q=retinol+alternative' },
+        ]},
+      { rank: 9,  keyword: 'Scalp Care Wellness',      category: 'wellness',   momentum: '⭐ Emerging',  description: 'Scalp health bridges hair and skincare as a new category',           mentions: 16,
+        articles: [
+          { title: 'Scalp Care Is the New Skincare — and Brands Are Paying Attention', source: 'Allure', url: 'https://www.allure.com/search?query=scalp+care' },
+          { title: 'How Scalp Wellness Became Beauty\'s Fastest-Growing New Category', source: 'BeautyMatter', url: 'https://beautymatter.com/?s=scalp+care' },
+          { title: 'The Scalp Care Boom and What It Means for the Industry', source: 'Beauty Independent', url: 'https://www.beautyindependent.com/?s=scalp+care' },
+        ]},
+      { rank: 10, keyword: 'Bold Graphic Liner',       category: 'makeup',     momentum: '📉 Declining', description: 'Peak 2023 aesthetic softening as natural dewy looks dominate',     mentions: 9,
+        articles: [
+          { title: 'Is the Graphic Liner Trend Finally Fading Out?', source: 'Allure', url: 'https://www.allure.com/search?query=graphic+liner+trend' },
+          { title: 'How the Natural Beauty Aesthetic Is Pushing Out the Graphic Look', source: 'Vogue Beauty', url: 'https://www.vogue.com/search?q=graphic+liner+makeup+trend' },
+          { title: 'The Makeup Aesthetic That\'s Losing Ground in 2026', source: "Harper's Bazaar", url: 'https://www.harpersbazaar.com/search/?q=graphic+liner' },
+        ]},
     ],
     sources: ['Vogue Beauty', 'Business of Fashion', 'Glossy', 'Beauty Independent', 'BeautyMatter', 'Allure', 'Elle Beauty', "Harper's Bazaar"],
     indonesia_sources: ['Elle Indonesia', 'Dewi Magazine', 'Beauty Journal', 'Beautynesia', 'Cosmopolitan ID', 'Female Daily', "Harper's Bazaar ID"],
@@ -568,16 +621,68 @@ const MOCK_DATA = {
     totalHeadlines: 390,
     coverage: '30 days',
     indonesia_trends: [
-      { rank: 1,  keyword: 'Glass Skin K-Beauty',       category: 'skincare',   momentum: '📈 Peak',      description: 'K-beauty glass skin remains the top Indonesian beauty aspiration',   mentions: 45 },
-      { rank: 2,  keyword: 'Halal Certified Skincare',  category: 'lifestyle',  momentum: '🔥 Rising',    description: 'Halal certification becomes a key purchase driver for IDN consumers', mentions: 40 },
-      { rank: 3,  keyword: 'SPF Tropical Protection',   category: 'skincare',   momentum: '🔥 Rising',    description: 'Everyday SPF adapted for tropical heat and humidity conditions',       mentions: 37 },
-      { rank: 4,  keyword: 'Niacinamide Brightening',   category: 'ingredient', momentum: '📈 Peak',      description: 'Niacinamide dominates as the #1 brightening ingredient in Indonesia',  mentions: 33 },
-      { rank: 5,  keyword: 'Natural Herbal Ingredients',category: 'ingredient', momentum: '🔥 Rising',    description: 'Local botanical ingredients driving trust and product differentiation', mentions: 30 },
-      { rank: 6,  keyword: 'Hijab-Friendly Skincare',   category: 'skincare',   momentum: '⭐ Emerging',  description: 'Sweat-resistant and breathable formulas tailored for hijab wearers',    mentions: 25 },
-      { rank: 7,  keyword: 'Affordable Local Brands',   category: 'lifestyle',  momentum: '🔥 Rising',    description: 'Domestic brands gain loyalty vs premium imports post-pandemic',         mentions: 22 },
-      { rank: 8,  keyword: 'Skinimalism Routine',       category: 'skincare',   momentum: '⭐ Emerging',  description: 'Simplified routines gaining ground especially among younger consumers', mentions: 18 },
-      { rank: 9,  keyword: 'Tinted Moisturiser SPF',    category: 'makeup',     momentum: '⭐ Emerging',  description: 'Hybrid tinted SPF replaces heavy foundation in humid climates',         mentions: 14 },
-      { rank: 10, keyword: 'Heavy Powder Foundation',   category: 'makeup',     momentum: '📉 Declining', description: 'Full-coverage powder looks fading in favour of skin-first aesthetics',  mentions: 8  },
+      { rank: 1,  keyword: 'Glass Skin K-Beauty',       category: 'skincare',   momentum: '📈 Peak',      description: 'K-beauty glass skin remains the top Indonesian beauty aspiration',   mentions: 45,
+        articles: [
+          { title: 'Tren Glass Skin K-Beauty Masih Kuasai Dunia Kecantikan Indonesia', source: 'Elle Indonesia', url: 'https://www.elle.com/id/search/glass+skin/' },
+          { title: 'Glass Skin: Inspirasi Kulit Kaca Favorit Perempuan Indonesia', source: 'Female Daily', url: 'https://femaledaily.com/?s=glass+skin' },
+          { title: 'Mengapa Glass Skin Tetap Menjadi Standar Kecantikan di Indonesia', source: 'Beautynesia', url: 'https://beautynesia.id/search?q=glass+skin' },
+          { title: 'The K-Beauty Glass Skin Ideal That Took Over Indonesia', source: "Harper's Bazaar ID", url: 'https://www.harpersbazaar.co.id/search/?q=glass+skin' },
+        ]},
+      { rank: 2,  keyword: 'Halal Certified Skincare',  category: 'lifestyle',  momentum: '🔥 Rising',    description: 'Halal certification becomes a key purchase driver for IDN consumers', mentions: 40,
+        articles: [
+          { title: 'Sertifikasi Halal Jadi Faktor Utama Pembelian Skincare di Indonesia', source: 'Female Daily', url: 'https://femaledaily.com/?s=halal+skincare' },
+          { title: 'Halal Beauty: Pasar yang Terus Berkembang Pesat di Indonesia', source: 'Beautynesia', url: 'https://beautynesia.id/search?q=halal+skincare' },
+          { title: 'Why Halal Certification Is Now a Non-Negotiable for Indonesian Consumers', source: "Harper's Bazaar ID", url: 'https://www.harpersbazaar.co.id/search/?q=halal+skincare' },
+          { title: 'Kosmetik Halal Semakin Diminati: Peluang Brand Lokal dan Global', source: 'Cosmopolitan ID', url: 'https://www.cosmopolitan.co.id/?s=halal+kosmetik' },
+        ]},
+      { rank: 3,  keyword: 'SPF Tropical Protection',   category: 'skincare',   momentum: '🔥 Rising',    description: 'Everyday SPF adapted for tropical heat and humidity conditions',       mentions: 37,
+        articles: [
+          { title: 'SPF Harian di Iklim Tropis: Mengapa Ini Jadi Kebutuhan Wajib', source: 'Beauty Journal', url: 'https://www.beautyjournal.id/?s=SPF+tropis' },
+          { title: 'Sunscreen Terbaik untuk Kulit di Iklim Indonesia 2026', source: 'Female Daily', url: 'https://femaledaily.com/?s=sunscreen+SPF' },
+          { title: 'Tropical SPF: The Unique Demands of Indonesia\'s Suncare Market', source: 'Elle Indonesia', url: 'https://www.elle.com/id/search/SPF/' },
+        ]},
+      { rank: 4,  keyword: 'Niacinamide Brightening',   category: 'ingredient', momentum: '📈 Peak',      description: 'Niacinamide dominates as the #1 brightening ingredient in Indonesia',  mentions: 33,
+        articles: [
+          { title: 'Niacinamide: Bahan Pencerah Kulit Nomor Satu di Indonesia', source: 'Beautynesia', url: 'https://beautynesia.id/search?q=niacinamide' },
+          { title: 'Kenapa Niacinamide Jadi Primadona di Dunia Skincare Indonesia', source: 'Female Daily', url: 'https://femaledaily.com/?s=niacinamide' },
+          { title: 'Brightening Indonesia: Niacinamide Leads the Charts in 2026', source: "Harper's Bazaar ID", url: 'https://www.harpersbazaar.co.id/search/?q=niacinamide' },
+        ]},
+      { rank: 5,  keyword: 'Natural Herbal Ingredients',category: 'ingredient', momentum: '🔥 Rising',    description: 'Local botanical ingredients driving trust and product differentiation', mentions: 30,
+        articles: [
+          { title: 'Bahan Herbal Lokal: Keunggulan Brand Kecantikan Indonesia', source: 'Dewi Magazine', url: 'https://dewi.co.id/?s=herbal+bahan+alami' },
+          { title: 'Kepercayaan Konsumen pada Bahan Alami Lokal Terus Tumbuh', source: 'Cosmopolitan ID', url: 'https://www.cosmopolitan.co.id/?s=bahan+alami+skincare' },
+          { title: 'Local Botanical Beauty: How Indonesian Brands Win With Natural Ingredients', source: "Harper's Bazaar ID", url: 'https://www.harpersbazaar.co.id/search/?q=bahan+herbal+lokal' },
+        ]},
+      { rank: 6,  keyword: 'Hijab-Friendly Skincare',   category: 'skincare',   momentum: '⭐ Emerging',  description: 'Sweat-resistant and breathable formulas tailored for hijab wearers',    mentions: 25,
+        articles: [
+          { title: 'Skincare untuk Hijabers: Produk yang Tahan Panas dan Nyaman', source: 'Female Daily', url: 'https://femaledaily.com/?s=skincare+hijab' },
+          { title: 'Hijab-Friendly Formula Menjadi Prioritas Brand Kecantikan', source: 'Beautynesia', url: 'https://beautynesia.id/search?q=hijab+skincare' },
+          { title: 'Beauty Brands Finally Designing Products for Hijab Wearers', source: "Harper's Bazaar ID", url: 'https://www.harpersbazaar.co.id/search/?q=hijab+beauty' },
+        ]},
+      { rank: 7,  keyword: 'Affordable Local Brands',   category: 'lifestyle',  momentum: '🔥 Rising',    description: 'Domestic brands gain loyalty vs premium imports post-pandemic',         mentions: 22,
+        articles: [
+          { title: 'Generasi Z Indonesia Pilih Brand Lokal Daripada Brand Import', source: 'Female Daily', url: 'https://femaledaily.com/?s=brand+lokal+kecantikan' },
+          { title: 'Brand Kecantikan Lokal Indonesia Makin Bersaing di Kelas Premium', source: 'Cosmopolitan ID', url: 'https://www.cosmopolitan.co.id/?s=brand+lokal+kecantikan' },
+          { title: 'How Local Indonesian Beauty Brands Are Winning Consumer Trust', source: 'Elle Indonesia', url: 'https://www.elle.com/id/search/brand+lokal/' },
+        ]},
+      { rank: 8,  keyword: 'Skinimalism Routine',       category: 'skincare',   momentum: '⭐ Emerging',  description: 'Simplified routines gaining ground especially among younger consumers', mentions: 18,
+        articles: [
+          { title: 'Skinimalism: Tren Perawatan Kulit Minimalis yang Digemari Gen Z Indonesia', source: 'Beautynesia', url: 'https://beautynesia.id/search?q=skinimalism' },
+          { title: 'Lebih Sedikit Produk, Lebih Banyak Manfaat: Skinimalism di Indonesia', source: 'Beauty Journal', url: 'https://www.beautyjournal.id/?s=skinimalism' },
+          { title: 'Minimalist Skincare Takes Hold Among Indonesian Beauty Consumers', source: "Harper's Bazaar ID", url: 'https://www.harpersbazaar.co.id/search/?q=skinimalism' },
+        ]},
+      { rank: 9,  keyword: 'Tinted Moisturiser SPF',    category: 'makeup',     momentum: '⭐ Emerging',  description: 'Hybrid tinted SPF replaces heavy foundation in humid climates',         mentions: 14,
+        articles: [
+          { title: 'Tinted SPF Moisturizer: Produk Hybrid Favorit Kulit Tropis', source: 'Female Daily', url: 'https://femaledaily.com/?s=tinted+SPF+moisturizer' },
+          { title: 'Foundation-Free dan Terlindungi: Tren Tinted SPF di Indonesia', source: 'Beautynesia', url: 'https://beautynesia.id/search?q=tinted+SPF' },
+          { title: 'Hybrid Skincare-Makeup Formats Rising in Indonesia\'s Humid Climate', source: 'Elle Indonesia', url: 'https://www.elle.com/id/search/tinted+SPF/' },
+        ]},
+      { rank: 10, keyword: 'Heavy Powder Foundation',   category: 'makeup',     momentum: '📉 Declining', description: 'Full-coverage powder looks fading in favour of skin-first aesthetics',  mentions: 8,
+        articles: [
+          { title: 'Era Foundation Tebal Mulai Memudar di Indonesia', source: 'Female Daily', url: 'https://femaledaily.com/?s=foundation+powder+makeup' },
+          { title: 'Konsumen Indonesia Tinggalkan Bedak Tebal untuk Tampilan Natural', source: 'Cosmopolitan ID', url: 'https://www.cosmopolitan.co.id/?s=foundation+powder' },
+          { title: 'Skin-First Makeup Aesthetics Push Out Heavy Powder in Indonesia', source: "Harper's Bazaar ID", url: 'https://www.harpersbazaar.co.id/search/?q=foundation+powder+makeup' },
+        ]},
     ],
   },
 
@@ -1076,6 +1181,15 @@ function vCompetitorSentiments(d) {
     + H.blk('Attribute Sentiment Comparison — % Positive', legend + bars);
 }
 
+function tsTog(uid) {
+  const el = document.getElementById(uid);
+  const chv = document.getElementById(uid + '-chv');
+  if (!el) return;
+  const open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  if (chv) chv.style.transform = open ? '' : 'rotate(180deg)';
+}
+
 function vTrendsSignals(d) {
   const catCol = {
     skincare: 'var(--olive)', makeup: 'var(--amber)', lifestyle: '#9A8A6A',
@@ -1083,24 +1197,43 @@ function vTrendsSignals(d) {
   };
   const momCol = m => m && m.includes('Rising') ? '#2d7a2d' : m && m.includes('Peak') ? 'var(--amber)' : m && m.includes('Emerging') ? 'var(--olive)' : 'var(--muted)';
 
-  const buildTrendList = (trendArr, sourceArr) => {
+  const today = new Date();
+  const nextUp = new Date(today.getFullYear(), today.getMonth(), 12);
+  if (nextUp <= today) nextUp.setMonth(nextUp.getMonth() + 1);
+  const nextUpStr = nextUp.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const buildTrendList = (trendArr, sourceArr, prefix) => {
     if (!trendArr || !trendArr.length) return `<div style="color:var(--muted);font-size:12px;padding:20px 0">Live data will appear after the edge function runs.</div>`;
     const rows = trendArr.map((t, i) => {
       const col = catCol[t.category] || 'var(--muted)';
       const mc = momCol(t.momentum);
-      return `<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 0;${i < trendArr.length - 1 ? 'border-bottom:1px solid var(--g2)' : ''}">
-        <span style="font-size:11px;font-weight:800;color:var(--muted);width:22px;flex-shrink:0;padding-top:2px">${String(i + 1).padStart(2, '0')}</span>
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
-            <span style="font-size:13px;font-weight:700;color:var(--text)">${t.keyword}</span>
-            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:${col}22;color:${col};text-transform:uppercase;letter-spacing:0.5px">${t.category}</span>
+      const uid = `${prefix}-${i}`;
+      const arts = t.articles || [];
+      const hasArts = arts.length > 0;
+      const artHtml = arts.map(a =>
+        `<a href="${a.url}" target="_blank" rel="noopener" style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--g2);text-decoration:none;color:inherit">
+          <span style="flex:0 0 auto;font-size:9.5px;font-weight:600;color:var(--muted);background:var(--g2);border:1px solid #ddd;padding:2px 7px;border-radius:20px;white-space:nowrap;margin-top:1px">${a.source}</span>
+          <span style="font-size:11.5px;color:var(--text);flex:1;line-height:1.4">${a.title}</span>
+          <span style="flex-shrink:0;font-size:11px;color:var(--olive);margin-top:1px;margin-left:4px">↗</span>
+        </a>`
+      ).join('');
+      return `<div style="border-bottom:1px solid var(--g2)">
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:11px 0;${hasArts ? 'cursor:pointer;user-select:none' : ''}" ${hasArts ? `onclick="tsTog('${uid}')"` : ''}>
+          <span style="font-size:11px;font-weight:800;color:var(--muted);width:22px;flex-shrink:0;padding-top:2px">${String(i + 1).padStart(2, '0')}</span>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
+              <span style="font-size:13px;font-weight:700;color:var(--text)">${t.keyword}</span>
+              <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:${col}22;color:${col};text-transform:uppercase;letter-spacing:0.5px">${t.category}</span>
+            </div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.4">${t.description}</div>
           </div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.4">${t.description}</div>
+          <div style="text-align:right;flex-shrink:0;padding-left:8px;display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <div style="font-size:11px;color:${mc};font-weight:600;white-space:nowrap">${t.momentum}</div>
+            <div style="font-size:10px;color:var(--muted)">${t.mentions} articles</div>
+            ${hasArts ? `<div id="${uid}-chv" style="font-size:9px;color:var(--muted);transition:transform 0.25s;line-height:1;margin-top:1px">▼</div>` : ''}
+          </div>
         </div>
-        <div style="text-align:right;flex-shrink:0;padding-left:8px">
-          <div style="font-size:11px;color:${mc};font-weight:600;white-space:nowrap">${t.momentum}</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:1px">${t.mentions} articles</div>
-        </div>
+        ${hasArts ? `<div id="${uid}" style="display:none;padding:2px 0 10px 34px">${artHtml}</div>` : ''}
       </div>`;
     }).join('');
     const chips = (sourceArr || []).map(s => `<span style="font-size:10px;background:var(--g2);padding:3px 8px;border-radius:20px;color:var(--muted)">${s}</span>`).join('');
@@ -1108,12 +1241,20 @@ function vTrendsSignals(d) {
   };
 
   const trends = d.trends || [];
+  const updateNote = `<div style="font-size:11px;color:var(--muted);margin:-2px 0 14px;display:flex;flex-wrap:wrap;align-items:center;gap:5px">
+    <span>Last updated: <strong style="color:var(--text)">${d.updated}</strong></span>
+    <span style="color:var(--g2)">·</span>
+    <span>Auto-updates on the 12th of each month</span>
+    <span style="color:var(--g2)">·</span>
+    <span>Next update: <strong style="color:var(--text)">${nextUpStr}</strong></span>
+  </div>`;
 
   return H.vh('Trends Signals', d.desc, d.updated, d.alertBadge)
+    + updateNote
     + H.kpiRow(d.kpis)
     + `<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-bottom:12px">
-        ${H.blk('🌐 Global Beauty Trends — AI Top 10', buildTrendList(trends, d.sources))}
-        ${H.blk('🇮🇩 Indonesia Trends — AI Top 10', buildTrendList(d.indonesia_trends, d.indonesia_sources))}
+        ${H.blk('🌐 Global Beauty Trends — AI Top 10', buildTrendList(trends, d.sources, 'ts-g'))}
+        ${H.blk('🇮🇩 Indonesia Trends — AI Top 10', buildTrendList(d.indonesia_trends, d.indonesia_sources, 'ts-id'))}
       </div>`;
 }
 
