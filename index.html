@@ -1202,6 +1202,24 @@ function vTrendsSignals(d) {
   if (nextUp <= today) nextUp.setMonth(nextUp.getMonth() + 1);
   const nextUpStr = nextUp.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
+  const srcUrlFn = {
+    'Vogue Beauty':        k => `https://www.vogue.com/search?q=${encodeURIComponent(k)}`,
+    'Business of Fashion': k => `https://www.businessoffashion.com/search/?q=${encodeURIComponent(k)}`,
+    'Glossy':              k => `https://www.glossy.co/?s=${encodeURIComponent(k)}`,
+    'Beauty Independent':  k => `https://www.beautyindependent.com/?s=${encodeURIComponent(k)}`,
+    'BeautyMatter':        k => `https://beautymatter.com/?s=${encodeURIComponent(k)}`,
+    'Allure':              k => `https://www.allure.com/search?query=${encodeURIComponent(k)}`,
+    'Elle Beauty':         k => `https://www.elle.com/search/${encodeURIComponent(k)}/`,
+    "Harper's Bazaar":     k => `https://www.harpersbazaar.com/search/?q=${encodeURIComponent(k)}`,
+    'Elle Indonesia':      k => `https://www.elle.com/id/search/${encodeURIComponent(k)}/`,
+    'Dewi Magazine':       k => `https://dewi.co.id/?s=${encodeURIComponent(k)}`,
+    'Beauty Journal':      k => `https://www.beautyjournal.id/?s=${encodeURIComponent(k)}`,
+    'Beautynesia':         k => `https://beautynesia.id/search?q=${encodeURIComponent(k)}`,
+    'Cosmopolitan ID':     k => `https://www.cosmopolitan.co.id/?s=${encodeURIComponent(k)}`,
+    'Female Daily':        k => `https://femaledaily.com/?s=${encodeURIComponent(k)}`,
+    "Harper's Bazaar ID":  k => `https://www.harpersbazaar.co.id/search/?q=${encodeURIComponent(k)}`,
+  };
+
   const buildTrendList = (trendArr, sourceArr, prefix) => {
     if (!trendArr || !trendArr.length) return `<div style="color:var(--muted);font-size:12px;padding:20px 0">Live data will appear after the edge function runs.</div>`;
     const rows = trendArr.map((t, i) => {
@@ -1209,16 +1227,24 @@ function vTrendsSignals(d) {
       const mc = momCol(t.momentum);
       const uid = `${prefix}-${i}`;
       const arts = t.articles || [];
-      const hasArts = arts.length > 0;
-      const artHtml = arts.map(a =>
-        `<a href="${a.url}" target="_blank" rel="noopener" style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--g2);text-decoration:none;color:inherit">
-          <span style="flex:0 0 auto;font-size:9.5px;font-weight:600;color:var(--muted);background:var(--g2);border:1px solid #ddd;padding:2px 7px;border-radius:20px;white-space:nowrap;margin-top:1px">${a.source}</span>
-          <span style="font-size:11.5px;color:var(--text);flex:1;line-height:1.4">${a.title}</span>
-          <span style="flex-shrink:0;font-size:11px;color:var(--olive);margin-top:1px;margin-left:4px">↗</span>
-        </a>`
-      ).join('');
+      let artHtml;
+      if (arts.length > 0) {
+        artHtml = arts.map(a =>
+          `<a href="${a.url}" target="_blank" rel="noopener" style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--g2);text-decoration:none;color:inherit">
+            <span style="flex:0 0 auto;font-size:9.5px;font-weight:600;color:var(--muted);background:var(--g2);border:1px solid #ddd;padding:2px 7px;border-radius:20px;white-space:nowrap;margin-top:1px">${a.source}</span>
+            <span style="font-size:11.5px;color:var(--text);flex:1;line-height:1.4">${a.title}</span>
+            <span style="flex-shrink:0;font-size:11px;color:var(--olive);margin-top:1px;margin-left:4px">↗</span>
+          </a>`
+        ).join('');
+      } else {
+        const chips = (sourceArr || []).map(s => {
+          const fn = srcUrlFn[s];
+          return fn ? `<a href="${fn(t.keyword)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--g2);border:1px solid #ddd;border-radius:20px;text-decoration:none;font-size:11px;color:var(--muted);font-weight:500;white-space:nowrap">${s} <span style="color:var(--olive)">↗</span></a>` : '';
+        }).filter(Boolean).join('');
+        artHtml = `<div style="padding:6px 0 4px"><div style="font-size:10.5px;color:var(--muted);margin-bottom:7px">Search this trend across sources:</div><div style="display:flex;flex-wrap:wrap;gap:6px">${chips}</div></div>`;
+      }
       return `<div style="border-bottom:1px solid var(--g2)">
-        <div style="display:flex;align-items:flex-start;gap:12px;padding:11px 0;${hasArts ? 'cursor:pointer;user-select:none' : ''}" ${hasArts ? `onclick="tsTog('${uid}')"` : ''}>
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:11px 0;cursor:pointer;user-select:none" onclick="tsTog('${uid}')">
           <span style="font-size:11px;font-weight:800;color:var(--muted);width:22px;flex-shrink:0;padding-top:2px">${String(i + 1).padStart(2, '0')}</span>
           <div style="flex:1;min-width:0">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
@@ -1230,10 +1256,10 @@ function vTrendsSignals(d) {
           <div style="text-align:right;flex-shrink:0;padding-left:8px;display:flex;flex-direction:column;align-items:flex-end;gap:2px">
             <div style="font-size:11px;color:${mc};font-weight:600;white-space:nowrap">${t.momentum}</div>
             <div style="font-size:10px;color:var(--muted)">${t.mentions} articles</div>
-            ${hasArts ? `<div id="${uid}-chv" style="font-size:9px;color:var(--muted);transition:transform 0.25s;line-height:1;margin-top:1px">▼</div>` : ''}
+            <div id="${uid}-chv" style="font-size:9px;color:var(--muted);transition:transform 0.25s;line-height:1;margin-top:1px">▼</div>
           </div>
         </div>
-        ${hasArts ? `<div id="${uid}" style="display:none;padding:2px 0 10px 34px">${artHtml}</div>` : ''}
+        <div id="${uid}" style="display:none;padding:2px 0 10px 34px">${artHtml}</div>
       </div>`;
     }).join('');
     const chips = (sourceArr || []).map(s => `<span style="font-size:10px;background:var(--g2);padding:3px 8px;border-radius:20px;color:var(--muted)">${s}</span>`).join('');
