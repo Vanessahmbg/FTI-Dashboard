@@ -1198,8 +1198,7 @@ function vTrendsSignals(d) {
   const momCol = m => m && m.includes('Rising') ? '#2d7a2d' : m && m.includes('Peak') ? 'var(--amber)' : m && m.includes('Emerging') ? 'var(--olive)' : 'var(--muted)';
 
   const today = new Date();
-  const nextUp = new Date(today.getFullYear(), today.getMonth(), 12);
-  if (nextUp <= today) nextUp.setMonth(nextUp.getMonth() + 1);
+  const nextUp = new Date(today.getFullYear(), today.getMonth() + 1, 1);
   const nextUpStr = nextUp.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
   const srcDomain = {
@@ -1268,7 +1267,7 @@ function vTrendsSignals(d) {
   const updateNote = `<div style="font-size:11px;color:var(--muted);margin:-2px 0 14px;display:flex;flex-wrap:wrap;align-items:center;gap:5px">
     <span>Last updated: <strong style="color:var(--text)">${d.updated}</strong></span>
     <span style="color:var(--g2)">·</span>
-    <span>Auto-updates on the 12th of each month</span>
+    <span>Auto-updates on the 1st of each month</span>
     <span style="color:var(--g2)">·</span>
     <span>Next update: <strong style="color:var(--text)">${nextUpStr}</strong></span>
   </div>`;
