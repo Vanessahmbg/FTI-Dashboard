@@ -1248,7 +1248,7 @@ function vTrendsSignals(d) {
     'Glossy': 'glossy.co', 'Beauty Independent': 'beautyindependent.com',
     'BeautyMatter': 'beautymatter.com', 'Allure': 'allure.com',
     'Elle Beauty': 'elle.com', "Harper's Bazaar": 'harpersbazaar.com',
-    'Elle Indonesia': 'elle.com', 'Dewi Magazine': 'dewi.co.id',
+    'Elle Indonesia': 'elle.co.id', 'Dewi Magazine': 'dewimagazine.com',
     'Beauty Journal': 'beautyjournal.id', 'Beautynesia': 'beautynesia.id',
     'Cosmopolitan ID': 'cosmopolitan.co.id', 'Female Daily': 'femaledaily.com',
     "Harper's Bazaar ID": 'harpersbazaar.co.id',
@@ -1331,35 +1331,25 @@ function vRelevanceScore(d) {
     (byGroup[g] || byGroup.lifestyle).push(p);
   });
 
-  const pScore = p => {
-    const m = p.matrix || {};
-    return (m.global||0)+(m.idn||0)+(m.actives||0)+(m.catGrowth||0)+(m.format||0);
-  };
+  const pScore = p => +(p.score || 0);
   const sCol = s => s >= 70 ? 'var(--olive)' : s >= 50 ? 'var(--amber)' : 'var(--red)';
   const sCls = s => s >= 70 ? 'st-r' : s >= 50 ? 'st-a' : 'st-n';
   const sLbl = s => s >= 70 ? 'Strong' : s >= 50 ? 'Mid' : 'Weak';
 
-  const dimInfo = [
-    { key: 'global',    icon: '🌐', lbl: 'Global' },
-    { key: 'idn',       icon: '🇮🇩', lbl: 'IDN'    },
-    { key: 'actives',   icon: '⚗',  lbl: 'Actives' },
-    { key: 'catGrowth', icon: '📈', lbl: 'Category' },
-    { key: 'format',    icon: '🎯', lbl: 'Format'  },
-  ];
-
-  const dimChip = (icon, lbl, val) => {
-    if (val === null || val === undefined) {
-      return `<span style="font-size:9.5px;padding:2px 6px;border-radius:3px;background:var(--g2);color:var(--muted);white-space:nowrap">${icon} ${lbl} —</span>`;
-    }
-    const col = val >= 16 ? 'var(--olive)' : val >= 11 ? 'var(--amber)' : 'var(--red)';
-    const bg  = val >= 16 ? 'rgba(107,142,35,0.12)' : val >= 11 ? 'rgba(202,138,4,0.12)' : 'rgba(220,38,38,0.09)';
-    return `<span style="font-size:9.5px;padding:2px 6px;border-radius:3px;background:${bg};color:${col};font-weight:700;white-space:nowrap">${icon} ${lbl} ${val}</span>`;
-  };
+  const confCol = c => c === 'High' ? 'var(--olive)' : c === 'Medium' ? 'var(--amber)' : 'var(--red)';
+  const confBg  = c => c === 'High' ? 'rgba(107,142,35,0.12)' : c === 'Medium' ? 'rgba(202,138,4,0.12)' : 'rgba(220,38,38,0.09)';
+  const confChip = c => c ? `<span style="font-size:9.5px;padding:2px 6px;border-radius:3px;background:${confBg(c)};color:${confCol(c)};font-weight:700;white-space:nowrap">◆ ${c} confidence</span>` : '';
 
   const pRow = p => {
     const score = pScore(p);
-    const m = p.matrix || {};
-    const chips = dimInfo.map(d => dimChip(d.icon, d.lbl, m[d.key])).join('');
+    const chips = [
+      confChip(p.confidence),
+      p.white_space ? `<span style="font-size:9.5px;padding:2px 6px;border-radius:3px;background:rgba(220,38,38,0.09);color:var(--red);font-weight:700">⚠ White space</span>` : '',
+    ].filter(Boolean).join('');
+    const noteParts = [
+      p.best_trend    ? `Best: ${p.best_trend} (${p.best_score})`       : '',
+      p.weakest_trend ? `Weakest: ${p.weakest_trend} (${p.weakest_score})` : '',
+    ].filter(Boolean).join(' · ');
     return `<div style="padding:10px 0;border-bottom:1px solid var(--g2)">
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
         <div style="flex:1;font-size:12.5px;font-weight:600;color:var(--text);line-height:1.25">${p.name}</div>
@@ -1369,8 +1359,8 @@ function vRelevanceScore(d) {
       <div style="background:var(--g2);border-radius:4px;height:6px;margin-bottom:6px">
         <div style="width:${score}%;height:6px;background:${sCol(score)};border-radius:4px"></div>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px">${chips}</div>
-      <div style="font-size:10.5px;color:var(--muted);line-height:1.4">${p.note}</div>
+      ${chips ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px">${chips}</div>` : ''}
+      <div style="font-size:10.5px;color:var(--muted);line-height:1.4">${noteParts}</div>
     </div>`;
   };
 
@@ -1396,13 +1386,22 @@ function vRelevanceScore(d) {
     return `background:var(--g2);color:var(--muted);font-size:11px`;
   };
   const cell = v => `<td style="text-align:center;padding:5px 10px;${cellStyle(v)}">${v ?? '—'}</td>`;
+  const scoreCell = v => {
+    const col = v >= 70 ? 'var(--olive)' : v >= 50 ? 'var(--amber)' : 'var(--red)';
+    const bg  = v >= 70 ? 'rgba(107,142,35,0.13)' : v >= 50 ? 'rgba(202,138,4,0.12)' : 'rgba(220,38,38,0.08)';
+    return `<td style="text-align:center;padding:5px 10px;background:${bg};color:${col};font-weight:800;font-size:12px">${v ?? '—'}</td>`;
+  };
   const matrixRows = products.map(p => {
-    const m = p.matrix || {};
     const score = pScore(p);
+    const cat = (p.category||'').charAt(0).toUpperCase() + (p.category||'').slice(1);
+    const confStyle = `color:${confCol(p.confidence||'Low')};font-weight:700;font-size:11px`;
     return `<tr style="border-bottom:1px solid var(--g2)">
       <td style="padding:5px 8px;font-size:11px;font-weight:500;color:var(--text);white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis">${p.name}</td>
-      ${cell(m.global)}${cell(m.idn)}${cell(m.actives)}${cell(m.catGrowth)}${cell(m.format)}
-      <td style="text-align:center;padding:5px 10px;font-size:12px;font-weight:800;color:${sCol(score)}">${score}</td>
+      <td style="padding:5px 8px;font-size:11px;color:var(--muted);text-align:center">${cat}</td>
+      ${scoreCell(score)}
+      <td style="padding:5px 8px;font-size:11px;color:var(--text)">${p.best_trend || '—'}</td>
+      <td style="padding:5px 8px;font-size:11px;color:var(--muted)">${p.weakest_trend || '—'}</td>
+      <td style="padding:5px 8px;text-align:center;${confStyle}">${p.confidence || '—'}</td>
     </tr>`;
   }).join('');
 
@@ -1411,38 +1410,35 @@ function vRelevanceScore(d) {
       <thead>
         <tr style="border-bottom:2px solid var(--g2)">
           <th style="padding:6px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:left;min-width:160px">Product</th>
-          <th style="padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:center;white-space:nowrap">🌐 Global<br><span style="font-weight:400">/20</span></th>
-          <th style="padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:center;white-space:nowrap">🇮🇩 IDN<br><span style="font-weight:400">/20</span></th>
-          <th style="padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:center;white-space:nowrap">⚗ Actives<br><span style="font-weight:400">/20</span></th>
-          <th style="padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:center;white-space:nowrap">📈 Category<br><span style="font-weight:400">/20</span></th>
-          <th style="padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:center;white-space:nowrap">🎯 Format<br><span style="font-weight:400">/20</span></th>
-          <th style="padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:center;white-space:nowrap">Total<br><span style="font-weight:400">/100</span></th>
+          <th style="padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:center">Category</th>
+          <th style="padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:center;white-space:nowrap">Score<br><span style="font-weight:400">/100</span></th>
+          <th style="padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:left">Best Trend</th>
+          <th style="padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:left">Weakest Trend</th>
+          <th style="padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:center">Confidence</th>
         </tr>
       </thead>
       <tbody>${matrixRows}</tbody>
     </table>
   </div>
   <div style="margin-top:8px;font-size:10px;color:var(--muted);display:flex;flex-wrap:wrap;gap:10px">
-    <span><span style="color:var(--olive);font-weight:700">■</span> 16–20 Strong</span>
-    <span><span style="color:var(--amber);font-weight:700">■</span> 11–15 Mid</span>
-    <span><span style="color:var(--red)">■</span> 6–10 Weak</span>
-    <span><span style="color:var(--muted)">■</span> 0–5 / — Minimal or N/A</span>
+    <span><span style="color:var(--olive);font-weight:700">■</span> 70–100 Strong</span>
+    <span><span style="color:var(--amber);font-weight:700">■</span> 50–69 Mid</span>
+    <span><span style="color:var(--red)">■</span> 0–49 Weak</span>
   </div>`;
 
   /* ── Scoring criteria legend ── */
-  const criteriaLegend = `<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
-    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">🌐 Global Trends</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Alignment with top 10 global beauty trends from Trends Signals. /20</div></div>
-    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">🇮🇩 IDN Trends</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Alignment with top 10 Indonesia-specific trends from Trends Signals. /20</div></div>
-    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">⚗ Actives</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Strength of trending ingredient / active story (N/A for non-formulated items). /20</div></div>
-    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">📈 Category Growth</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Scaled from Indonesia subcategory YoY growth rate (Category data). /20</div></div>
-    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">🎯 Format Fit</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">How well the product format & positioning matches current market demand. /20</div></div>
+  const criteriaLegend = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">🔑 Keyword Match</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Token-level overlap between trend keywords and product ingredient/theme tags. Weight: 50%.</div></div>
+    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">🎯 Format Match</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Product format compatibility with trend format requirements (serum, cream, gel, etc.). Weight: 25%.</div></div>
+    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">💰 Price Match</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Product price point alignment with trend's target price segment. Weight: 25%.</div></div>
+    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">📈 Trend Strength</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Multiplier based on trend momentum (Rising ×1.15 · Peak ×1.00 · Emerging ×0.85) and article count.</div></div>
   </div>`;
 
-  const gapRows = (d.gaps||[]).map(g => [
-    `<span class="fw">${g.trend}</span>`,
-    g.trendScore,
-    `<span class="${g.ftiScore < 50 ? 'tdn fw' : 'tst'}">${g.ftiScore}</span>`,
-    g.opp === 'High' ? `<span class="st st-r">High</span>` : `<span class="st st-a">Medium</span>`,
+  const gapRows = (d.gap_analysis||[]).map(g => [
+    `<span class="fw">${g.trend_name}</span>`,
+    g.trend_score,
+    `<span class="${(g.fti_avg_score||0) < 50 ? 'tdn fw' : 'tst'}">${g.fti_avg_score ?? '—'}</span>`,
+    g.opportunity === 'High' ? `<span class="st st-r">High</span>` : `<span class="st st-a">Medium</span>`,
   ]);
   const recList = (d.recs||[]).map(r => `<div class="quote pos"><div class="q-text">${r}</div></div>`).join('');
 
