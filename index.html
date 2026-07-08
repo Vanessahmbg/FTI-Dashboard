@@ -1411,11 +1411,16 @@ function vRelevanceScore(d) {
     const bg  = v >= 60 ? 'rgba(107,142,35,0.13)' : v >= 40 ? 'rgba(202,138,4,0.12)' : 'rgba(220,38,38,0.08)';
     return `<td style="text-align:center;padding:5px 10px;background:${bg};color:${col};font-weight:800;font-size:12px">${v ?? '—'}</td>`;
   };
-  const matrixRows = products.map(p => {
+  const PAGE_SIZE = 5;
+  const totalPages = Math.ceil(products.length / PAGE_SIZE);
+  const matrixRows = products.map((p, i) => {
+    const pg = Math.floor(i / PAGE_SIZE);
     const score = pScore(p);
     const cat = (p.category||'').charAt(0).toUpperCase() + (p.category||'').slice(1);
     const confStyle = `color:${confCol(p.confidence||'Low')};font-weight:700;font-size:11px`;
-    return `<tr style="border-bottom:1px solid var(--g2)">
+    const rankStyle = i < 3 ? 'font-weight:800;color:var(--olive-dk)' : 'color:var(--muted)';
+    return `<tr class="fti-mrow" data-page="${pg}" style="border-bottom:1px solid var(--g2);${pg > 0 ? 'display:none' : ''}">
+      <td style="padding:5px 8px;font-size:11px;text-align:center;${rankStyle}">${i+1}</td>
       <td style="padding:5px 8px;font-size:11px;font-weight:500;color:var(--text);white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis">${p.name}</td>
       <td style="padding:5px 8px;font-size:11px;color:var(--muted);text-align:center">${cat}</td>
       ${scoreCell(score)}
@@ -1425,10 +1430,13 @@ function vRelevanceScore(d) {
     </tr>`;
   }).join('');
 
+  const navFn = `(function(dir){var tbl=document.getElementById('fti-rank');if(!tbl)return;var cur=parseInt(tbl.dataset.p||'0');var tp=${totalPages};var nx=Math.max(0,Math.min(cur+dir,tp-1));tbl.querySelectorAll('.fti-mrow[data-page="'+cur+'"]').forEach(function(r){r.style.display='none'});tbl.querySelectorAll('.fti-mrow[data-page="'+nx+'"]').forEach(function(r){r.style.display=''});tbl.dataset.p=nx;var info=document.getElementById('fti-pinfo');if(info)info.textContent=(nx+1)+' / '+tp;var pv=document.getElementById('fti-prev');var nxt=document.getElementById('fti-next');if(pv)pv.disabled=nx===0;if(nxt)nxt.disabled=nx===tp-1;})`;
+
   const matrixTable = `<div style="overflow-x:auto">
-    <table style="width:100%;border-collapse:collapse;min-width:540px">
+    <table id="fti-rank" data-p="0" style="width:100%;border-collapse:collapse;min-width:540px">
       <thead>
         <tr style="border-bottom:2px solid var(--g2)">
+          <th style="padding:6px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:center;width:32px">#</th>
           <th style="padding:6px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:left;min-width:160px">Product</th>
           <th style="padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:center">Category</th>
           <th style="padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:center;white-space:nowrap">Score<br><span style="font-weight:400">/100</span></th>
@@ -1440,10 +1448,17 @@ function vRelevanceScore(d) {
       <tbody>${matrixRows}</tbody>
     </table>
   </div>
-  <div style="margin-top:8px;font-size:10px;color:var(--muted);display:flex;flex-wrap:wrap;gap:10px">
-    <span><span style="color:var(--olive);font-weight:700">■</span> 60–100 Strong</span>
-    <span><span style="color:var(--amber);font-weight:700">■</span> 40–59 Mid</span>
-    <span><span style="color:var(--red)">■</span> 0–39 Weak</span>
+  <div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between">
+    <div style="font-size:10px;color:var(--muted);display:flex;gap:10px">
+      <span><span style="color:var(--olive);font-weight:700">■</span> 60–100 Strong</span>
+      <span><span style="color:var(--amber);font-weight:700">■</span> 40–59 Mid</span>
+      <span><span style="color:var(--red)">■</span> 0–39 Weak</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button id="fti-prev" disabled onclick="${navFn}(-1)" style="padding:5px 14px;border:1.5px solid var(--g3);background:var(--white);border-radius:6px;font-family:inherit;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer">← Prev</button>
+      <span id="fti-pinfo" style="font-size:11px;color:var(--muted);font-weight:600;min-width:44px;text-align:center">1 / ${totalPages}</span>
+      <button id="fti-next" onclick="${navFn}(1)" style="padding:5px 14px;border:1.5px solid var(--olive);background:var(--white);border-radius:6px;font-family:inherit;font-size:11px;font-weight:600;color:var(--olive-dk);cursor:pointer">Next →</button>
+    </div>
   </div>`;
 
   /* ── Scoring criteria items ── */
@@ -1545,7 +1560,7 @@ function vRelevanceScore(d) {
     + H.callout(d.alert || dynAlert)
     + H.kpiRow(d.kpis || dynKpis)
     + scoreAndCriteria
-    + H.blk('Scoring Matrix — All Products', matrixTable)
+    + H.blk('Product Rank — Most to Least Relevant', matrixTable)
     + H.blk('Product Scores — Detail View', productGrid)
     + H.blk('High-Opportunity Gaps (FTI Under-indexed)', H.table(['Trend','Trend Score','FTI Score','Opportunity'], gapRows))
     + H.blk('Recommendations', (() => {
