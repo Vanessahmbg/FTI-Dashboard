@@ -1636,9 +1636,34 @@ function vCategory(d) {
 }
 
 function vMacroOverview(irD, ccD) {
+  // After the HTML is in the DOM, restructure into a true 2-col × N-row grid
+  // so every section pair (KPIs / Scale / Chart / AI) shares the same row height.
+  window.__postRender = function() {
+    const ir   = document.getElementById('macro-ir');
+    const cc   = document.getElementById('macro-cc');
+    const wrap = document.getElementById('macro-grid');
+    if (!ir || !cc || !wrap) return;
+
+    // Collect visible sections (skip the hidden .vh header)
+    const irSecs = [...ir.children].filter(el => !el.classList.contains('vh'));
+    const ccSecs = [...cc.children].filter(el => !el.classList.contains('vh'));
+
+    // Rebuild the wrapper as a flat 2-col grid, alternating IR / CC per row
+    wrap.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:12px 20px';
+    wrap.innerHTML = '';
+    const rows = Math.max(irSecs.length, ccSecs.length);
+    for (let i = 0; i < rows; i++) {
+      if (irSecs[i]) { irSecs[i].style.marginBottom = '0'; wrap.appendChild(irSecs[i]); }
+      else            { wrap.appendChild(document.createElement('div')); }
+      if (ccSecs[i]) { ccSecs[i].style.marginBottom = '0'; wrap.appendChild(ccSecs[i]); }
+      else            { wrap.appendChild(document.createElement('div')); }
+    }
+  };
+
   const irHtml = irD ? vInflationRate(irD) : '<div style="color:var(--muted);padding:20px">No inflation data.</div>';
   const ccHtml = ccD ? vConsumerConfidence(ccD) : '<div style="color:var(--muted);padding:20px">No CCI data.</div>';
   const updated = irD?.updated || ccD?.updated || '—';
+
   return `<div class="vh">
       <div class="vh-top">
         <div class="vh-title">Macro Indicators</div>
@@ -1649,11 +1674,11 @@ function vMacroOverview(irD, ccD) {
     <style>
       .macro-col .vh { display:none !important; }
       .macro-col .kpi-row { grid-template-columns:repeat(2,1fr) !important; }
-      @media(max-width:820px){ .macro-col-wrap { grid-template-columns:1fr !important; } }
+      @media(max-width:820px){ #macro-grid { grid-template-columns:1fr !important; } }
     </style>
-    <div class="macro-col-wrap" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
-      <div class="macro-col">${irHtml}</div>
-      <div class="macro-col">${ccHtml}</div>
+    <div id="macro-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px">
+      <div id="macro-ir" class="macro-col">${irHtml}</div>
+      <div id="macro-cc" class="macro-col">${ccHtml}</div>
     </div>`;
 }
 
@@ -2365,6 +2390,10 @@ function navigate(id) {
     console.error('Render error for', id, e);
     content.innerHTML = `<div style="padding:32px;color:var(--red);font-size:13px">Failed to render this section. Please hard-refresh (Ctrl+Shift+R) and try again.<br><small style="color:var(--muted)">${e.message}</small><br><small style="color:var(--muted);font-size:10px;white-space:pre-wrap">${(e.stack||'').slice(0,400)}</small></div>`;
     return;
+  }
+  if (typeof window.__postRender === 'function') {
+    try { window.__postRender(); } catch(e) { console.warn('postRender error', e); }
+    window.__postRender = null;
   }
   if (WIP_IDS.includes(id)) {
     content.querySelectorAll('.kpi, .blk-body').forEach(el => {
