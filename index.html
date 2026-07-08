@@ -1446,13 +1446,19 @@ function vRelevanceScore(d) {
     <span><span style="color:var(--red)">■</span> 0–39 Weak</span>
   </div>`;
 
-  /* ── Scoring criteria legend ── */
-  const criteriaLegend = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">📊 Trend Alignment — 35%</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Best in-category trend score from the keyword × format × price × trend-strength matrix.</div></div>
-    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">🗂 Category Fit — 25%</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Momentum of active trends in the product's category (Rising 90 · Peak 85 · Emerging 50) weighted by article count.</div></div>
-    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">🛒 Market Proof — 25%</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">TikTok Shop performance: GMV share of top seller (60%) + CTR vs 4% avg (20%) + ATC% vs 7% avg (20%).</div></div>
-    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">🏷 Format & Price — 15%</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Average of format match and price match scores across all in-category trends.</div></div>
-  </div>`;
+  /* ── Scoring criteria items ── */
+  const criteriaItems = [
+    {lbl:'Trend Alignment', w:35, desc:'Best in-category trend score: keyword × format × price × trend-strength matrix.'},
+    {lbl:'Category Fit',    w:25, desc:'Momentum of active trends in product\'s category (Rising 90 · Peak 85 · Emerging 50) weighted by article count.'},
+    {lbl:'Market Proof',    w:25, desc:'TikTok Shop GMV share of top seller (60%) + CTR vs 4% avg (20%) + ATC% vs 7% avg (20%).'},
+    {lbl:'Format & Price',  w:15, desc:'Format and price match scores averaged across all in-category trends.'},
+  ].map(c => `<div style="padding:10px 12px;background:var(--g1);border-radius:8px;border-left:3px solid var(--g3)">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+      <span style="font-size:10.5px;font-weight:700;color:var(--text)">${c.lbl}</span>
+      <span style="font-size:9px;font-weight:700;color:var(--muted);background:var(--g2);padding:1px 6px;border-radius:3px">${c.w}%</span>
+    </div>
+    <div style="font-size:10px;color:var(--muted);line-height:1.5">${c.desc}</div>
+  </div>`).join('');
 
   const gapRows = (d.gap_analysis||[]).map(g => [
     `<span class="fw">${g.trend_name}</span>`,
@@ -1466,18 +1472,24 @@ function vRelevanceScore(d) {
     ? Math.round(products.reduce((s,p) => s + pScore(p), 0) / products.length)
     : (d.kpis?.[0]?.val ?? '—');
 
-  const bigScore = `<div class="blk">
-    <div class="score-wrap">
-      <div class="score-num">${avgScore}<span class="score-den"> /100</span></div>
-      <div class="score-lbl">Avg. Matrix Score across ${products.length || 21} Products — ${d.updated}</div>
+  const scoreAndCriteria = `<div class="blk">
+    <div style="display:grid;grid-template-columns:200px 1fr;gap:32px;align-items:start">
+      <div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Overall Score</div>
+        <div style="font-size:56px;font-weight:800;color:${sCol(avgScore)};line-height:1;letter-spacing:-2px">${avgScore}<span style="font-size:18px;font-weight:400;color:var(--muted);letter-spacing:0"> /100</span></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Avg. across ${products.length || 21} products<br>${d.updated}</div>
+      </div>
+      <div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Scoring Criteria</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${criteriaItems}</div>
+      </div>
     </div>
   </div>`;
 
   return H.vh('FTI Relevance Score', d.desc, d.updated, d.alertBadge)
     + H.callout(d.alert)
     + H.kpiRow(d.kpis)
-    + bigScore
-    + H.blk('Scoring Criteria', criteriaLegend)
+    + scoreAndCriteria
     + H.blk('Scoring Matrix — All Products', matrixTable)
     + H.blk('Product Scores — Detail View', productGrid)
     + H.blk('High-Opportunity Gaps (FTI Under-indexed)', H.table(['Trend','Trend Score','FTI Score','Opportunity'], gapRows))
