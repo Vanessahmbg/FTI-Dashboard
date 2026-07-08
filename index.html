@@ -900,7 +900,7 @@ const MOCK_DATA = {
       { lbl: 'Current CCI',                 val: '120.9', u: '',  trend: 'dn', t: '↓ -2.1 vs Apr 2026' },
       { lbl: 'Current Conditions Index',    val: '112.2', u: '',  trend: 'up', t: '→ Optimistic Zone' },
       { lbl: 'Consumer Expectations Index', val: '129.7', u: '',  trend: 'up', t: '→ Optimistic Zone' },
-      { lbl: 'Beauty Spending Est.',        val: '+12',   u: '%', trend: 'up', t: '↑ FTI segment estimate' },
+      { lbl: '6M Average CCI',              val: '123.8', u: '',  trend: 'dn', t: '↓ -2.9 vs 6M avg' },
     ],
     history: [
       // 2020 — COVID crash (confirmed: Jan, May, Jun, Jul, Aug; rest estimated)
@@ -1880,12 +1880,21 @@ function vConsumerConfidence(d) {
     </div>
     <div style="font-size:10px;color:var(--muted);margin-top:6px">Scale: 0–200 · Neutral threshold: <strong style="color:var(--text)">100</strong> · Source: Bank Indonesia</div>`;
 
+  // Compute 6M average CCI from history for the 4th KPI card
+  const last6cci  = allHistory.slice(-6).map(h => Number(h.cci)).filter(v => !isNaN(v));
+  const avg6cci   = last6cci.length ? (last6cci.reduce((a,b)=>a+b,0)/last6cci.length).toFixed(1) : '—';
+  const currCci   = Number(d.kpis?.[0]?.val);
+  const cciDiff   = avg6cci !== '—' && !isNaN(currCci) ? (currCci - Number(avg6cci)).toFixed(1) : null;
+  const avg6Trend = cciDiff === null ? 'st' : Number(cciDiff) > 0 ? 'up' : Number(cciDiff) < 0 ? 'dn' : 'st';
+  const avg6T     = cciDiff === null ? '→ 6-Month Rolling'
+                  : Number(cciDiff) > 0 ? `↑ +${cciDiff} vs 6M avg` : `↓ ${cciDiff} vs 6M avg`;
+
   // KPI row with fully English labels (override DB labels for sub-indices)
   const kpiCards = [
     { lbl: 'Current CCI',                  val: d.kpis?.[0]?.val ?? '—', u: '', trend: d.kpis?.[0]?.trend, t: d.kpis?.[0]?.t },
     { lbl: 'Current Conditions Index',     val: d.kpis?.[1]?.val ?? '—', u: '', trend: d.kpis?.[1]?.trend, t: d.kpis?.[1]?.t },
     { lbl: 'Consumer Expectations Index',  val: d.kpis?.[2]?.val ?? '—', u: '', trend: d.kpis?.[2]?.trend, t: d.kpis?.[2]?.t },
-    { lbl: 'Beauty Spending Est.',         val: d.kpis?.[3]?.val ?? '+12', u: '%', trend: 'up', t: '↑ FTI segment estimate' },
+    { lbl: '6M Average CCI',              val: avg6cci,                   u: '', trend: avg6Trend,          t: avg6T },
   ];
 
   return H.vh('Consumer Confidence — CCI', d.desc, d.updated, d.alertBadge)
