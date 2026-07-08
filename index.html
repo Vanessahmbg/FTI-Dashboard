@@ -1468,9 +1468,30 @@ function vRelevanceScore(d) {
   ]);
   const recList = (d.recs||[]).map(r => `<div class="quote pos"><div class="q-text">${r}</div></div>`).join('');
 
-  const avgScore = products.length
-    ? Math.round(products.reduce((s,p) => s + pScore(p), 0) / products.length)
-    : (d.kpis?.[0]?.val ?? '—');
+  const grpAvg = arr => arr.length ? Math.round(arr.reduce((s,p) => s + pScore(p), 0) / arr.length) : 0;
+  const avgScore = products.length ? grpAvg(products) : (d.kpis?.[0]?.val ?? '—');
+
+  const bestP  = [...products].sort((a,b) => pScore(b) - pScore(a))[0];
+  const worstP = [...products].sort((a,b) => pScore(a) - pScore(b))[0];
+  const highGaps = (d.gap_analysis||[]).filter(g => g.opportunity === 'High').length;
+  const skAvg = grpAvg(byGroup.skincare);
+  const mkAvg = grpAvg(byGroup.makeup);
+  const liAvg = grpAvg(byGroup.lifestyle);
+
+  const dynKpis = [
+    { lbl:'Overall Score',  val:avgScore,  u:'/100',  t:`Avg. across ${products.length} products` },
+    { lbl:'Best Product',   val:(bestP?.name||'—').split(' ').slice(0,3).join(' '),  t:`Score: ${pScore(bestP||{})}` },
+    { lbl:'Needs Work',     val:(worstP?.name||'—').split(' ').slice(0,2).join(' '), t:`Score: ${pScore(worstP||{})}` },
+    { lbl:'Urgent Gaps',    val:highGaps,  t: highGaps > 0 ? '↑ Action needed' : 'On track', trend: highGaps > 0 ? 'dn' : 'up' },
+  ];
+  const skLbl = skAvg >= 60 ? 'Strong' : skAvg >= 40 ? 'Mid' : 'Weak';
+  const mkLbl = mkAvg >= 60 ? 'Strong' : mkAvg >= 40 ? 'Mid' : 'Weak';
+  const liLbl = liAvg >= 60 ? 'Strong' : liAvg >= 40 ? 'Mid' : 'Weak';
+  const dynAlert = products.length ? {
+    type: skAvg >= 60 ? 'green' : 'amber',
+    title: `${skLbl} Skincare (${skAvg}) · ${mkLbl} Makeup (${mkAvg}) · ${liLbl} Lifestyle (${liAvg})`,
+    body: `Top product: ${bestP?.name||'—'} (${pScore(bestP||{})}). Needs attention: ${worstP?.name||'—'} (${pScore(worstP||{})}). ${highGaps > 0 ? `${highGaps} high-opportunity trend gap${highGaps>1?'s':''} identified — check gap table below.` : 'No urgent trend gaps.'}`
+  } : null;
 
   const scoreAndCriteria = `<div class="blk">
     <div style="display:grid;grid-template-columns:200px 1fr;gap:32px;align-items:start">
@@ -1486,9 +1507,9 @@ function vRelevanceScore(d) {
     </div>
   </div>`;
 
-  return H.vh('FTI Relevance Score', d.desc, d.updated, d.alertBadge)
-    + H.callout(d.alert)
-    + H.kpiRow(d.kpis)
+  return H.vh('FTI Relevance Score', 'How closely each FTI product aligns with this month\'s top beauty trends.', d.updated, d.alertBadge)
+    + H.callout(d.alert || dynAlert)
+    + H.kpiRow(d.kpis || dynKpis)
     + scoreAndCriteria
     + H.blk('Scoring Matrix — All Products', matrixTable)
     + H.blk('Product Scores — Detail View', productGrid)
