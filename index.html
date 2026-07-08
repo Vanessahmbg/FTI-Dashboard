@@ -1350,8 +1350,10 @@ function vRelevanceScore(d) {
     </div>`;
   };
 
+  let _pRowIdx = 0;
   const pRow = p => {
     const score = pScore(p);
+    const uid = 'pr' + (_pRowIdx++);
     const chips = [
       confChip(p.confidence),
       p.white_space ? `<span style="font-size:9.5px;padding:2px 6px;border-radius:3px;background:rgba(220,38,38,0.09);color:var(--red);font-weight:700">⚠ White space</span>` : '',
@@ -1367,18 +1369,22 @@ function vRelevanceScore(d) {
       ${dimBar('Market Proof', 25, p.market_proof)}
       ${dimBar('Format & Price', 15, p.format_price)}
     </div>` : '';
+    const detail = (dimBars || chips || noteParts) ? `
+      ${dimBars}
+      ${chips ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px">${chips}</div>` : ''}
+      ${noteParts ? `<div style="font-size:10.5px;color:var(--muted);line-height:1.4">${noteParts}</div>` : ''}
+    ` : '';
     return `<div style="padding:10px 0;border-bottom:1px solid var(--g2)">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;cursor:pointer" onclick="(function(el){var d=document.getElementById('${uid}');var open=d.style.display!=='none';d.style.display=open?'none':'block';el.querySelector('.prchev').style.transform=open?'rotate(0deg)':'rotate(180deg)'})(this)">
         <div style="flex:1;font-size:12.5px;font-weight:600;color:var(--text);line-height:1.25">${p.name}</div>
         <div style="flex:0 0 28px;font-size:15px;font-weight:800;color:${sCol(score)};text-align:right">${score}</div>
         <span class="st ${sCls(score)}" style="font-size:10px;flex:0 0 46px;text-align:center">${sLbl(score)}</span>
+        <span class="prchev" style="font-size:11px;color:var(--muted);transition:transform 0.2s;flex:0 0 14px;text-align:center">&#8964;</span>
       </div>
       <div style="background:var(--g2);border-radius:4px;height:6px;margin-bottom:6px">
         <div style="width:${score}%;height:6px;background:${sCol(score)};border-radius:4px"></div>
       </div>
-      ${dimBars}
-      ${chips ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px">${chips}</div>` : ''}
-      <div style="font-size:10.5px;color:var(--muted);line-height:1.4">${noteParts}</div>
+      <div id="${uid}" style="display:none">${detail}</div>
     </div>`;
   };
 
