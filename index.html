@@ -1430,7 +1430,7 @@ function vRelevanceScore(d) {
     </tr>`;
   }).join('');
 
-  const navFn = `(function(dir){var tbl=document.getElementById('fti-rank');if(!tbl)return;var cur=parseInt(tbl.dataset.p||'0');var tp=${totalPages};var nx=Math.max(0,Math.min(cur+dir,tp-1));tbl.querySelectorAll('.fti-mrow[data-page="'+cur+'"]').forEach(function(r){r.style.display='none'});tbl.querySelectorAll('.fti-mrow[data-page="'+nx+'"]').forEach(function(r){r.style.display=''});tbl.dataset.p=nx;var info=document.getElementById('fti-pinfo');if(info)info.textContent=(nx+1)+' / '+tp;var pv=document.getElementById('fti-prev');var nxt=document.getElementById('fti-next');if(pv)pv.disabled=nx===0;if(nxt)nxt.disabled=nx===tp-1;})`;
+  const navFn = `(function(d){var tbl=document.getElementById('fti-rank');if(!tbl)return;var cur=parseInt(tbl.dataset.p||0);var tp=${totalPages};var nx=Math.max(0,Math.min(cur+d,tp-1));var rows=tbl.getElementsByClassName('fti-mrow');for(var i=0;i<rows.length;i++){var pg=parseInt(rows[i].getAttribute('data-page'));rows[i].style.display=pg===nx?'':'none';}tbl.dataset.p=nx;var info=document.getElementById('fti-pinfo');if(info)info.textContent=(nx+1)+' / '+tp;var pv=document.getElementById('fti-prev');var nxt=document.getElementById('fti-next');if(pv)pv.disabled=nx===0;if(nxt)nxt.disabled=nx===tp-1;})`;
 
   const matrixTable = `<div style="overflow-x:auto">
     <table id="fti-rank" data-p="0" style="width:100%;border-collapse:collapse;min-width:540px">
