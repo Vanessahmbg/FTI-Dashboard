@@ -1494,14 +1494,14 @@ function vRelevanceScore(d) {
   } : null;
 
   const scoreAndCriteria = `<div class="blk">
-    <div style="display:grid;grid-template-columns:200px 1fr;gap:32px;align-items:start">
-      <div>
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Overall Score</div>
-        <div style="font-size:56px;font-weight:800;color:${sCol(avgScore)};line-height:1;letter-spacing:-2px">${avgScore}<span style="font-size:18px;font-weight:400;color:var(--muted);letter-spacing:0"> /100</span></div>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Avg. across ${products.length || 21} products<br>${d.updated}</div>
+    <div style="display:grid;grid-template-columns:200px 1fr;gap:0;align-items:stretch">
+      <div style="padding:20px 24px;border-right:1px solid var(--g2)">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px">Overall Score</div>
+        <div style="font-size:54px;font-weight:800;color:${sCol(avgScore)};line-height:1;letter-spacing:-2px">${avgScore}<span style="font-size:17px;font-weight:400;color:var(--muted);letter-spacing:0"> /100</span></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6">Avg. across ${products.length || 21} products<br>${d.updated}</div>
       </div>
-      <div>
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Scoring Criteria</div>
+      <div style="padding:20px 24px">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px">Scoring Criteria</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${criteriaItems}</div>
       </div>
     </div>
