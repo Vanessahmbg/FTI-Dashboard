@@ -1471,9 +1471,11 @@ function vRelevanceScore(d) {
   const grpAvg = arr => arr.length ? Math.round(arr.reduce((s,p) => s + pScore(p), 0) / arr.length) : 0;
   const avgScore = products.length ? grpAvg(products) : (d.kpis?.[0]?.val ?? '—');
 
-  const bestP  = [...products].sort((a,b) => pScore(b) - pScore(a))[0];
-  const worstP = [...products].sort((a,b) => pScore(a) - pScore(b))[0];
-  const highGaps = (d.gap_analysis||[]).filter(g => g.opportunity === 'High').length;
+  const bestP   = [...products].sort((a,b) => pScore(b) - pScore(a))[0];
+  const worstP  = [...products].sort((a,b) => pScore(a) - pScore(b))[0];
+  const allGaps = d.gap_analysis || [];
+  const highGapCount = allGaps.filter(g => g.opportunity === 'High').length;
+  const totalGaps    = allGaps.length;
   const skAvg = grpAvg(byGroup.skincare);
   const mkAvg = grpAvg(byGroup.makeup);
   const liAvg = grpAvg(byGroup.lifestyle);
@@ -1482,7 +1484,7 @@ function vRelevanceScore(d) {
     { lbl:'Overall Score',  val:avgScore,  u:'/100',  t:`Avg. across ${products.length} products` },
     { lbl:'Best Product',   val:(bestP?.name||'—').split(' ').slice(0,3).join(' '),  t:`Score: ${pScore(bestP||{})}` },
     { lbl:'Needs Work',     val:(worstP?.name||'—').split(' ').slice(0,2).join(' '), t:`Score: ${pScore(worstP||{})}` },
-    { lbl:'Urgent Gaps',    val:highGaps,  t: highGaps > 0 ? '↑ Action needed' : 'On track', trend: highGaps > 0 ? 'dn' : 'up' },
+    { lbl:'Trend Gaps',     val:totalGaps, t:`${highGapCount} high · ${totalGaps - highGapCount} medium`, trend: highGapCount > 0 ? 'dn' : 'up' },
   ];
   const skLbl = skAvg >= 60 ? 'Strong' : skAvg >= 40 ? 'Mid' : 'Weak';
   const mkLbl = mkAvg >= 60 ? 'Strong' : mkAvg >= 40 ? 'Mid' : 'Weak';
@@ -1490,8 +1492,37 @@ function vRelevanceScore(d) {
   const dynAlert = products.length ? {
     type: skAvg >= 60 ? 'green' : 'amber',
     title: `${skLbl} Skincare (${skAvg}) · ${mkLbl} Makeup (${mkAvg}) · ${liLbl} Lifestyle (${liAvg})`,
-    body: `Top product: ${bestP?.name||'—'} (${pScore(bestP||{})}). Needs attention: ${worstP?.name||'—'} (${pScore(worstP||{})}). ${highGaps > 0 ? `${highGaps} high-opportunity trend gap${highGaps>1?'s':''} identified — check gap table below.` : 'No urgent trend gaps.'}`
+    body: `Top product: ${bestP?.name||'—'} (${pScore(bestP||{})}). Needs attention: ${worstP?.name||'—'} (${pScore(worstP||{})}). ${highGapCount} high-priority trend gap${highGapCount!==1?'s':''} and ${totalGaps-highGapCount} medium gaps identified — see breakdown below.`
   } : null;
+
+  const dynRecs = (() => {
+    if (!allGaps.length) return [];
+    const recs = [];
+    const highPri  = allGaps.filter(g => g.opportunity === 'High').sort((a,b) => (b.trend_score||0)-(a.trend_score||0));
+    const medPri   = allGaps.filter(g => g.opportunity !== 'High').sort((a,b) => (b.gap||0)-(a.gap||0));
+    const whites   = highPri.filter(g => (g.fti_avg_score||0) === 0);
+    const nonWhite = highPri.filter(g => (g.fti_avg_score||0) > 0);
+
+    if (whites.length) {
+      recs.push(`<strong>White space — no current coverage:</strong> FTI has zero products aligned to <em>${whites.map(g=>g.trend_name).join(', ')}</em>. These are high-momentum trends with a complete gap. Consider repositioning existing products or scoping new launches to enter these spaces.`);
+    }
+    if (nonWhite.length) {
+      const top = nonWhite[0];
+      const gap = (top.trend_score||0) - (top.fti_avg_score||0);
+      recs.push(`<strong>Close the ${top.trend_name} gap (${gap}-pt gap):</strong> Trend score is ${top.trend_score}/100 but FTI only scores ${top.fti_avg_score}/100. This is the highest-momentum under-indexed trend. Strengthen ingredient storytelling, keyword alignment, and content to close this gap.`);
+    }
+    if (mkAvg < 50 && byGroup.makeup.length) {
+      recs.push(`<strong>Makeup portfolio needs repositioning:</strong> Makeup products average ${mkAvg}/100 across active trends. The Mass Beauty Comeback and Runway trends reward affordable, viral formats — increase influencer-led content and consider lighter-hold, more accessible lip formats.`);
+    }
+    if (liAvg < 50 && byGroup.lifestyle.length) {
+      recs.push(`<strong>Lifestyle & accessories carry low trend value:</strong> Lifestyle products average ${liAvg}/100 against current beauty trends. Short-term: bundle accessories with high-scoring skincare products. Long-term: evaluate product mix to reduce reliance on low-trend-alignment SKUs.`);
+    }
+    if (medPri.length) {
+      const top = medPri[0];
+      recs.push(`<strong>Quick win — ${top.trend_name}:</strong> A ${(top.gap||0)}-point gap at medium priority. Tactical content and keyword updates could meaningfully close this without new product development.`);
+    }
+    return recs;
+  })();
 
   const scoreAndCriteria = `<div class="blk">
     <div style="display:grid;grid-template-columns:200px 1fr;gap:0;align-items:stretch">
@@ -1517,7 +1548,12 @@ function vRelevanceScore(d) {
     + H.blk('Scoring Matrix — All Products', matrixTable)
     + H.blk('Product Scores — Detail View', productGrid)
     + H.blk('High-Opportunity Gaps (FTI Under-indexed)', H.table(['Trend','Trend Score','FTI Score','Opportunity'], gapRows))
-    + H.blk('Recommendations', recList);
+    + H.blk('Recommendations', (() => {
+      const items = (d.recs||[]).length ? (d.recs||[]) : dynRecs;
+      return items.length
+        ? items.map(r => `<div class="quote pos"><div class="q-text">${r}</div></div>`).join('')
+        : '<div style="color:var(--muted);font-size:12px">No recommendations available.</div>';
+    })());
 }
 
 function vSelfCare(d) {
