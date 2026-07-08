@@ -1339,17 +1339,6 @@ function vRelevanceScore(d) {
   const confBg  = c => c === 'High' ? 'rgba(107,142,35,0.12)' : c === 'Medium' ? 'rgba(202,138,4,0.12)' : 'rgba(220,38,38,0.09)';
   const confChip = c => c ? `<span style="font-size:9.5px;padding:2px 6px;border-radius:3px;background:${confBg(c)};color:${confCol(c)};font-weight:700;white-space:nowrap">◆ ${c} confidence</span>` : '';
 
-  const dimBar = (lbl, wPct, val) => {
-    const v = +(val || 0);
-    return `<div style="display:flex;align-items:center;gap:5px">
-      <div style="font-size:9px;color:var(--muted);width:70px;flex:0 0 70px;white-space:nowrap">${lbl} <span style="opacity:0.6">${wPct}%</span></div>
-      <div style="flex:1;background:var(--g2);border-radius:2px;height:3px">
-        <div style="width:${v}%;height:3px;background:${sCol(v)};border-radius:2px"></div>
-      </div>
-      <div style="font-size:9px;font-weight:700;color:${sCol(v)};width:20px;text-align:right">${v}</div>
-    </div>`;
-  };
-
   let _pRowIdx = 0;
   const pRow = p => {
     const score = pScore(p);
@@ -1362,27 +1351,34 @@ function vRelevanceScore(d) {
       p.best_trend    ? `Best: ${p.best_trend} (${p.best_score})`       : '',
       p.weakest_trend ? `Weakest: ${p.weakest_trend} (${p.weakest_score})` : '',
     ].filter(Boolean).join(' · ');
-    const hasDims = p.trend_alignment != null || p.category_fit != null || p.market_proof != null || p.format_price != null;
-    const dimBars = hasDims ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 16px;margin-bottom:6px">
-      ${dimBar('Trend Align', 35, p.trend_alignment)}
-      ${dimBar('Category Fit', 25, p.category_fit)}
-      ${dimBar('Market Proof', 25, p.market_proof)}
-      ${dimBar('Format & Price', 15, p.format_price)}
+    const hasDims = p.trend_alignment != null && p.category_fit != null;
+    const dimNums = hasDims ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;padding:8px 0 6px;border-top:1px solid var(--g2)">
+      ${[
+        {lbl:'Trend Align',w:35,v:+(p.trend_alignment||0)},
+        {lbl:'Category Fit',w:25,v:+(p.category_fit||0)},
+        {lbl:'Market Proof',w:25,v:+(p.market_proof||0)},
+        {lbl:'Format & Price',w:15,v:+(p.format_price||0)},
+      ].map(d=>`<div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px">${d.lbl} <span style="opacity:0.55">${d.w}%</span></div>
+        <div style="font-size:16px;font-weight:800;color:${sCol(d.v)};line-height:1.1">${d.v}</div>
+      </div>`).join('')}
     </div>` : '';
-    const detail = (dimBars || chips || noteParts) ? `
-      ${dimBars}
-      ${chips ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px">${chips}</div>` : ''}
-      ${noteParts ? `<div style="font-size:10.5px;color:var(--muted);line-height:1.4">${noteParts}</div>` : ''}
+    const detail = (hasDims || chips || noteParts) ? `
+      ${dimNums}
+      ${chips || noteParts ? `<div style="padding-top:6px;display:flex;flex-wrap:wrap;align-items:center;gap:6px">
+        ${chips}
+        ${noteParts ? `<div style="font-size:10px;color:var(--muted);line-height:1.4">${noteParts}</div>` : ''}
+      </div>` : ''}
     ` : '';
     return `<div style="padding:10px 0;border-bottom:1px solid var(--g2)">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;cursor:pointer" onclick="(function(el){var d=document.getElementById('${uid}');var open=d.style.display!=='none';d.style.display=open?'none':'block';el.querySelector('.prchev').style.transform=open?'rotate(0deg)':'rotate(180deg)'})(this)">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;cursor:pointer" onclick="(function(el){var d=document.getElementById('${uid}');var open=d.style.display!=='none';d.style.display=open?'none':'block';el.querySelector('.prchev').style.transform=open?'rotate(0deg)':'rotate(180deg)'})(this)">
         <div style="flex:1;font-size:12.5px;font-weight:600;color:var(--text);line-height:1.25">${p.name}</div>
         <div style="flex:0 0 28px;font-size:15px;font-weight:800;color:${sCol(score)};text-align:right">${score}</div>
         <span class="st ${sCls(score)}" style="font-size:10px;flex:0 0 46px;text-align:center">${sLbl(score)}</span>
         <span class="prchev" style="font-size:11px;color:var(--muted);transition:transform 0.2s;flex:0 0 14px;text-align:center">&#8964;</span>
       </div>
-      <div style="background:var(--g2);border-radius:4px;height:6px;margin-bottom:6px">
-        <div style="width:${score}%;height:6px;background:${sCol(score)};border-radius:4px"></div>
+      <div style="background:var(--g2);border-radius:3px;height:4px;max-width:70%;margin-bottom:2px">
+        <div style="width:${score}%;height:4px;background:${sCol(score)};border-radius:3px"></div>
       </div>
       <div id="${uid}" style="display:none">${detail}</div>
     </div>`;
