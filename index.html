@@ -996,7 +996,7 @@ const MOCK_DATA = {
     updated: 'June 2026', alertBadge: '⚠ Approaching Limit',
     desc: 'National inflation rate and its projected impact on consumer purchasing power and discretionary beauty spending.',
     kpis: [
-      { lbl: 'Current Rate',     val: '3.34', u: '%', trend: 'up', t: '↑ +0.54pp vs May 2026' },
+      { lbl: 'Nominal YoY CPI',  val: '3.34', u: '%', trend: 'up', t: '↑ +0.54pp vs May 2026' },
       { lbl: 'Alert Threshold',  val: '4.0',  u: '%', trend: null },
       { lbl: 'Headroom',         val: '0.66', u: 'pp', trend: null },
       { lbl: 'Status',           val: 'Monitor', u: '',  trend: 'st', t: '→ Within BI target, watch trend' },
@@ -1813,7 +1813,7 @@ function vConsumerConfidence(d) {
     </div>`;
 
     const tableRows = history.map(h => {
-      const v=Number(h.cci); const isLast=h===history[history.length-1];
+      const v=Number(h.cci); const isLast=h===history[0];
       return [
         isLast?`<strong>${h.month}</strong>`:h.month,
         `<span class="fw ${v>=100?'tup':'tdn'}">${v}</span>`,
