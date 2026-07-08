@@ -1636,28 +1636,29 @@ function vCategory(d) {
 }
 
 function vMacroOverview(irD, ccD) {
-  // After the HTML is in the DOM, restructure into a true 2-col × N-row grid
-  // so every section pair (KPIs / Scale / Chart / AI) shares the same row height.
+  // After the HTML is in the DOM, make both column wrappers transparent to the
+  // parent grid (display:contents) so their children become direct grid items,
+  // then explicitly assign grid-column + grid-row so each section pair shares
+  // the same grid row. DOM parent-child stays intact, so all .macro-col CSS
+  // selectors (kpi-row sizing, .vh hiding, etc.) keep working.
   window.__postRender = function() {
-    const ir   = document.getElementById('macro-ir');
-    const cc   = document.getElementById('macro-cc');
-    const wrap = document.getElementById('macro-grid');
-    if (!ir || !cc || !wrap) return;
+    const ir = document.getElementById('macro-ir');
+    const cc = document.getElementById('macro-cc');
+    if (!ir || !cc) return;
 
-    // Collect visible sections (skip the hidden .vh header)
-    const irSecs = [...ir.children].filter(el => !el.classList.contains('vh'));
-    const ccSecs = [...cc.children].filter(el => !el.classList.contains('vh'));
+    ir.style.display = 'contents';
+    cc.style.display = 'contents';
 
-    // Rebuild the wrapper as a flat 2-col grid, alternating IR / CC per row
-    wrap.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:12px 20px';
-    wrap.innerHTML = '';
-    const rows = Math.max(irSecs.length, ccSecs.length);
-    for (let i = 0; i < rows; i++) {
-      if (irSecs[i]) { irSecs[i].style.marginBottom = '0'; wrap.appendChild(irSecs[i]); }
-      else            { wrap.appendChild(document.createElement('div')); }
-      if (ccSecs[i]) { ccSecs[i].style.marginBottom = '0'; wrap.appendChild(ccSecs[i]); }
-      else            { wrap.appendChild(document.createElement('div')); }
-    }
+    const place = (container, col) => {
+      const secs = [...container.children].filter(el => !el.classList.contains('vh'));
+      secs.forEach((el, i) => {
+        el.style.gridColumn = col;
+        el.style.gridRow    = (i + 1).toString();
+        el.style.marginBottom = '0';
+      });
+    };
+    place(ir, '1');
+    place(cc, '2');
   };
 
   const irHtml = irD ? vInflationRate(irD) : '<div style="color:var(--muted);padding:20px">No inflation data.</div>';
