@@ -1331,13 +1331,24 @@ function vRelevanceScore(d) {
   });
 
   const pScore = p => +(p.score || 0);
-  const sCol = s => s >= 70 ? 'var(--olive)' : s >= 50 ? 'var(--amber)' : 'var(--red)';
-  const sCls = s => s >= 70 ? 'st-r' : s >= 50 ? 'st-a' : 'st-n';
-  const sLbl = s => s >= 70 ? 'Strong' : s >= 50 ? 'Mid' : 'Weak';
+  const sCol = s => s >= 60 ? 'var(--olive)' : s >= 40 ? 'var(--amber)' : 'var(--red)';
+  const sCls = s => s >= 60 ? 'st-r' : s >= 40 ? 'st-a' : 'st-n';
+  const sLbl = s => s >= 60 ? 'Strong' : s >= 40 ? 'Mid' : 'Weak';
 
   const confCol = c => c === 'High' ? 'var(--olive)' : c === 'Medium' ? 'var(--amber)' : 'var(--red)';
   const confBg  = c => c === 'High' ? 'rgba(107,142,35,0.12)' : c === 'Medium' ? 'rgba(202,138,4,0.12)' : 'rgba(220,38,38,0.09)';
   const confChip = c => c ? `<span style="font-size:9.5px;padding:2px 6px;border-radius:3px;background:${confBg(c)};color:${confCol(c)};font-weight:700;white-space:nowrap">◆ ${c} confidence</span>` : '';
+
+  const dimBar = (lbl, wPct, val) => {
+    const v = +(val || 0);
+    return `<div style="display:flex;align-items:center;gap:5px">
+      <div style="font-size:9px;color:var(--muted);width:70px;flex:0 0 70px;white-space:nowrap">${lbl} <span style="opacity:0.6">${wPct}%</span></div>
+      <div style="flex:1;background:var(--g2);border-radius:2px;height:3px">
+        <div style="width:${v}%;height:3px;background:${sCol(v)};border-radius:2px"></div>
+      </div>
+      <div style="font-size:9px;font-weight:700;color:${sCol(v)};width:20px;text-align:right">${v}</div>
+    </div>`;
+  };
 
   const pRow = p => {
     const score = pScore(p);
@@ -1349,6 +1360,13 @@ function vRelevanceScore(d) {
       p.best_trend    ? `Best: ${p.best_trend} (${p.best_score})`       : '',
       p.weakest_trend ? `Weakest: ${p.weakest_trend} (${p.weakest_score})` : '',
     ].filter(Boolean).join(' · ');
+    const hasDims = p.trend_alignment != null || p.category_fit != null || p.market_proof != null || p.format_price != null;
+    const dimBars = hasDims ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 16px;margin-bottom:6px">
+      ${dimBar('Trend Align', 35, p.trend_alignment)}
+      ${dimBar('Category Fit', 25, p.category_fit)}
+      ${dimBar('Market Proof', 25, p.market_proof)}
+      ${dimBar('Format & Price', 15, p.format_price)}
+    </div>` : '';
     return `<div style="padding:10px 0;border-bottom:1px solid var(--g2)">
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
         <div style="flex:1;font-size:12.5px;font-weight:600;color:var(--text);line-height:1.25">${p.name}</div>
@@ -1358,6 +1376,7 @@ function vRelevanceScore(d) {
       <div style="background:var(--g2);border-radius:4px;height:6px;margin-bottom:6px">
         <div style="width:${score}%;height:6px;background:${sCol(score)};border-radius:4px"></div>
       </div>
+      ${dimBars}
       ${chips ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px">${chips}</div>` : ''}
       <div style="font-size:10.5px;color:var(--muted);line-height:1.4">${noteParts}</div>
     </div>`;
@@ -1386,8 +1405,8 @@ function vRelevanceScore(d) {
   };
   const cell = v => `<td style="text-align:center;padding:5px 10px;${cellStyle(v)}">${v ?? '—'}</td>`;
   const scoreCell = v => {
-    const col = v >= 70 ? 'var(--olive)' : v >= 50 ? 'var(--amber)' : 'var(--red)';
-    const bg  = v >= 70 ? 'rgba(107,142,35,0.13)' : v >= 50 ? 'rgba(202,138,4,0.12)' : 'rgba(220,38,38,0.08)';
+    const col = v >= 60 ? 'var(--olive)' : v >= 40 ? 'var(--amber)' : 'var(--red)';
+    const bg  = v >= 60 ? 'rgba(107,142,35,0.13)' : v >= 40 ? 'rgba(202,138,4,0.12)' : 'rgba(220,38,38,0.08)';
     return `<td style="text-align:center;padding:5px 10px;background:${bg};color:${col};font-weight:800;font-size:12px">${v ?? '—'}</td>`;
   };
   const matrixRows = products.map(p => {
@@ -1420,17 +1439,17 @@ function vRelevanceScore(d) {
     </table>
   </div>
   <div style="margin-top:8px;font-size:10px;color:var(--muted);display:flex;flex-wrap:wrap;gap:10px">
-    <span><span style="color:var(--olive);font-weight:700">■</span> 70–100 Strong</span>
-    <span><span style="color:var(--amber);font-weight:700">■</span> 50–69 Mid</span>
-    <span><span style="color:var(--red)">■</span> 0–49 Weak</span>
+    <span><span style="color:var(--olive);font-weight:700">■</span> 60–100 Strong</span>
+    <span><span style="color:var(--amber);font-weight:700">■</span> 40–59 Mid</span>
+    <span><span style="color:var(--red)">■</span> 0–39 Weak</span>
   </div>`;
 
   /* ── Scoring criteria legend ── */
   const criteriaLegend = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">🔑 Keyword Match</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Token-level overlap between trend keywords and product ingredient/theme tags. Weight: 50%.</div></div>
-    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">🎯 Format Match</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Product format compatibility with trend format requirements (serum, cream, gel, etc.). Weight: 25%.</div></div>
-    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">💰 Price Match</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Product price point alignment with trend's target price segment. Weight: 25%.</div></div>
-    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">📈 Trend Strength</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Multiplier based on trend momentum (Rising ×1.15 · Peak ×1.00 · Emerging ×0.85) and article count.</div></div>
+    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">📊 Trend Alignment — 35%</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Best in-category trend score from the keyword × format × price × trend-strength matrix.</div></div>
+    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">🗂 Category Fit — 25%</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Momentum of active trends in the product's category (Rising 90 · Peak 85 · Emerging 50) weighted by article count.</div></div>
+    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">🛒 Market Proof — 25%</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">TikTok Shop performance: GMV share of top seller (60%) + CTR vs 4% avg (20%) + ATC% vs 7% avg (20%).</div></div>
+    <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">🏷 Format & Price — 15%</div><div style="font-size:10.5px;color:var(--text);line-height:1.4">Average of format match and price match scores across all in-category trends.</div></div>
   </div>`;
 
   const gapRows = (d.gap_analysis||[]).map(g => [
