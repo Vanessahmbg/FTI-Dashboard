@@ -379,8 +379,7 @@ const SIDEBAR = [
     { id: 'lifestyle-merchandise',  label: 'Lifestyle & Merch',      alert: false },
   ]},
   { id: 'macro', num: '05', name: 'Macro Outlook', items: [
-    { id: 'consumer-confidence', label: 'Consumer Confidence', alert: false },
-    { id: 'inflation-rate',      label: 'Inflation Rate',      alert: false },
+    { id: 'inflation-rate',      label: 'Macro Indicators',   alert: false },
     { id: 'peak-season-alert',   label: 'Peak Season Alert',   alert: true  },
   ]},
 ];
@@ -1636,6 +1635,28 @@ function vCategory(d) {
     + H.blk('Market Summary', `<div class="ai-box"><div class="ai-lbl">Summary</div><div class="ai-text">${d.summary}</div></div>`);
 }
 
+function vMacroOverview(irD, ccD) {
+  const irHtml = irD ? vInflationRate(irD) : '<div style="color:var(--muted);padding:20px">No inflation data.</div>';
+  const ccHtml = ccD ? vConsumerConfidence(ccD) : '<div style="color:var(--muted);padding:20px">No CCI data.</div>';
+  const updated = irD?.updated || ccD?.updated || '—';
+  return `<div class="vh">
+      <div class="vh-top">
+        <div class="vh-title">Macro Indicators</div>
+        <div class="vh-badges">${H.badge('gray','Updated '+updated)}</div>
+      </div>
+      <div class="vh-desc">Indonesia macroeconomic context — inflation rate (CPI) and consumer confidence index (CCI) side by side.</div>
+    </div>
+    <style>
+      .macro-col .vh { display:none !important; }
+      .macro-col .kpi-row { grid-template-columns:repeat(2,1fr) !important; }
+      @media(max-width:820px){ .macro-col-wrap { grid-template-columns:1fr !important; } }
+    </style>
+    <div class="macro-col-wrap" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+      <div class="macro-col">${irHtml}</div>
+      <div class="macro-col">${ccHtml}</div>
+    </div>`;
+}
+
 function vConsumerConfidence(d) {
   const allHistory = d.history || [];
   window.__ccHistory = allHistory;
@@ -2304,8 +2325,7 @@ const VIEWS = {
   'self-care':            d => vSelfCare(d),
   'makeup':               d => vSelfCare(d),
   'lifestyle-merchandise':d => vSelfCare(d),
-  'consumer-confidence':  d => vConsumerConfidence(d),
-  'inflation-rate':       d => vInflationRate(d),
+  'inflation-rate':       d => vMacroOverview(d, DATA['consumer-confidence']),
   'peak-season-alert':    d => vPeakSeason(d),
 };
 
