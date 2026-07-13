@@ -443,28 +443,84 @@ const MOCK_DATA = {
 
   /* ── 1c. PRODUCTS SENTIMENT ─────────────────────────────── */
   'products-sentiment': {
-    updated: 'June 2026', alertBadge: '⚠ 2 Alerts',
-    desc: 'AI-scored sentiment across key product attributes from Shopee and TikTok Shop reviews. Negative themes trigger alerts.',
+    updated: 'Juni 2026', alertBadge: '⚠ 1 Alert',
+    desc: '315 ulasan TikTok Shop · Juni 2026 · dianalisis secara manual berdasarkan kategori Skincare, Makeup, dan Lifestyle & Merch',
     kpis: [
-      { lbl: 'Avg Positive Score', val: '76', u: '%',  trend: 'dn', t: '↓ −3pp MoM' },
-      { lbl: 'Reviews Analysed',   val: '4,576', u: '', trend: 'up', t: '↑ +312 MoM' },
-      { lbl: 'Best Attribute',     val: 'Ingredients', u: '', trend: null },
-      { lbl: 'Active Alerts',      val: '2',  u: '',   trend: 'dn', t: '↓ Results, Price/Value' },
+      { lbl: 'Total Ulasan',        val: '315',  u: '',   trend: null, t: 'TikTok Shop · Juni 2026' },
+      { lbl: 'Bintang 5 / Sangat Puas', val: '~92', u: '%', trend: 'up', t: '↑ Mayoritas ulasan' },
+      { lbl: 'Produk Terbanyak Diulas', val: 'Illipe Blurring Butter Pot', u: '', trend: null },
+      { lbl: 'Repeat Buyers',       val: 'Tinggi', u: '', trend: 'up', t: '↑ Banyak sebut beli ke-2, ke-3, ke-5x' },
     ],
-    alert: { type: 'red', title: 'Recurring Negatives: Results & Price/Value', body: '"Didn\'t see results after 2 weeks" appears in 18% of Hydra Toner reviews. Price/Value concerns are rising on Brightening Serum as competitors drop prices.' },
-    attrs: [
-      { name: 'Ingredients',  pct: 82, cls: ''       },
-      { name: 'Packaging',    pct: 80, cls: ''       },
-      { name: 'Texture',      pct: 76, cls: ''       },
-      { name: 'Results',      pct: 65, cls: 'warn'   },
-      { name: 'Price / Value',pct: 59, cls: 'danger' },
-    ],
-    quotes: [
-      { type: 'pos', text: '"Love the minimalist packaging — looks expensive on my shelf. Brightening effect on my serum is real!"', meta: 'Shopee · Brightening Serum · ★★★★★' },
-      { type: 'pos', text: '"The texture is so light, absorbs fast, doesn\'t leave residue. Perfect for humid weather."', meta: 'TikTok Shop · Daily Moisturizer · ★★★★★' },
-      { type: 'neg', text: '"Been using Hydra Toner for 3 weeks and my skin doesn\'t feel different at all. Expected more."', meta: 'Shopee · Hydra Toner · ★★★' },
-      { type: 'neg', text: '"It\'s fine but the price jumped 15k last month. Same Skintific quality at half the price now."', meta: 'TikTok Shop · Brightening Serum · ★★★' },
-    ],
+    alert: { type: 'amber', title: '⚠ 2 Hal Perlu Diperhatikan', body: '<strong>(1) Aroma Papua Red Fruit Plumping Cream:</strong> beberapa pembeli menyebut aromanya kurang familiar. <strong>(2) Durabilitas warna Illipe Blurring Butter Pot & Plumping Lip Butter:</strong> 2 review menyebut warna cepat pudar / bibir terasa kering. Volume sangat kecil (&lt;1% dari total) tapi patut dipantau.' },
+    skincare: {
+      attrs: [
+        { name: 'Formula / Tekstur', pct: 94, cls: '' },
+        { name: 'Outcome / Hasil',   pct: 88, cls: '' },
+        { name: 'Packaging',         pct: 95, cls: '' },
+        { name: 'Value / Harga',     pct: 86, cls: '' },
+      ],
+      products: [
+        { name: 'Java Black Tea Soothing Cleanser',     reviews: '~25', stars: '4.9', note: 'Repurchase tertinggi · cocok kulit sensitif · gentle · wangi natural' },
+        { name: 'Mangosteen Brightening Serum',         reviews: '~45', stars: '4.8', note: 'Dark spot memudar · lembut · beli ulang konsisten · perlu waktu untuk hasil cerah' },
+        { name: 'Papua Red Fruit Plumping Cream',       reviews: '~30', stars: '4.7', note: 'Kulit plumpy & lembab · cocok sensitif · ⚠ sebagian tidak suka aroma' },
+        { name: 'Turmeric Advanced Powder Wash',        reviews: '~10', stars: '4.7', note: 'Mencerahkan · aroma lembut · cocok semua jenis kulit' },
+        { name: 'Sugarcane AHA Exfoliating Toner',      reviews: '~10', stars: '4.6', note: 'Eksfoliasi lembut · bahan alami · tekstur ringan' },
+        { name: 'Blue Pea Purifying Micellar Water',    reviews: '~10', stars: '4.7', note: 'Membersihkan sempurna · wangi · ringan di kulit' },
+        { name: 'White Tea Ultra Light Primer',         reviews: '~5',  stars: '4.9', note: 'Tidak berat · bikin glowing · cepat meresap · cocok kulit berminyak' },
+        { name: 'Tropical Guava Barrier Moisturizer',   reviews: '~5',  stars: '4.8', note: 'Ringan & lembab · cepat meresap · barrier-friendly' },
+        { name: 'Skincare Sets (Power Glow, Skin Barrier, Double Cleanse, dll.)', reviews: '~75', stars: '4.8', note: 'Repurchase & gift favorit · sensitif-friendly · harga set dianggap worth it' },
+      ],
+      quotes: [
+        { type: 'pos', text: 'Alwayss harus ada serum ini, sungkemm deh sama dia 😍', meta: 'Mangosteen Brightening Serum · ★★★★★' },
+        { type: 'pos', text: 'Udah beli fw yg ke-3 kalinya cocok di muka ku yng sensitif..suka banget', meta: 'Java Black Tea Cleanser · ★★★★★' },
+        { type: 'pos', text: 'Nyaman di kulit, benar-benar membuat plumpy', meta: 'Papua Red Fruit Plumping Cream · ★★★★★' },
+        { type: 'pos', text: 'Repurchase kesekian kalinya, selalu jadi andalan sih produk from this island', meta: 'Anniversary All-Star Bundle · ★★★★★' },
+        { type: 'mix', text: 'Lembab & berminyak di kulit, tapi gak suka dgn Aroma cream', meta: 'Papua Red Fruit Plumping Cream · ★★★★' },
+      ],
+    },
+    makeup: {
+      attrs: [
+        { name: 'Color / Warna',    pct: 96, cls: '' },
+        { name: 'Formula / Tekstur',pct: 89, cls: '' },
+        { name: 'Packaging',        pct: 93, cls: '' },
+        { name: 'Worthiness',       pct: 87, cls: '' },
+      ],
+      products: [
+        { name: 'Illipe Blurring Butter Pot (Ruby Renaissance, Mauve Mural, Berry Surreal, Peach Portrait, Nude Canvas)', reviews: '~80', stars: '4.8', note: 'Ruby Renaissance favorit terlaris · warna sesuai foto · lembut · ⚠ 2 review: warna pudar / bibir kering' },
+        { name: 'Illipe Plumping Lip Butter (Pink Sugar, Sweet Peach, Classic Nude, Cold Brew, Cinnamon Toast, dll.)', reviews: '~40', stars: '4.8', note: 'Non-sticky glossy · melembabkan bibir kering · banyak pilihan shade · ringan dipakai' },
+        { name: 'Retractable Lip Precision Liner', reviews: '~10', stars: '4.9', note: 'Pigmentasi kuat · warna menyala · tahan lama · aplikasi presisi' },
+        { name: 'The Ruby Palette Illipe', reviews: '~8',  stars: '4.9', note: 'Repeat buyers · kualitas konsisten · nilai bagus untuk bundle' },
+        { name: 'Blurring Lip Gel Brush', reviews: '~10', stars: '4.7', note: 'Media aplikasi yang baik · mudah digunakan' },
+        { name: 'Illipe Butter Lip Duo & Free Pouch Sets', reviews: '~30', stars: '4.8', note: 'Gift set populer · warna duo cocok · packaging cantik' },
+      ],
+      quotes: [
+        { type: 'pos', text: 'Warna merah nya cakep banget di kulit neutral to olive skin tone', meta: 'Illipe Blurring Butter Pot – Ruby Renaissance · ★★★★★' },
+        { type: 'pos', text: 'The best red colour ever!! Br ini nemu warna merah yg suite to my skin tone', meta: 'Illipe Blurring Butter Pot – Ruby Renaissance · ★★★★★' },
+        { type: 'pos', text: 'lip butternya bagus..lembut di bibir..wrnnya cakep..bibir lgs lembab', meta: 'Illipe Plumping Lip Butter · ★★★★★' },
+        { type: 'pos', text: 'ini yang ke-5x nya saya beli produk from this island, karena le...', meta: 'Illipe Blurring Butter Pot – Berry Surreal · ★★★★★' },
+        { type: 'neg', text: 'Bibir jd kering bgt setelah pakai', meta: 'Illipe Blurring Butter Pot – Mauve Mural · ★★★' },
+      ],
+    },
+    lifestyle: {
+      attrs: [
+        { name: 'Design / Model',  pct: 97, cls: '' },
+        { name: 'Color / Warna',   pct: 95, cls: '' },
+        { name: 'Fit / Ukuran',    pct: 92, cls: '' },
+        { name: 'Bahan / Material',pct: 96, cls: '' },
+      ],
+      products: [
+        { name: 'Islander Baseball Cap (Rainforest Green, Deep Sea Blue)', reviews: '~15', stars: '4.9', note: 'Desain keren · warna sesuai ekspektasi · ukuran cocok · repeat order' },
+        { name: 'Islander Oversized Quarter Zip (Creamy Oat, Stone Blue, Burnt Cherry)', reviews: '~8', stars: '4.9', note: 'Bahan tebel & super lembut · adem · kualitas premium · pilihan warna bagus' },
+        { name: 'FTI x Local Painters (Sastia N, Linkan P)', reviews: '~5', stars: '4.8', note: 'Kolaborasi limited · desain unik · bahan adem · sesuai foto' },
+        { name: 'Puffy Pillow Travel Pouch', reviews: '~3', stars: '4.8', note: 'Kualitas bagus · desain lucu · fungsional untuk perjalanan' },
+      ],
+      quotes: [
+        { type: 'pos', text: 'bagusss bangettt tebel lembutt akhhhhhh', meta: 'Islander Oversized QZ – Creamy Oat · ★★★★★' },
+        { type: 'pos', text: 'sumpah cantik sekli, awalnya maju mundur belinya tp tetap cocok dan suka banget', meta: 'Islander Baseball Cap – Rainforest Green · ★★★★★' },
+        { type: 'pos', text: 'Kualitas produk: Bagusnya bngt di dunia nyata ktmu susunan yang keren', meta: 'Islander Baseball Cap · ★★★★★' },
+      ],
+    },
+    updateNote: 'Data diperbarui manual setiap bulan berdasarkan screenshot ulasan TikTok Shop. Bulan berikutnya: Juli 2026.',
   },
 
   /* ── 1d. SOCIAL LISTENING ───────────────────────────────── */
@@ -1176,15 +1232,76 @@ function vRepurchaseRate(d) {
 }
 
 function vProductsSentiment(d) {
-  const bars = H.bars(d.attrs.map(a => ({ name: a.name, pct: a.pct, cls: a.cls })));
-  const quotes = d.quotes.map(q =>
-    `<div class="quote ${q.type}"><div class="q-text">"${q.text}"</div><div class="q-meta">${q.meta}</div></div>`
-  ).join('');
+  const C  = 'background:#fff;border:1.5px solid #e8e8e4;border-radius:12px;padding:14px';
+  const CT = 'font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:10px';
+  const DIV = '<hr style="border:none;border-top:1.5px solid #f0f0ee;margin:10px 0">';
+
+  function catSection(catKey, label, emoji, cat) {
+    const bars = cat.attrs.map(a => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+      <div style="width:130px;font-size:11px;color:#555;font-weight:600">${a.name}</div>
+      <div style="flex:1;height:7px;background:#f0f0ee;border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${a.pct}%;background:${a.pct>=90?'#7A8B5E':a.pct>=80?'#a0b070':'#C0392B'};border-radius:4px"></div>
+      </div>
+      <div style="width:34px;font-size:11px;font-weight:700;color:${a.pct>=90?'#5a7040':a.pct>=80?'#888':'#C0392B'};text-align:right">${a.pct}%</div>
+    </div>`).join('');
+
+    const productRows = cat.products.map(p => {
+      const warn = p.note.includes('⚠') ? `<div style="font-size:10px;color:#C0392B;margin-top:2px">${p.note.replace(/^[^⚠]*⚠\s*/,'⚠ ')}</div>` : '';
+      const noteClean = p.note.replace(/·?\s*⚠[^·]*/g,'').trim();
+      return `<div style="padding:8px 0;border-bottom:1px solid #f0f0ee;display:flex;align-items:flex-start;gap:10px">
+        <div style="flex:1">
+          <div style="font-size:11.5px;font-weight:600;color:#1a1a1a">${p.name}</div>
+          <div style="font-size:10.5px;color:#888;margin-top:2px">${noteClean}</div>
+          ${warn}
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:12px;font-weight:700;color:#3D4A2E">★ ${p.stars}</div>
+          <div style="font-size:10px;color:#aaa">${p.reviews} ulasan</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    const quoteHtml = cat.quotes.map(q => {
+      const bc = q.type==='pos'?'#f0f4ea':q.type==='neg'?'#fdecea':'#fff9f0';
+      const tc = q.type==='pos'?'#3d5a1e':q.type==='neg'?'#7a1a0e':'#7a5a00';
+      return `<div style="background:${bc};border-radius:8px;padding:9px 11px;margin-bottom:7px">
+        <div style="font-size:11.5px;color:${tc};font-style:italic;line-height:1.5">"${q.text}"</div>
+        <div style="font-size:10px;color:#888;margin-top:4px">${q.meta}</div>
+      </div>`;
+    }).join('');
+
+    return `<div style="${C};margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size:18px">${emoji}</span>
+        <div style="font-size:13px;font-weight:800;color:#3D4A2E;letter-spacing:0.5px">${label}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div>
+          <div style="${CT}">Sentimen per Atribut</div>
+          ${bars}
+          ${DIV}
+          <div style="${CT}">Quote Pelanggan</div>
+          ${quoteHtml}
+        </div>
+        <div>
+          <div style="${CT}">Produk dalam Kategori</div>
+          ${productRows}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const updateNote = `<div style="background:#f5f2ea;border:1.5px solid #d9e5c2;border-radius:8px;padding:9px 14px;margin-top:4px;font-size:10.5px;color:#5a7040">
+    🗓 <strong>Cara Update:</strong> Setiap bulan kirim screenshot ulasan TikTok Shop / Shopee → Claude akan update sentimen, quotes, dan produk secara otomatis. ${d.updateNote||''}
+  </div>`;
+
   return H.vh('Products Sentiment', d.desc, d.updated, d.alertBadge)
     + H.callout(d.alert)
     + H.kpiRow(d.kpis)
-    + H.blk('Sentiment by Attribute — % Positive Reviews', bars)
-    + H.blk('Representative Customer Quotes', quotes);
+    + catSection('skincare',  'Skincare',           '🌿', d.skincare)
+    + catSection('makeup',    'Makeup',              '💄', d.makeup)
+    + catSection('lifestyle', 'Lifestyle & Merch',   '👕', d.lifestyle)
+    + updateNote;
 }
 
 function vSocialListening(d) {
