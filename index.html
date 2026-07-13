@@ -290,7 +290,7 @@
 <body>
 
 <!-- ── LOGIN OVERLAY ─────────────────────────────────────────── -->
-<div id="auth-overlay" style="display:flex;position:fixed;inset:0;z-index:9999;background:var(--cream);align-items:center;justify-content:center;font-family:'Manrope',sans-serif">
+<div id="auth-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--cream);align-items:center;justify-content:center;font-family:'Manrope',sans-serif">
   <div style="width:100%;max-width:400px;padding:0 24px">
     <div style="text-align:center;margin-bottom:40px">
       <div style="font-size:36px;font-weight:900;color:var(--olive-dk);letter-spacing:-1.5px">FTI</div>
@@ -332,7 +332,7 @@
   </div>
   <div class="nav-r" style="display:flex;align-items:center;gap:12px">
     <span>Intelligence Hub</span>
-    <button id="logout-btn" onclick="doLogout()" style="display:none;padding:4px 12px;border-radius:99px;border:1.5px solid var(--g3);background:transparent;color:var(--muted);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.4px">Sign out</button>
+    <button id="logout-btn" onclick="doLogout()" style="display:none!important;padding:4px 12px;border-radius:99px;border:1.5px solid var(--g3);background:transparent;color:var(--muted);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.4px">Sign out</button>
   </div>
 </nav>
 
@@ -2869,16 +2869,10 @@ function resetIdleTimer() {
   document.addEventListener(e, resetIdleTimer, { passive: true })
 );
 
-// Check for existing session on load
+// Auth disabled — open access
 (async () => {
-  const { data: { session } } = await _sb.auth.getSession();
-  if (session) {
-    document.getElementById('auth-overlay').style.display = 'none';
-    document.getElementById('logout-btn').style.display = 'block';
-    window._dashInited = true;
-    resetIdleTimer();
-    await init();
-  }
+  window._dashInited = true;
+  await init();
 })();
 </script>
 </body>
