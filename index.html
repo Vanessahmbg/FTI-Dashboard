@@ -446,10 +446,10 @@ const MOCK_DATA = {
     updated: 'Juni 2026', alertBadge: '⚠ 1 Alert',
     desc: '315 ulasan TikTok Shop · Juni 2026 · dianalisis secara manual berdasarkan kategori Skincare, Makeup, dan Lifestyle & Merch',
     kpis: [
-      { lbl: 'Total Ulasan',        val: '315',  u: '',   trend: null, t: 'TikTok Shop · Juni 2026' },
-      { lbl: 'Bintang 5 / Sangat Puas', val: '~92', u: '%', trend: 'up', t: '↑ Mayoritas ulasan' },
-      { lbl: 'Produk Terbanyak Diulas', val: 'Illipe Blurring Butter Pot', u: '', trend: null },
-      { lbl: 'Repeat Buyers',       val: 'Tinggi', u: '', trend: 'up', t: '↑ Banyak sebut beli ke-2, ke-3, ke-5x' },
+      { lbl: 'Total Ulasan',            val: '315',  u: '',  trend: null, t: 'TikTok Shop · Juni 2026' },
+      { lbl: 'Produk Terbanyak Diulas', val: 'Illipe Blurring Butter Pot', u: '', trend: null, t: '~80 ulasan · Makeup' },
+      { lbl: 'Avg Rating',              val: '4.8',  u: '★', trend: 'up', t: '↑ Rata-rata semua produk' },
+      { lbl: 'Repeat Buyers',           val: 'Tinggi', u: '', trend: 'up', t: '↑ Banyak sebut beli ke-2, ke-3, ke-5x' },
     ],
     alert: { type: 'amber', title: '⚠ 2 Hal Perlu Diperhatikan', body: '<strong>(1) Aroma Papua Red Fruit Plumping Cream:</strong> beberapa pembeli menyebut aromanya kurang familiar. <strong>(2) Durabilitas warna Illipe Blurring Butter Pot & Plumping Lip Butter:</strong> 2 review menyebut warna cepat pudar / bibir terasa kering. Volume sangat kecil (&lt;1% dari total) tapi patut dipantau.' },
     skincare: {
@@ -2722,7 +2722,7 @@ let DATA = {};
 let activeId = null;
 
 const WIP_IDS = [
-  'review-score', 'repurchase-rate', 'products-sentiment', 'social-listening',
+  'review-score', 'repurchase-rate', 'social-listening',
   'competitor-alerts', 'competitor-sentiments',
 ];
 
