@@ -1416,7 +1416,60 @@ function vSocialListening(d) {
       </div>`
     + `<div style="background:#f5f5f5;border-radius:8px;padding:8px 12px;font-size:10px;color:#888;display:flex;gap:6px;align-items:center">
         <span>ℹ️</span><span>Data source: Google-indexed public content (TikTok, editorial blogs, Female Daily, SOCO/Sociolla, Shopee). X and Threads direct feed not accessible without paid API. Sentiment estimated from qualitative review reading. This is an Option A (free) preview run — not live monitoring.</span>
-      </div>`;
+      </div>`
+    + vGoogleAlertsFeed();
+}
+
+function vGoogleAlertsFeed() {
+  const ga = DATA['google-alerts'];
+  const C  = 'background:#fff;border:1.5px solid #e8e8e4;border-radius:12px;padding:14px;margin-top:12px';
+  const CT = 'font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:10px';
+
+  if (!ga || !ga.alerts || ga.alerts.length === 0) {
+    return `<div style="${C}">
+      <div style="${CT}">Google Alerts Feed — Live Web Mentions</div>
+      <div style="display:flex;align-items:center;gap:12px;padding:20px 0;color:#aaa">
+        <span style="font-size:24px">⏳</span>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#888">Waiting for first alert</div>
+          <div style="font-size:11px;color:#aaa;margin-top:3px">Google Alerts emails will appear here automatically once they start arriving. Usually within 24 hours of setup.</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const keywordColors = {
+    'skincare': '#e8f0e0', 'makeup': '#fce8f0', 'review': '#e8f0fc',
+    'price': '#fdf3e0', 'products': '#e8f0e0', 'worth it': '#fdf3e0',
+    'illipe': '#fce8f0', 'maudy': '#f0e8fc',
+  };
+  function kwColor(kw) {
+    const k = (kw||'').toLowerCase();
+    for (const [key, col] of Object.entries(keywordColors)) { if (k.includes(key)) return col; }
+    return '#f5f5f3';
+  }
+
+  const rows = ga.alerts.map(a => {
+    const kwTag = a.keyword ? `<span style="background:${kwColor(a.keyword)};border-radius:99px;padding:2px 8px;font-size:9px;font-weight:700;color:#555;margin-right:6px">${a.keyword}</span>` : '';
+    const url = a.url ? `<a href="${a.url}" target="_blank" style="font-size:10px;color:#7A8B5E;text-decoration:none;font-weight:600">View →</a>` : '';
+    const date = a.date ? `<span style="font-size:10px;color:#aaa">${a.date}</span>` : '';
+    return `<div style="padding:10px 0;border-bottom:1px solid #f0f0ee">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div>${kwTag}${date}</div>
+        ${url}
+      </div>
+      <div style="font-size:11.5px;font-weight:600;color:#1a1a1a;margin-bottom:3px">${a.title||''}</div>
+      <div style="font-size:10.5px;color:#666;line-height:1.5">${(a.snippet||'').substring(0,200)}${(a.snippet||'').length>200?'…':''}</div>
+    </div>`;
+  }).join('');
+
+  return `<div style="${C}">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="${CT};margin-bottom:0">Google Alerts Feed — Live Web Mentions</div>
+      <div style="font-size:10px;color:#aaa">Updated ${ga.updated||''} · ${ga.alerts.length} mentions · auto-synced daily</div>
+    </div>
+    ${rows}
+  </div>`;
 }
 
 function vCompetitorAlerts(d) {
