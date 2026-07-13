@@ -1092,7 +1092,14 @@ const MOCK_DATA = {
       { month: 'May 2026', rate: 2.8,  impact: 'Low' },
       { month: 'Jun 2026', rate: 3.34, impact: 'Medium' },
     ],
-    ai: 'June 2026 inflation jumped to 3.34% (from 2.8% in May), driven by the Pertamax fuel price hike and weaker rupiah. Still within BI\'s 1.5–3.5% target band, but headroom to the upper bound is now only 0.16pp. Products in the Rp 50K–200K range (FTI\'s core price band) face mild pressure. If inflation breaches 3.5%, expect downtrading on premium SKUs first. Watch the July release closely — sustained fuel/transport inflation could trigger a hawkish BI response.',
+    ai: 'June\'s CPI rose to 3.34% while Consumer Confidence held at 117.8 — both still within safe territory, but showing early pressure signals. Purchasing power remains intact; the risk window is 1–2 quarters out if fuel-driven inflation continues.',
+    aiActions: [
+      'Hold pricing — no urgency to discount; stable inflation means consumers are not under acute pressure. Protect margin.',
+      'Invest in mid-premium SKUs (Rp 80K–250K) — this price band shows the highest resilience when CPI is below 3.5%. Prioritise restocking and promotions here.',
+      'Delay price increases — safe to defer 1–2 quarters given current inflation trajectory.',
+      'Double down on social proof — in low-inflation environments, discovery-driven purchases rise. Prioritise UGC, review collection, and TikTok seeding.',
+      'Watch July CPI — if inflation breaches 3.5%, prepare contingency messaging that emphasises value and cost-per-use.',
+    ],
   },
 
   /* ── 5c. PEAK SEASON ALERT ──────────────────────────────── */
@@ -2072,12 +2079,16 @@ function vMacroOverview(irD, ccD) {
   const ccHtml = ccD ? vConsumerConfidence(ccD) : '<div style="color:var(--muted);padding:20px">No CCI data.</div>';
   const updated = irD?.updated || ccD?.updated || '—';
 
-  const combinedAI = [irD?.ai, ccD?.ai].filter(Boolean).join(' ');
-  const aiFormatted = combinedAI.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  const briefText = (irD?.ai || '').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  const actions   = irD?.aiActions || [];
+  const actionHtml = actions.length ? `<ol style="margin:10px 0 0 0;padding-left:18px;line-height:1.8">
+    ${actions.map(a => `<li style="font-size:11.5px;color:#333;margin-bottom:4px">${a.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</li>`).join('')}
+  </ol>` : '';
 
-  const combinedSummary = combinedAI ? `<div class="ai-box" style="margin-bottom:14px">
+  const combinedSummary = briefText ? `<div class="ai-box" style="margin-bottom:14px">
     <div class="ai-lbl">AI Summary — Inflation Rate + Consumer Confidence</div>
-    <div class="ai-text">${aiFormatted}</div>
+    <div class="ai-text" style="margin-bottom:6px">${briefText}</div>
+    ${actionHtml ? `<div style="font-size:11px;font-weight:700;color:#5a7040;margin-top:10px;margin-bottom:2px">Action Items</div>${actionHtml}` : ''}
   </div>` : '';
 
   return `<div class="vh">
