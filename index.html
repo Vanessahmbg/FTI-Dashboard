@@ -2072,6 +2072,14 @@ function vMacroOverview(irD, ccD) {
   const ccHtml = ccD ? vConsumerConfidence(ccD) : '<div style="color:var(--muted);padding:20px">No CCI data.</div>';
   const updated = irD?.updated || ccD?.updated || '—';
 
+  const combinedAI = [irD?.ai, ccD?.ai].filter(Boolean).join(' ');
+  const aiFormatted = combinedAI.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+
+  const combinedSummary = combinedAI ? `<div class="ai-box" style="margin-bottom:14px">
+    <div class="ai-lbl">AI Summary — Inflation Rate + Consumer Confidence</div>
+    <div class="ai-text">${aiFormatted}</div>
+  </div>` : '';
+
   return `<div class="vh">
       <div class="vh-top">
         <div class="vh-title">Macro Indicators</div>
@@ -2079,9 +2087,11 @@ function vMacroOverview(irD, ccD) {
       </div>
       <div class="vh-desc">Indonesia macroeconomic context — inflation rate (CPI) and consumer confidence index (CCI) side by side.</div>
     </div>
+    ${combinedSummary}
     <style>
       .macro-col .vh { display:none !important; }
       .macro-col .kpi-row { grid-template-columns:repeat(2,1fr) !important; }
+      .macro-col .blk:last-child { display:none !important; }
       @media(max-width:820px){ #macro-grid { grid-template-columns:1fr !important; } }
     </style>
     <div id="macro-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px">
