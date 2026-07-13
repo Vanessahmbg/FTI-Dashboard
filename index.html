@@ -469,29 +469,38 @@ const MOCK_DATA = {
 
   /* ── 1d. SOCIAL LISTENING ───────────────────────────────── */
   'social-listening': {
-    updated: 'June 2026', alertBadge: '🔥 1 Viral',
-    desc: 'Tracks brand and product mentions across X/Twitter and Threads. Surfaces trending topics, pain points, and viral discussions.',
-    kpis: [
-      { lbl: 'Total Mentions',   val: '2,341', u: '',  trend: 'up', t: '↑ +18% MoM' },
-      { lbl: 'X / Twitter',      val: '1,203', u: '',  trend: 'up', t: '↑ +210 MoM' },
-      { lbl: 'Threads',          val: '1,138', u: '',  trend: 'up', t: '↑ +163 MoM' },
-      { lbl: 'Sentiment Score',  val: '71',    u: '%', trend: 'st', t: '→ Positive' },
+    updated: 'Jul 2026', alertBadge: null,
+    desc: 'Organic mentions across web, TikTok & beauty platforms · Keywords: "From This Island" · "Maudy Ayunda FTI" · "local skincare"',
+    coverageNote: 'This run used free web search (Google indexing). X/Twitter posts only appeared where Google indexed them — direct X feed access is blocked without paid API. Threads returned zero results. Coverage is strongest on TikTok, Female Daily, SOCO/Sociolla, and editorial blogs.',
+    sentiment: { positive: 72, neutral: 20, negative: 8 },
+    ratings: {
+      avg: 4.5, platforms: 'Female Daily & SOCO/Sociolla',
+      products: [
+        { name: 'Java Black Tea Cleanser', rating: 4.8, note: 'FD, 45 reviews', emoji: '🫖' },
+        { name: 'Illipe Lip Butter',        rating: 4.9, note: 'FD, 22 reviews', emoji: '💜' },
+        { name: 'Papua Plumping Cream',     rating: 4.4, note: 'SOCO',           emoji: '🔴' },
+        { name: 'Mangosteen Serum',         rating: 4.0, note: 'FD, mixed',      emoji: '🟠' },
+      ],
+    },
+    topSelling: {
+      highlight: '10K+', highlightSub: 'units — Java Black Tea Cleanser',
+      products: [
+        { rank: 1, name: 'Java Black Tea Cleanser',       units: '10,000+' },
+        { rank: 2, name: 'Tropical Guava Moisture Gel',   units: '8,300+'  },
+        { rank: 3, name: 'Papua Red Fruit Plumping Cream',units: '8,000+'  },
+      ],
+    },
+    quotes: [
+      { text: '"Skincarenya Maudy Ayunda — emang bagus sih secara kualitas ya. Ga kecewa, puas banget!"', source: 'TikTok @ema.ervita', sentiment: 'Positive' },
+      { text: '"My skin has never been plumper! Full review of the highly anticipated clean skincare — love it."', source: 'TikTok @suzannesarahs', sentiment: 'Positive' },
+      { text: '"From This Island lebih bagus dari brand mewah Jepang? Jujur, skin texture aku jadi lebih plump dan lembab — tapi brightening-nya kurang kerasa."', source: 'TikTok @beautyid_review', sentiment: 'Neutral' },
     ],
-    viral: { type: 'green', title: '🔥 Viral Thread: "Glass Skin Routine ft. FTI Serum"', body: 'A Threads post by @glowwithriaka (224K followers) featuring FTI Brightening Serum in a glass skin routine has 12,300 engagements and is driving +40% search uplift. Monitor for potential stock impact.' },
-    topics: [
-      { topic: 'Brightening / glow results', mentions: 420, trend: '↑' },
-      { topic: 'Packaging & aesthetics',     mentions: 318, trend: '↑' },
-      { topic: 'Price point comparison',     mentions: 287, trend: '↑' },
-      { topic: 'Repurchase intent',          mentions: 241, trend: '→' },
-      { topic: 'Ingredient transparency',    mentions: 198, trend: '↑' },
-      { topic: 'Shipping & packaging damage',mentions: 134, trend: '↓' },
-      { topic: 'Shade range (Lip Tint)',     mentions: 112, trend: '↑' },
-    ],
-    pain: [
-      '"Serum feels sticky in humid weather — needs lighter formula"',
-      '"Toner bottle runs out too fast for the price"',
-      '"Only 2 shades for Lip Tint — need more options for NC40+ skin"',
-      '"Still waiting for Brightening Serum to restock on Shopee"',
+    themes: [
+      { emoji: '🇮🇩', name: 'Local Pride',         sub: 'Bangga produk lokal berkualitas global', level: 'High' },
+      { emoji: '💧',   name: 'Hydration & Texture', sub: 'Kulit lebih plump, lembab, glowing',    level: 'High' },
+      { emoji: '⭐',   name: 'Maudy Ayunda Effect', sub: 'Brand credibility via founder name',     level: 'High' },
+      { emoji: '🌿',   name: 'Natural Ingredients', sub: 'Papua red fruit, manggis, guava, teh',  level: 'Med'  },
+      { emoji: '✨',   name: 'Brightening Claims',  sub: 'Vitamin C, niacinamide results claimed', level: 'Med'  },
     ],
   },
 
@@ -1160,17 +1169,70 @@ function vProductsSentiment(d) {
 }
 
 function vSocialListening(d) {
-  const topicRows = d.topics.map(t => [
-    t.topic,
-    `<span class="fw">${t.mentions.toLocaleString()}</span>`,
-    t.trend,
-  ]);
-  const painList = d.pain.map(p => `<div class="quote neg"><div class="q-text">${p}</div></div>`).join('');
-  return H.vh('Social Listening', d.desc, d.updated, d.alertBadge)
-    + H.callout(d.viral)
-    + H.kpiRow(d.kpis)
-    + H.blk('Top Discussed Topics', H.table(['Topic','Mentions','Trend'], topicRows))
-    + H.blk('Common Pain Points', painList);
+  const coverageNote = `<div style="background:#fffbeb;border:1px solid #f5c842;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#7a5f10;line-height:1.5">
+    <span style="font-size:13px;margin-right:6px">⚠️</span><strong>Coverage note:</strong> ${d.coverageNote}
+  </div>`;
+
+  const sentimentCard = `<div class="blk" style="margin:0">
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:10px">Overall Sentiment</div>
+    <div style="font-size:30px;font-weight:800;color:var(--olive);margin-bottom:4px">Positive</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:16px">Dominant tone across mentions</div>
+    ${[{lbl:'Positive',v:d.sentiment.positive,c:'var(--olive)'},{lbl:'Neutral',v:d.sentiment.neutral,c:'var(--muted)'},{lbl:'Negative',v:d.sentiment.negative,c:'var(--red)'}].map(s=>`
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="font-size:11.5px;width:58px;color:var(--text)">${s.lbl}</div>
+        <div style="flex:1;height:6px;background:var(--g2);border-radius:3px"><div style="width:${s.v}%;height:6px;background:${s.c};border-radius:3px"></div></div>
+        <div style="font-size:11.5px;font-weight:700;color:${s.c};width:32px;text-align:right">${s.v}%</div>
+      </div>`).join('')}
+  </div>`;
+
+  const ratingCard = `<div class="blk" style="margin:0">
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:10px">Avg Rating (Review Platforms)</div>
+    <div style="font-size:30px;font-weight:800;color:var(--amber);margin-bottom:2px">${d.ratings.avg}<span style="font-size:16px;font-weight:400;color:var(--muted)">/5</span></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:16px">Across ${d.ratings.platforms}</div>
+    ${d.ratings.products.map(p=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px">
+      <span>${p.emoji}</span>
+      <div style="flex:1;color:var(--text)">${p.name}</div>
+      <span style="font-weight:700;color:var(--amber)">${p.rating}</span>
+      <span style="color:var(--muted);font-size:11px">(${p.note})</span>
+    </div>`).join('')}
+  </div>`;
+
+  const sellingCard = `<div class="blk" style="margin:0">
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:10px">Top Selling Products (Shopee)</div>
+    <div style="font-size:30px;font-weight:800;color:var(--text);margin-bottom:2px">${d.topSelling.highlight}</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:16px">${d.topSelling.highlightSub}</div>
+    ${d.topSelling.products.map(p=>`<div style="display:flex;gap:8px;margin-bottom:8px;font-size:12px;align-items:baseline">
+      <span style="color:var(--muted);min-width:14px">${p.rank}.</span>
+      <span style="flex:1;color:var(--text)">${p.name}</span>
+      <span style="font-weight:700;color:var(--text)">${p.units}</span>
+    </div>`).join('')}
+  </div>`;
+
+  const sentCol = s => s === 'Positive' ? 'var(--olive)' : s === 'Negative' ? 'var(--red)' : 'var(--muted)';
+  const quotes = d.quotes.map(q=>`<div style="background:var(--g1);border-radius:8px;padding:14px 16px;border-left:3px solid var(--g3);margin-bottom:10px">
+    <div style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:8px">${q.text}</div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span style="background:var(--g2);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;color:var(--text)">${q.source}</span>
+      <span style="font-size:11px;font-weight:600;color:${sentCol(q.sentiment)}">• ${q.sentiment}</span>
+    </div>
+  </div>`).join('');
+
+  const lvlC = l => l === 'High' ? 'var(--olive)' : l === 'Med' ? 'var(--amber)' : 'var(--muted)';
+  const lvlBg = l => l === 'High' ? '#f0f5ec' : l === 'Med' ? '#fdf6e3' : 'var(--g2)';
+  const themes = d.themes.map(t=>`<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--g2)">
+    <span style="font-size:18px;width:26px;text-align:center;flex-shrink:0;margin-top:1px">${t.emoji}</span>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:700;color:var(--text)">${t.name}</div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:2px">${t.sub}</div>
+    </div>
+    <span style="font-size:11px;font-weight:700;color:${lvlC(t.level)};background:${lvlBg(t.level)};border-radius:4px;padding:2px 9px;flex-shrink:0;margin-top:2px">${t.level}</span>
+  </div>`).join('');
+
+  return H.vh('Social Listening — From This Island', d.desc, d.updated, d.alertBadge)
+    + coverageNote
+    + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">${sentimentCard}${ratingCard}${sellingCard}</div>`
+    + H.blk('Organic Quotes from Users', quotes)
+    + H.blk('Top Organic Themes', themes);
 }
 
 function vCompetitorAlerts(d) {
