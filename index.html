@@ -1245,17 +1245,15 @@ function vSocialListening(d) {
   const sentColor = { pos:'#7A8B5E', mix:'#C47D0E', neu:'#888' };
   const quotes = (d.quotes||[]).map((q,i)=>{
     const uid = 'slq'+i;
-    const srcLink = q.url
-      ? `<a href="${q.url}" target="_blank" rel="noopener" style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;text-decoration:none;${srcStyle[q.srcType]||srcStyle.ws}">${q.src}</a>`
-      : `<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;${srcStyle[q.srcType]||srcStyle.ws}">${q.src}</span>`;
-    return `<div style="background:#f8f8f6;border:1.5px solid #e8e8e4;border-radius:10px;margin-bottom:8px;overflow:hidden">
-      <div onclick="(function(el){var b=document.getElementById('${uid}');var open=b.style.display!=='none';b.style.display=open?'none':'block';el.querySelector('.slqchv').style.transform=open?'':'rotate(180deg)'})(this)" style="display:flex;align-items:center;gap:6px;padding:10px 12px;cursor:pointer;user-select:none">
-        ${srcLink}
+    return `<div style="background:#f8f8f6;border:1.5px solid #e8e8e4;border-radius:10px;padding:10px 12px;margin-bottom:8px">
+      <div style="font-size:11px;line-height:1.5;color:#333;font-style:italic;margin-bottom:8px">${q.text}</div>
+      <div style="display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none" onclick="(function(el){var b=document.getElementById('${uid}');var open=b.style.display!=='none';b.style.display=open?'none':'block';el.querySelector('.slqchv').style.transform=open?'':'rotate(180deg)'})(this)">
+        <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;${srcStyle[q.srcType]||srcStyle.ws}">${q.src}</span>
         <span style="font-size:9px;font-weight:700;color:${sentColor[q.sentType]||'#888'}">● ${q.sentiment}</span>
         <span class="slqchv" style="margin-left:auto;font-size:11px;color:#aaa;transition:transform 0.2s">&#8964;</span>
       </div>
-      <div id="${uid}" style="display:none;padding:0 12px 10px;border-top:1px solid #e8e8e4">
-        <div style="font-size:11px;line-height:1.5;color:#333;font-style:italic;padding-top:8px">${q.text}</div>
+      <div id="${uid}" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid #e8e8e4">
+        ${q.url ? `<a href="${q.url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:#1a6fc4;text-decoration:none;${srcStyle[q.srcType]||srcStyle.ws};padding:3px 8px;border-radius:4px">${q.src} <span style="font-size:10px">↗</span></a>` : ''}
       </div>
     </div>`;
   }).join('');
