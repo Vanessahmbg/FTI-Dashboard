@@ -1050,7 +1050,8 @@ async function loadData() {
   try {
     const { data, error } = await _sb.from('market_intelligence').select('id, data');
     if (error || !data || data.length === 0) return MOCK_DATA;
-    return Object.fromEntries(data.map(row => [row.id, row.data]));
+    const sbData = Object.fromEntries(data.map(row => [row.id, row.data]));
+    return { ...MOCK_DATA, ...sbData };
   } catch (e) {
     return MOCK_DATA;
   }
