@@ -420,24 +420,24 @@ const MOCK_DATA = {
 
   /* ── 1b. REPURCHASE RATE ────────────────────────────────── */
   'repurchase-rate': {
-    updated: 'June 2026', alertBadge: '⚠ 2 Alerts',
-    desc: 'Repurchase rates across Shopee and TikTok Shop, broken down per product. Alerts fire on stagnant or declining rates.',
+    updated: 'July 2026', alertBadge: null,
+    desc: 'Customer repurchase rate from Jubelio order history (Apr–Jul 2026). Based on 44,265 completed orders across Shopee, Tokopedia, and other channels. A customer counts as a repeat buyer if they placed 2+ orders within the period.',
     kpis: [
-      { lbl: 'Shopee Overall',      val: '42', u: '%', trend: 'up', t: '↑ +2pp MoM' },
-      { lbl: 'TikTok Overall',      val: '34', u: '%', trend: 'dn', t: '↓ −1pp MoM' },
-      { lbl: 'Best Product',        val: '52', u: '%', trend: 'up', t: '↑ Mangosteen Brightening Serum' },
-      { lbl: 'Products Declining',  val: '2',  u: '',  trend: 'dn', t: '↓ Micellar Water, Lip Butter' },
+      { lbl: 'Overall Repurchase Rate', val: '18.4', u: '%', trend: 'up', t: '↑ 5,546 of 30,174 unique customers repurchased' },
+      { lbl: 'Unique Customers',        val: '30.2K', u: '', trend: null, t: 'Apr–Jul 2026 · all channels' },
+      { lbl: 'Completed Orders',        val: '44,265', u: '', trend: 'up', t: '↑ Shopee 66% · Tokopedia 32%' },
+      { lbl: 'Return Rate',             val: '1.8', u: '%', trend: 'up', t: '↑ 802 returns of 45,067 total orders' },
     ],
-    alert: { type: 'amber', title: '2 Products Stagnant / Declining', body: 'Hydra Toner repurchase rate has dropped 4pp over 3 months on TikTok. Lip Tint (Coral) has been flat at 18–22% for 4 months — may indicate saturation.' },
+    alert: { type: 'info', title: 'Product-level breakdown coming soon', body: 'Overall repurchase rate (18.4%) is calculated from Jubelio order history. Per-product breakdown requires webhook data — being collected from July 2026 onward. Monthly revenue: Apr 2.1B · May 4.5B · Jun 4.0B · Jul 0.8B IDR (partial).' },
     rows: [
-      { name: 'Skincare | Mangosteen Brightening Serum',              shopee: 52, tt: 43, mom: '+2pp', st: 'g' },
-      { name: 'Skincare | Tropical Guava Barrier Moisture Gel',       shopee: 45, tt: 38, mom: '+1pp', st: 'g' },
-      { name: 'Skincare | White Tea Ultra-Light Protective Sun Serum',shopee: 48, tt: 41, mom: '+3pp', st: 'g' },
-      { name: 'Skincare | Blue Pea Purifying Micellar Water',         shopee: 38, tt: 29, mom: '−3pp', st: 'r' },
-      { name: 'Skincare | Java Black Tea Soothing Gel Cleanser',      shopee: 35, tt: 28, mom: '  0pp', st: 'n' },
-      { name: 'Skincare | Papua Red Fruit Plumping Cream',            shopee: 31, tt: 24, mom: '+1pp', st: 'g' },
-      { name: 'Skincare | Bali Green Coffee Espresso Eye Cream',      shopee: 29, tt: 21, mom: '−1pp', st: 'a' },
-      { name: 'Makeup | Illipe Plumping Lip Butter',                  shopee: 22, tt: 18, mom: '  0pp', st: 'a' },
+      { name: 'Skincare | Mangosteen Brightening Serum',              shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
+      { name: 'Skincare | Tropical Guava Barrier Moisture Gel',       shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
+      { name: 'Skincare | White Tea Ultra-Light Protective Sun Serum',shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
+      { name: 'Skincare | Blue Pea Purifying Micellar Water',         shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
+      { name: 'Skincare | Java Black Tea Soothing Gel Cleanser',      shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
+      { name: 'Skincare | Papua Red Fruit Plumping Cream',            shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
+      { name: 'Skincare | Bali Green Coffee Espresso Eye Cream',      shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
+      { name: 'Makeup | Illipe Plumping Lip Butter',                  shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
     ],
   },
 
@@ -1227,8 +1227,8 @@ function vReviewScore(d) {
 function vRepurchaseRate(d) {
   const rows = d.rows.map(r => [
     r.name,
-    `<span class="fw">${r.shopee}%</span>`,
-    `<span class="fw">${r.tt}%</span>`,
+    `<span class="fw">${r.shopee === '—' ? '—' : r.shopee + '%'}</span>`,
+    `<span class="fw">${r.tt === '—' ? '—' : r.tt + '%'}</span>`,
     H.trendCell(r.mom),
     H.statusChip(r.st),
   ]);
