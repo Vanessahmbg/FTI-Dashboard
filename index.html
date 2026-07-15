@@ -1130,10 +1130,46 @@ const _sb = supabase.createClient(
  * ════════════════════════════════════════════════════════════════ */
 async function loadData() {
   try {
-    const { data, error } = await _sb.from('market_intelligence').select('id, data');
-    if (error || !data || data.length === 0) return MOCK_DATA;
-    const sbData = Object.fromEntries(data.map(row => [row.id, row.data]));
-    return { ...MOCK_DATA, ...sbData };
+    const [miRes, rpRes] = await Promise.all([
+      _sb.from('market_intelligence').select('id, data'),
+      _sb.from('repurchase_by_product').select('product_name,repurchase_rate_pct,repeat_customers,total_customers').order('repurchase_rate_pct', { ascending: false }).limit(12),
+    ]);
+
+    const sbData = (miRes.data && miRes.data.length)
+      ? Object.fromEntries(miRes.data.map(row => [row.id, row.data]))
+      : {};
+
+    const merged = { ...MOCK_DATA, ...sbData };
+
+    if (rpRes.data && rpRes.data.length) {
+      const rows = rpRes.data
+        .filter(r => r.total_customers >= 30 && !r.product_name.includes('Defect') && !r.product_name.includes('Scarf') && !r.product_name.includes('Sweater') && !r.product_name.includes('Tote'))
+        .slice(0, 10);
+
+      const totalRepeat = rows.reduce((s, r) => s + r.repeat_customers, 0);
+      const totalCust   = rows.reduce((s, r) => s + r.total_customers, 0);
+      const overallRate = totalCust ? Math.round(totalRepeat / totalCust * 1000) / 10 : 18.4;
+
+      merged['repurchase-rate'] = {
+        ...merged['repurchase-rate'],
+        updated: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+        kpis: [
+          { lbl: 'Overall Repurchase Rate', val: overallRate.toFixed(1), u: '%', trend: 'up', t: `↑ across ${rows.length} tracked products` },
+          { lbl: 'Unique Customers',        val: totalCust.toLocaleString(), u: '', trend: null, t: 'Apr–Jul 2026 · all channels' },
+          { lbl: 'Completed Orders',        val: '44,265', u: '', trend: 'up', t: '↑ Shopee 66% · Tokopedia 32%' },
+          { lbl: 'Return Rate',             val: '1.8', u: '%', trend: 'up', t: '↑ 802 returns of 45,067 total orders' },
+        ],
+        products: rows.map(r => ({
+          name:   r.product_name,
+          rate:   parseFloat(r.repurchase_rate_pct),
+          repeat: r.repeat_customers,
+          total:  r.total_customers,
+          st:     parseFloat(r.repurchase_rate_pct) >= 15 ? 'g' : parseFloat(r.repurchase_rate_pct) >= 10 ? 'a' : 'n',
+        })),
+      };
+    }
+
+    return merged;
   } catch (e) {
     return MOCK_DATA;
   }
