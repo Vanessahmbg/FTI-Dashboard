@@ -1180,28 +1180,40 @@ function rpRenderDynamic(products, platforms) {
 }
 function rpMakeChart(monthly) {
   if (!monthly || !monthly.length) return '';
-  const W = 420, H2 = 160, PL = 42, PR = 16, PT = 14, PB = 30;
+  const W = 380, H2 = 170, PL = 36, PR = 12, PT = 18, PB = 28;
   const cw = W - PL - PR, ch = H2 - PT - PB;
+  const LINE_COLOR = '#c9952a', AREA_COLOR = '#7A8B5E', DOT_COLOR = '#c9952a';
   const maxRate = Math.max(35, ...monthly.map(m => parseFloat(m.repurchase_rate_pct)));
   const xs = monthly.map((_, i) => PL + (i / (monthly.length - 1)) * cw);
   const ys = monthly.map(m => PT + (1 - parseFloat(m.repurchase_rate_pct) / maxRate) * ch);
   const polyline = xs.map((x,i) => `${x},${ys[i]}`).join(' ');
   const area = `${PL},${PT+ch} ` + xs.map((x,i) => `${x},${ys[i]}`).join(' ') + ` ${xs[xs.length-1]},${PT+ch}`;
-  const yLabels = [0, Math.round(maxRate*0.33), Math.round(maxRate*0.67), maxRate].map((v,i) => {
+  const yLabels = [0, Math.round(maxRate*0.33), Math.round(maxRate*0.67), maxRate].map(v => {
     const y = PT + (1 - v/maxRate)*ch;
-    return `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3"/>
-            <text x="${PL-6}" y="${y+4}" text-anchor="end" fill="var(--txt-3)" font-size="9">${v}%</text>`;
+    return `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#e0e0d8" stroke-width="1" stroke-dasharray="3,3"/>
+            <text x="${PL-5}" y="${y+4}" text-anchor="end" fill="#aaa" font-size="9">${v}%</text>`;
   }).join('');
-  const dots = xs.map((x,i) => `<circle cx="${x}" cy="${ys[i]}" r="4" fill="var(--accent)" stroke="#fff" stroke-width="2"/>
-    <text x="${x}" y="${ys[i]-9}" text-anchor="middle" fill="var(--accent)" font-size="9" font-weight="700">${monthly[i].repurchase_rate_pct}%</text>`).join('');
-  const xLabels = xs.map((x,i) => `<text x="${x}" y="${H2-4}" text-anchor="middle" fill="var(--txt-3)" font-size="9">${monthly[i].month_label}</text>`).join('');
-  return `<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px">
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--txt-3);margin-bottom:10px">Monthly Repurchase Rate Trend</div>
+  const dots = xs.map((x,i) => {
+    const lbl = monthly[i].repurchase_rate_pct + '%';
+    const above = ys[i] > PT + 14;
+    return `<circle cx="${x}" cy="${ys[i]}" r="5" fill="${DOT_COLOR}" stroke="#fff" stroke-width="2"/>
+      <text x="${x}" y="${above ? ys[i]-10 : ys[i]+16}" text-anchor="middle" fill="${DOT_COLOR}" font-size="10" font-weight="700">${lbl}</text>`;
+  }).join('');
+  const xLabels = xs.map((x,i) => `<text x="${x}" y="${H2-3}" text-anchor="middle" fill="#888" font-size="9">${monthly[i].month_label}</text>`).join('');
+  return `<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--txt-3);margin-bottom:8px">Monthly Repurchase Rate Trend</div>
+    <div style="display:flex;gap:12px;margin-bottom:8px;font-size:10px;color:#888">
+      <span><span style="display:inline-block;width:20px;height:3px;background:${LINE_COLOR};vertical-align:middle;margin-right:4px;border-radius:2px"></span>Repurchase Rate %</span>
+      <span><span style="display:inline-block;width:12px;height:12px;background:${AREA_COLOR};opacity:0.35;vertical-align:middle;margin-right:4px;border-radius:2px"></span>Volume area</span>
+    </div>
     <svg viewBox="0 0 ${W} ${H2}" style="width:100%;height:auto;display:block">
-      <defs><linearGradient id="rpGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity="0.18"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
+      <defs><linearGradient id="rpGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${AREA_COLOR}" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="${AREA_COLOR}" stop-opacity="0.04"/>
+      </linearGradient></defs>
       ${yLabels}
       <polygon points="${area}" fill="url(#rpGrad)"/>
-      <polyline points="${polyline}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <polyline points="${polyline}" fill="none" stroke="${LINE_COLOR}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
       ${dots}${xLabels}
     </svg>
   </div>`;
@@ -1366,13 +1378,13 @@ function vRepurchaseRate(d) {
   const aiRec = rpAiRec(d._monthly || [], d._platforms || [], d._products || []);
   const dynamic = rpRenderDynamic(d._products || [], d._platforms || []);
 
-  const chartAndKpi = `<div style="display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;margin-bottom:16px">
+  const chartAndKpi = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;margin-bottom:16px">
     <div style="min-width:0">${chart}</div>
-    <div style="width:260px;display:flex;flex-direction:column;gap:8px">
-      ${(d.kpis||[]).map(k => `<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px">
-        <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--txt-3);font-weight:700;margin-bottom:4px">${k.lbl}</div>
-        <div style="font-size:${k.val.length>5?'18':'22'}px;font-weight:800;color:var(--txt-1)">${k.val}<span style="font-size:13px;font-weight:400;color:var(--txt-2)">${k.u}</span></div>
-        <div style="font-size:10px;color:${k.trend==='up'?'#5a7040':k.trend==='dn'?'#c0392b':'var(--txt-3)'};margin-top:3px">${k.t}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      ${(d.kpis||[]).map(k => `<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px 18px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--txt-3);font-weight:700;margin-bottom:6px">${k.lbl}</div>
+        <div style="font-size:${k.val.toString().length>5?'22':'28'}px;font-weight:800;color:var(--txt-1);line-height:1.1">${k.val}<span style="font-size:15px;font-weight:500;color:var(--txt-2)">${k.u}</span></div>
+        <div style="font-size:11px;color:${k.trend==='up'?'#5a7040':k.trend==='dn'?'#c0392b':'var(--txt-3)'};margin-top:5px">${k.t}</div>
       </div>`).join('')}
     </div>
   </div>`;
