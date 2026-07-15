@@ -1180,7 +1180,7 @@ function rpRenderDynamic(products, platforms) {
 }
 function rpMakeChart(monthly) {
   if (!monthly || !monthly.length) return '';
-  const W = 380, H2 = 165, PL = 32, PR = 62, PT = 20, PB = 24;
+  const W = 380, H2 = 165, PL = 32, PR = 52, PT = 20, PB = 24;
   const cw = W - PL - PR, ch = H2 - PT - PB;
   const LINE_COLOR = '#c9952a', AREA_COLOR = '#7A8B5E', DOT_COLOR = '#c9952a';
   const BENCH = 15; // industry benchmark %
@@ -1387,9 +1387,9 @@ function vRepurchaseRate(d) {
     <div style="min-width:0">${chart}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:stretch">
       ${(d.kpis||[]).map(k => `<div style="background:#ffffff;border:1px solid #e8e8e2;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;justify-content:center">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888888;font-weight:700;margin-bottom:6px">${k.lbl}</div>
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888888;font-weight:700;margin-bottom:6px">${k.lbl}</div>
         <div style="font-size:${k.val.toString().length>5?'22':'28'}px;font-weight:800;color:#1A1A1A;line-height:1.1">${k.val}<span style="font-size:15px;font-weight:500;color:#555555">${k.u}</span></div>
-        <div style="font-size:11px;color:${k.trend==='up'?'#5a7040':k.trend==='dn'?'#c0392b':'#888888'};margin-top:5px">${k.t}</div>
+        <div style="font-size:13px;color:${k.trend==='up'?'#5a7040':k.trend==='dn'?'#c0392b':'#888888'};margin-top:5px">${k.t}</div>
       </div>`).join('')}
     </div>
   </div>`;
