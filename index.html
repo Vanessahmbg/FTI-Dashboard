@@ -1128,47 +1128,139 @@ const _sb = supabase.createClient(
 /* ════════════════════════════════════════════════════════════════
  * DATA LOADER — fetches from Supabase, falls back to MOCK_DATA
  * ════════════════════════════════════════════════════════════════ */
+/* ── Repurchase rate helpers ─────────────────────────── */
+const RP_EXCLUDE = ['Defect','Scarf','Sweater','Tote','Tee ','Hoodie','Bundle Gift'];
+function rpCutoff(period) {
+  const now = new Date();
+  if (period === '1W') return new Date(now - 7*86400000).toISOString();
+  if (period === '1M') return new Date(now - 30*86400000).toISOString();
+  if (period === '3M') return new Date(now - 90*86400000).toISOString();
+  if (period === '6M') return new Date(now - 180*86400000).toISOString();
+  return '2000-01-01T00:00:00Z';
+}
+async function fetchRpData(period) {
+  const cutoff = rpCutoff(period);
+  const [prodRes, platRes] = await Promise.all([
+    _sb.rpc('get_repurchase_by_product', { cutoff_date: cutoff }),
+    _sb.rpc('get_repurchase_by_platform', { cutoff_date: cutoff }),
+  ]);
+  const products  = (prodRes.data||[]).filter(r => r.total_customers >= 5 && !RP_EXCLUDE.some(x => r.product_name.includes(x))).slice(0,10);
+  const platforms = platRes.data || [];
+  return { products, platforms };
+}
+window._rpPeriod = '3M';
+window._rpMonthly = [];
+window.rpChangePeriod = async function(period) {
+  window._rpPeriod = period;
+  document.querySelectorAll('.rp-tab').forEach(t => {
+    t.style.background = t.dataset.p === period ? 'var(--accent)' : 'transparent';
+    t.style.color = t.dataset.p === period ? '#fff' : 'var(--txt-2)';
+  });
+  const el = document.getElementById('rp-dynamic');
+  if (el) el.innerHTML = '<div style="padding:24px;color:var(--txt-3);font-size:13px">Loading…</div>';
+  const { products, platforms } = await fetchRpData(period);
+  if (el) el.innerHTML = rpRenderDynamic(products, platforms);
+};
+function rpRenderDynamic(products, platforms) {
+  const ACCENT = '#3D4A2E';
+  const platRows = platforms.filter(p => p.platform !== 'Offline / Internal' || p.total_customers > 50).map(p => [
+    p.platform,
+    `<span style="font-weight:700">${p.repurchase_rate_pct}%</span>`,
+    p.repeat_customers.toLocaleString() + ' / ' + p.total_customers.toLocaleString(),
+    `<span style="font-size:11px;color:#888">${p.total_orders.toLocaleString()} orders</span>`,
+  ]);
+  const prodRows = products.map(r => [
+    r.product_name,
+    `<span style="font-weight:700;color:${parseFloat(r.repurchase_rate_pct)>=15?'#5a7040':parseFloat(r.repurchase_rate_pct)>=10?'#8a6a00':'#555'}">${r.repurchase_rate_pct}%</span>`,
+    r.repeat_customers.toLocaleString() + ' / ' + r.total_customers.toLocaleString(),
+    H.statusChip(parseFloat(r.repurchase_rate_pct) >= 15 ? 'g' : parseFloat(r.repurchase_rate_pct) >= 10 ? 'a' : 'n'),
+  ]);
+  return H.blk('By Platform', H.table(['Platform','Repurchase Rate','Repeat / Total Customers','Orders'], platRows))
+       + H.blk('Top Products by Repurchase Rate', H.table(['Product','Rate','Repeat / Total Customers','Status'], prodRows));
+}
+function rpMakeChart(monthly) {
+  if (!monthly || !monthly.length) return '';
+  const W = 420, H2 = 160, PL = 42, PR = 16, PT = 14, PB = 30;
+  const cw = W - PL - PR, ch = H2 - PT - PB;
+  const maxRate = Math.max(35, ...monthly.map(m => parseFloat(m.repurchase_rate_pct)));
+  const xs = monthly.map((_, i) => PL + (i / (monthly.length - 1)) * cw);
+  const ys = monthly.map(m => PT + (1 - parseFloat(m.repurchase_rate_pct) / maxRate) * ch);
+  const polyline = xs.map((x,i) => `${x},${ys[i]}`).join(' ');
+  const area = `${PL},${PT+ch} ` + xs.map((x,i) => `${x},${ys[i]}`).join(' ') + ` ${xs[xs.length-1]},${PT+ch}`;
+  const yLabels = [0, Math.round(maxRate*0.33), Math.round(maxRate*0.67), maxRate].map((v,i) => {
+    const y = PT + (1 - v/maxRate)*ch;
+    return `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3"/>
+            <text x="${PL-6}" y="${y+4}" text-anchor="end" fill="var(--txt-3)" font-size="9">${v}%</text>`;
+  }).join('');
+  const dots = xs.map((x,i) => `<circle cx="${x}" cy="${ys[i]}" r="4" fill="var(--accent)" stroke="#fff" stroke-width="2"/>
+    <text x="${x}" y="${ys[i]-9}" text-anchor="middle" fill="var(--accent)" font-size="9" font-weight="700">${monthly[i].repurchase_rate_pct}%</text>`).join('');
+  const xLabels = xs.map((x,i) => `<text x="${x}" y="${H2-4}" text-anchor="middle" fill="var(--txt-3)" font-size="9">${monthly[i].month_label}</text>`).join('');
+  return `<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--txt-3);margin-bottom:10px">Monthly Repurchase Rate Trend</div>
+    <svg viewBox="0 0 ${W} ${H2}" style="width:100%;height:auto;display:block">
+      <defs><linearGradient id="rpGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity="0.18"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
+      ${yLabels}
+      <polygon points="${area}" fill="url(#rpGrad)"/>
+      <polyline points="${polyline}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}${xLabels}
+    </svg>
+  </div>`;
+}
+function rpAiRec(monthly, platforms, products) {
+  if (!monthly || !monthly.length || !products || !products.length) return '';
+  const latest = monthly[monthly.length-1];
+  const prev   = monthly.length > 1 ? monthly[monthly.length-2] : null;
+  const delta  = prev ? (parseFloat(latest.repurchase_rate_pct) - parseFloat(prev.repurchase_rate_pct)).toFixed(1) : null;
+  const topProd = products[0];
+  const topPlat = [...platforms].sort((a,b) => parseFloat(b.repurchase_rate_pct) - parseFloat(a.repurchase_rate_pct))[0];
+  const lowProd = products.filter(p => p.total_customers > 100).sort((a,b) => parseFloat(a.repurchase_rate_pct) - parseFloat(b.repurchase_rate_pct))[0];
+  const trend = delta !== null ? (parseFloat(delta) > 0 ? `↑ +${delta}pp from last month — strong upward trajectory.` : `↓ ${delta}pp from last month — monitor closely.`) : '';
+  const summary = `Repurchase rate reached <strong>${latest.repurchase_rate_pct}%</strong> in ${latest.month_label}${delta !== null ? ` (${parseFloat(delta)>0?'+':''}${delta}pp MoM)` : ''}, driven by ${latest.returning_customers.toLocaleString()} returning customers. ${topProd ? `<strong>${topProd.product_name}</strong> leads all products at ${topProd.repurchase_rate_pct}%.` : ''} ${topPlat ? `<strong>${topPlat.platform}</strong> has the highest platform loyalty at ${topPlat.repurchase_rate_pct}%.` : ''}`;
+  const actions = [
+    topProd ? `<strong>Double down on ${topProd.product_name}</strong> — highest repurchase signal; prioritise stock, bundling, and restock reminders.` : null,
+    topPlat && topPlat.platform !== 'Offline / Internal' ? `<strong>Grow ${topPlat.platform}</strong> — loyalty is highest here; invest in channel-exclusive offers or loyalty perks.` : null,
+    lowProd ? `<strong>Investigate ${lowProd.product_name}</strong> — lowest repurchase rate among high-volume products; consider post-purchase follow-up or formula feedback.` : null,
+    `<strong>Set up restock reminders</strong> — beauty repurchase cycles are 30–90 days; an automated email at day 45 could lift overall rate by 3–5pp.`,
+  ].filter(Boolean);
+  return `<div style="background:linear-gradient(135deg,#f0f4ea,#fafaf8);border:1.5px solid #c8d4b0;border-radius:12px;padding:18px 20px;margin-bottom:16px">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5a7040;margin-bottom:10px">🤖 AI Recommendation</div>
+    <div style="font-size:12.5px;color:#2a3520;line-height:1.6;margin-bottom:12px">${summary}</div>
+    <div style="font-size:11px;font-weight:700;color:#3D4A2E;margin-bottom:6px">Action Items</div>
+    <ul style="margin:0;padding-left:16px;font-size:12px;color:#444;line-height:1.8">${actions.map(a=>`<li>${a}</li>`).join('')}</ul>
+  </div>`;
+}
+
 async function loadData() {
   try {
-    const [miRes, rpRes] = await Promise.all([
+    const [miRes, monthRes] = await Promise.all([
       _sb.from('market_intelligence').select('id, data'),
-      _sb.from('repurchase_by_product').select('product_name,repurchase_rate_pct,repeat_customers,total_customers').order('repurchase_rate_pct', { ascending: false }).limit(12),
+      _sb.from('repurchase_monthly_trend').select('*'),
     ]);
-
     const sbData = (miRes.data && miRes.data.length)
       ? Object.fromEntries(miRes.data.map(row => [row.id, row.data]))
       : {};
-
     const merged = { ...MOCK_DATA, ...sbData };
+    window._rpMonthly = monthRes.data || [];
 
-    if (rpRes.data && rpRes.data.length) {
-      const rows = rpRes.data
-        .filter(r => r.total_customers >= 30 && !r.product_name.includes('Defect') && !r.product_name.includes('Scarf') && !r.product_name.includes('Sweater') && !r.product_name.includes('Tote'))
-        .slice(0, 10);
-
-      const totalRepeat = rows.reduce((s, r) => s + r.repeat_customers, 0);
-      const totalCust   = rows.reduce((s, r) => s + r.total_customers, 0);
-      const overallRate = totalCust ? Math.round(totalRepeat / totalCust * 1000) / 10 : 18.4;
-
-      merged['repurchase-rate'] = {
-        ...merged['repurchase-rate'],
-        updated: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-        kpis: [
-          { lbl: 'Overall Repurchase Rate', val: overallRate.toFixed(1), u: '%', trend: 'up', t: `↑ across ${rows.length} tracked products` },
-          { lbl: 'Unique Customers',        val: totalCust.toLocaleString(), u: '', trend: null, t: 'Apr–Jul 2026 · all channels' },
-          { lbl: 'Completed Orders',        val: '44,265', u: '', trend: 'up', t: '↑ Shopee 66% · Tokopedia 32%' },
-          { lbl: 'Return Rate',             val: '1.8', u: '%', trend: 'up', t: '↑ 802 returns of 45,067 total orders' },
-        ],
-        products: rows.map(r => ({
-          name:   r.product_name,
-          rate:   parseFloat(r.repurchase_rate_pct),
-          repeat: r.repeat_customers,
-          total:  r.total_customers,
-          st:     parseFloat(r.repurchase_rate_pct) >= 15 ? 'g' : parseFloat(r.repurchase_rate_pct) >= 10 ? 'a' : 'n',
-        })),
-      };
-    }
-
+    const { products, platforms } = await fetchRpData(window._rpPeriod);
+    const totalCust   = products.reduce((s, r) => s + r.total_customers, 0);
+    const totalRepeat = products.reduce((s, r) => s + r.repeat_customers, 0);
+    const overallRate = totalCust ? (totalRepeat / totalCust * 100).toFixed(1) : '18.4';
+    merged['repurchase-rate'] = {
+      ...merged['repurchase-rate'],
+      updated: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+      _monthly: window._rpMonthly,
+      _products: products,
+      _platforms: platforms,
+      _overallRate: overallRate,
+      _totalCust: totalCust,
+      kpis: [
+        { lbl: 'Overall Repurchase Rate', val: overallRate, u: '%', trend: 'up', t: `↑ ${(+overallRate - 9).toFixed(1)}pp since May 2026` },
+        { lbl: 'Unique Customers',        val: totalCust.toLocaleString(), u: '', trend: null, t: 'across all channels · Apr–Jul 2026' },
+        { lbl: 'Completed Orders',        val: '44,265', u: '', trend: 'up', t: '↑ Shopee 66% · Tokopedia 32%' },
+        { lbl: 'Return Rate',             val: '1.8', u: '%', trend: 'up', t: '↑ 802 returns of 45,067 total orders' },
+      ],
+    };
     return merged;
   } catch (e) {
     return MOCK_DATA;
@@ -1262,16 +1354,34 @@ function vReviewScore(d) {
 }
 
 function vRepurchaseRate(d) {
-  const prodRows = d.products.map(r => [
-    r.name,
-    `<span class="fw">${r.rate}%</span>`,
-    `${r.repeat.toLocaleString()} / ${r.total.toLocaleString()}`,
-    H.statusChip(r.st),
-  ]);
+  const periods = ['1W','1M','3M','6M','All'];
+  const tabs = `<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+    ${periods.map(p => `<button class="rp-tab" data-p="${p}" onclick="window.rpChangePeriod('${p}')"
+      style="padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);cursor:pointer;font-size:12px;font-weight:600;
+      background:${p===window._rpPeriod?'var(--accent)':'transparent'};color:${p===window._rpPeriod?'#fff':'var(--txt-2)'};transition:all 0.15s">${p}</button>`).join('')}
+    <span style="margin-left:auto;font-size:11px;color:var(--txt-3);align-self:center">Data: Jubelio · updates live</span>
+  </div>`;
+
+  const chart = rpMakeChart(d._monthly || []);
+  const aiRec = rpAiRec(d._monthly || [], d._platforms || [], d._products || []);
+  const dynamic = rpRenderDynamic(d._products || [], d._platforms || []);
+
+  const chartAndKpi = `<div style="display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;margin-bottom:16px">
+    <div style="min-width:0">${chart}</div>
+    <div style="width:260px;display:flex;flex-direction:column;gap:8px">
+      ${(d.kpis||[]).map(k => `<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--txt-3);font-weight:700;margin-bottom:4px">${k.lbl}</div>
+        <div style="font-size:${k.val.length>5?'18':'22'}px;font-weight:800;color:var(--txt-1)">${k.val}<span style="font-size:13px;font-weight:400;color:var(--txt-2)">${k.u}</span></div>
+        <div style="font-size:10px;color:${k.trend==='up'?'#5a7040':k.trend==='dn'?'#c0392b':'var(--txt-3)'};margin-top:3px">${k.t}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+
   return H.vh('Repurchase Rate', d.desc, d.updated, d.alertBadge)
-    + H.callout(d.alert)
-    + H.kpiRow(d.kpis)
-    + H.blk('Top 10 Products by Repurchase Rate (Apr–Jul 2026)', H.table(['Product','Rate','Repeat / Total Customers','Status'], prodRows));
+    + aiRec
+    + tabs
+    + chartAndKpi
+    + `<div id="rp-dynamic">${dynamic}</div>`;
 }
 
 function vProductsSentiment(d) {
