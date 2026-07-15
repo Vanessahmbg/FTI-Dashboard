@@ -2042,7 +2042,7 @@ function vRelevanceScore(d) {
 
 function vSelfCare(d) {
   const allHistory = d.history || [];
-  window.__scPeriod = 'all';
+  window.__scPeriod = '3y';
 
   window.scHover = function(evt) {
     const svg = document.getElementById('sc-svg');
@@ -2194,7 +2194,7 @@ function vSelfCare(d) {
   return H.vh(d.catName,d.desc,d.updated,d.alertBadge)
     + H.kpiRow(d.kpis)
     + `<div style="display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:16px;margin-bottom:12px">
-        ${H.blk(`Market Size & Growth Rate — Indonesia ${d.catName}`,`<div id="sc-chart-block">${renderChart('all')}</div>`)}
+        ${H.blk(`Market Size & Growth Rate — Indonesia ${d.catName}`,`<div id="sc-chart-block">${renderChart('3y')}</div>`)}
         ${H.blk('Top-Growing Sub-Categories — YoY %',buildSubcats(d.subcats||[]))}
       </div>`
     + H.blk('AI Quarterly Insight',`<div class="ai-box"><div class="ai-lbl">Q2 2026 Analysis</div><div class="ai-text">${aiText}</div></div>`);
