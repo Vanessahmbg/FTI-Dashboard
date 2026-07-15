@@ -1153,11 +1153,11 @@ window._rpMonthly = [];
 window.rpChangePeriod = async function(period) {
   window._rpPeriod = period;
   document.querySelectorAll('.rp-tab').forEach(t => {
-    t.style.background = t.dataset.p === period ? 'var(--accent)' : 'transparent';
-    t.style.color = t.dataset.p === period ? '#fff' : 'var(--txt-2)';
+    t.style.background = t.dataset.p === period ? '#3D4A2E' : 'transparent';
+    t.style.color = t.dataset.p === period ? '#fff' : '#555555';
   });
   const el = document.getElementById('rp-dynamic');
-  if (el) el.innerHTML = '<div style="padding:24px;color:var(--txt-3);font-size:13px">Loading…</div>';
+  if (el) el.innerHTML = '<div style="padding:24px;color:#888888;font-size:13px">Loading…</div>';
   const { products, platforms } = await fetchRpData(period);
   if (el) el.innerHTML = rpRenderDynamic(products, platforms);
 };
@@ -1203,8 +1203,8 @@ function rpMakeChart(monthly) {
   const xLabels = xs.map((x,i) => `<text x="${x}" y="${H2-2}" text-anchor="middle" fill="#bbb" font-size="8">${monthly[i].month_label}</text>`).join('');
   const benchLine = `<line x1="${PL}" y1="${benchY}" x2="${W-PR}" y2="${benchY}" stroke="#888" stroke-width="1" stroke-dasharray="5,3"/>
     <text x="${W-PR+2}" y="${benchY+3.5}" fill="#888" font-size="7.5" font-weight="600">Benchmark</text>`;
-  return `<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px">
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--txt-3);margin-bottom:6px">Monthly Repurchase Rate Trend</div>
+  return `<div style="background:#ffffff;border:1px solid #e8e8e2;border-radius:12px;padding:14px 16px">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888888;margin-bottom:6px">Monthly Repurchase Rate Trend</div>
     <div style="display:flex;gap:14px;margin-bottom:6px;font-size:9px;color:#aaa;align-items:center">
       <span><span style="display:inline-block;width:16px;height:2.5px;background:${LINE_COLOR};vertical-align:middle;margin-right:4px;border-radius:2px"></span>FTI Rate</span>
       <span><span style="display:inline-block;width:12px;height:10px;background:${AREA_COLOR};opacity:0.3;vertical-align:middle;margin-right:4px;border-radius:2px"></span>Volume</span>
@@ -1374,9 +1374,9 @@ function vRepurchaseRate(d) {
   const periods = ['1W','1M','3M','6M','All'];
   const tabs = `<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
     ${periods.map(p => `<button class="rp-tab" data-p="${p}" onclick="window.rpChangePeriod('${p}')"
-      style="padding:5px 16px;border-radius:20px;border:1.5px solid ${p===window._rpPeriod?'var(--accent)':'#d0d0c8'};cursor:pointer;font-size:12px;font-weight:600;
-      background:${p===window._rpPeriod?'var(--accent)':'#fff'};color:${p===window._rpPeriod?'#fff':'#444'};transition:all 0.15s">${p}</button>`).join('')}
-    <span style="margin-left:auto;font-size:11px;color:var(--txt-3)">Data: Jubelio · updates live</span>
+      style="padding:5px 16px;border-radius:20px;border:1.5px solid ${p===window._rpPeriod?'#3D4A2E':'#d0d0c8'};cursor:pointer;font-size:12px;font-weight:600;
+      background:${p===window._rpPeriod?'#3D4A2E':'#fff'};color:${p===window._rpPeriod?'#fff':'#444'};transition:all 0.15s">${p}</button>`).join('')}
+    <span style="margin-left:auto;font-size:11px;color:#888888">Data: Jubelio · updates live</span>
   </div>`;
 
   const chart = rpMakeChart(d._monthly || []);
@@ -1386,10 +1386,10 @@ function vRepurchaseRate(d) {
   const chartAndKpi = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center;margin-bottom:16px">
     <div style="min-width:0">${chart}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      ${(d.kpis||[]).map(k => `<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px 18px">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--txt-3);font-weight:700;margin-bottom:6px">${k.lbl}</div>
-        <div style="font-size:${k.val.toString().length>5?'22':'28'}px;font-weight:800;color:var(--txt-1);line-height:1.1">${k.val}<span style="font-size:15px;font-weight:500;color:var(--txt-2)">${k.u}</span></div>
-        <div style="font-size:11px;color:${k.trend==='up'?'#5a7040':k.trend==='dn'?'#c0392b':'var(--txt-3)'};margin-top:5px">${k.t}</div>
+      ${(d.kpis||[]).map(k => `<div style="background:#ffffff;border:1px solid #e8e8e2;border-radius:12px;padding:16px 18px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888888;font-weight:700;margin-bottom:6px">${k.lbl}</div>
+        <div style="font-size:${k.val.toString().length>5?'22':'28'}px;font-weight:800;color:#1A1A1A;line-height:1.1">${k.val}<span style="font-size:15px;font-weight:500;color:#555555">${k.u}</span></div>
+        <div style="font-size:11px;color:${k.trend==='up'?'#5a7040':k.trend==='dn'?'#c0392b':'#888888'};margin-top:5px">${k.t}</div>
       </div>`).join('')}
     </div>
   </div>`;
