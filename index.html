@@ -428,16 +428,19 @@ const MOCK_DATA = {
       { lbl: 'Completed Orders',        val: '44,265', u: '', trend: 'up', t: '↑ Shopee 66% · Tokopedia 32%' },
       { lbl: 'Return Rate',             val: '1.8', u: '%', trend: 'up', t: '↑ 802 returns of 45,067 total orders' },
     ],
-    alert: { type: 'info', title: 'Product-level breakdown coming soon', body: 'Overall repurchase rate (18.4%) is calculated from Jubelio order history. Per-product breakdown requires webhook data — being collected from July 2026 onward. Monthly revenue: Apr 2.1B · May 4.5B · Jun 4.0B · Jul 0.8B IDR (partial).' },
-    rows: [
-      { name: 'Skincare | Mangosteen Brightening Serum',              shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
-      { name: 'Skincare | Tropical Guava Barrier Moisture Gel',       shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
-      { name: 'Skincare | White Tea Ultra-Light Protective Sun Serum',shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
-      { name: 'Skincare | Blue Pea Purifying Micellar Water',         shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
-      { name: 'Skincare | Java Black Tea Soothing Gel Cleanser',      shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
-      { name: 'Skincare | Papua Red Fruit Plumping Cream',            shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
-      { name: 'Skincare | Bali Green Coffee Espresso Eye Cream',      shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
-      { name: 'Makeup | Illipe Plumping Lip Butter',                  shopee: '—', tt: '—', mom: 'TBD', st: 'n' },
+    alert: { type: 'info', title: 'Product-level breakdown coming soon', body: 'Per-product repurchase rate requires webhook data — being collected from July 2026 onward. Overall rate (18.4%) and all figures below are from Jubelio order history export.' },
+    channels: [
+      { name: 'Shopee',     orders: 29183, pct: 66, mom: '+2pp' },
+      { name: 'Tokopedia',  orders: 14312, pct: 32, mom: '−1pp' },
+      { name: 'Shopify',    orders: 351,   pct: 1,  mom: '  0pp' },
+      { name: 'Internal',   orders: 302,   pct: 1,  mom: '  0pp' },
+      { name: 'Lazada',     orders: 117,   pct: 0,  mom: '  0pp' },
+    ],
+    monthly: [
+      { month: 'April 2026', orders: 7472,  revenue: 'Rp 2.1B', aov: 'Rp 284K' },
+      { month: 'May 2026',   orders: 16768, revenue: 'Rp 4.5B', aov: 'Rp 265K' },
+      { month: 'June 2026',  orders: 15761, revenue: 'Rp 4.0B', aov: 'Rp 255K' },
+      { month: 'July 2026',  orders: 3798,  revenue: 'Rp 0.8B', aov: 'Rp 216K' },
     ],
   },
 
@@ -1225,17 +1228,23 @@ function vReviewScore(d) {
 }
 
 function vRepurchaseRate(d) {
-  const rows = d.rows.map(r => [
+  const channelRows = d.channels.map(r => [
     r.name,
-    `<span class="fw">${r.shopee === '—' ? '—' : r.shopee + '%'}</span>`,
-    `<span class="fw">${r.tt === '—' ? '—' : r.tt + '%'}</span>`,
+    `<span class="fw">${r.orders.toLocaleString()}</span>`,
+    `${r.pct}%`,
     H.trendCell(r.mom),
-    H.statusChip(r.st),
+  ]);
+  const monthRows = d.monthly.map(r => [
+    r.month,
+    `<span class="fw">${r.orders.toLocaleString()}</span>`,
+    r.revenue,
+    r.aov,
   ]);
   return H.vh('Repurchase Rate', d.desc, d.updated, d.alertBadge)
     + H.callout(d.alert)
     + H.kpiRow(d.kpis)
-    + H.blk('Repurchase Rate by Product', H.table(['Product','Shopee Rate','TikTok Rate','MoM Trend','Status'], rows));
+    + H.blk('Orders by Channel (Apr–Jul 2026)', H.table(['Channel','Completed Orders','Share','MoM Trend'], channelRows))
+    + H.blk('Monthly Performance (Apr–Jul 2026)', H.table(['Month','Orders','Revenue (IDR)','Avg Order Value'], monthRows));
 }
 
 function vProductsSentiment(d) {
