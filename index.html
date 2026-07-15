@@ -1192,7 +1192,7 @@ function rpMakeChart(monthly) {
   const benchY = PT + (1 - BENCH / maxRate) * ch;
   const yLabels = [0, Math.round(maxRate*0.33), Math.round(maxRate*0.67), maxRate].map(v => {
     const y = PT + (1 - v/maxRate)*ch;
-    return `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#e8e8e2" stroke-width="1" stroke-dasharray="2,3"/>
+    return `<line x1="${PL}" y1="${y}" x2="${W-4}" y2="${y}" stroke="#e8e8e2" stroke-width="1" stroke-dasharray="2,3"/>
             <text x="${PL-4}" y="${y+3.5}" text-anchor="end" fill="#444" font-size="8">${v}%</text>`;
   }).join('');
   const dots = xs.map((x,i) => {
@@ -1201,8 +1201,8 @@ function rpMakeChart(monthly) {
       <text x="${x}" y="${above ? ys[i]-9 : ys[i]+14}" text-anchor="middle" fill="${DOT_COLOR}" font-size="8.5" font-weight="700">${monthly[i].repurchase_rate_pct}%</text>`;
   }).join('');
   const xLabels = xs.map((x,i) => `<text x="${x}" y="${H2-2}" text-anchor="middle" fill="#444" font-size="8">${monthly[i].month_label}</text>`).join('');
-  const benchLine = `<line x1="${PL}" y1="${benchY}" x2="${W-PR}" y2="${benchY}" stroke="#555" stroke-width="1" stroke-dasharray="5,3"/>
-    <text x="${W-PR+4}" y="${benchY+3.5}" fill="#444" font-size="7.5" font-weight="600">Benchmark</text>`;
+  const benchLine = `<line x1="${PL}" y1="${benchY}" x2="${W-4}" y2="${benchY}" stroke="#555" stroke-width="1" stroke-dasharray="5,3"/>
+    <text x="${W-6}" y="${benchY-3}" text-anchor="end" fill="#444" font-size="7.5" font-weight="600">Benchmark</text>`;
   return `<div style="background:#ffffff;border:1px solid #e8e8e2;border-radius:12px;padding:14px 16px">
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888888;margin-bottom:6px">Monthly Repurchase Rate Trend</div>
     <div style="display:flex;gap:14px;margin-bottom:6px;font-size:9px;color:#555;align-items:center">
@@ -1388,7 +1388,7 @@ function vRepurchaseRate(d) {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:stretch">
       ${(d.kpis||[]).map(k => `<div style="background:#ffffff;border:1px solid #e8e8e2;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;justify-content:center">
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888888;font-weight:700;margin-bottom:6px">${k.lbl}</div>
-        <div style="font-size:${k.val.toString().length>5?'22':'28'}px;font-weight:800;color:#1A1A1A;line-height:1.1">${k.val}<span style="font-size:15px;font-weight:500;color:#555555">${k.u}</span></div>
+        <div style="font-size:${k.val.toString().length>5?'28':'36'}px;font-weight:800;color:#1A1A1A;line-height:1.1">${k.val}<span style="font-size:18px;font-weight:500;color:#555555">${k.u}</span></div>
         <div style="font-size:13px;color:${k.trend==='up'?'#5a7040':k.trend==='dn'?'#c0392b':'#888888'};margin-top:5px">${k.t}</div>
       </div>`).join('')}
     </div>
