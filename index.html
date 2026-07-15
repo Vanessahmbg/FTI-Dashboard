@@ -428,19 +428,17 @@ const MOCK_DATA = {
       { lbl: 'Completed Orders',        val: '44,265', u: '', trend: 'up', t: '↑ Shopee 66% · Tokopedia 32%' },
       { lbl: 'Return Rate',             val: '1.8', u: '%', trend: 'up', t: '↑ 802 returns of 45,067 total orders' },
     ],
-    alert: { type: 'info', title: 'Product-level breakdown coming soon', body: 'Per-product repurchase rate requires webhook data — being collected from July 2026 onward. Overall rate (18.4%) and all figures below are from Jubelio order history export.' },
-    channels: [
-      { name: 'Shopee',     orders: 29183, pct: 66, mom: '+2pp' },
-      { name: 'Tokopedia',  orders: 14312, pct: 32, mom: '−1pp' },
-      { name: 'Shopify',    orders: 351,   pct: 1,  mom: '  0pp' },
-      { name: 'Internal',   orders: 302,   pct: 1,  mom: '  0pp' },
-      { name: 'Lazada',     orders: 117,   pct: 0,  mom: '  0pp' },
-    ],
-    monthly: [
-      { month: 'April 2026', orders: 7472,  revenue: 'Rp 2.1B', aov: 'Rp 284K' },
-      { month: 'May 2026',   orders: 16768, revenue: 'Rp 4.5B', aov: 'Rp 265K' },
-      { month: 'June 2026',  orders: 15761, revenue: 'Rp 4.0B', aov: 'Rp 255K' },
-      { month: 'July 2026',  orders: 3798,  revenue: 'Rp 0.8B', aov: 'Rp 216K' },
+    alert: { type: 'info', title: 'Data source: Jubelio export (Apr–Jul 2026)', body: 'Repurchase rate = customers who placed 2+ distinct orders for the same product. Matched by masked customer name across 60,064 product-level order lines.' },
+    products: [
+      { name: 'Mangosteen Brightening Serum',          rate: 11.6, repeat: 485, total: 4193, st: 'g' },
+      { name: 'Java Black Tea Soothing Gel Cleanser',  rate: 11.5, repeat: 329, total: 2854, st: 'g' },
+      { name: 'Papua Red Fruit Plumping Cream',        rate: 10.6, repeat: 265, total: 2510, st: 'g' },
+      { name: 'Illipe Blurring Butter Pot',            rate:  9.6, repeat: 431, total: 4499, st: 'a' },
+      { name: 'Papua Red Fruit Potent Plumping Serum', rate:  8.6, repeat:  46, total:  532, st: 'a' },
+      { name: 'Turmeric Advanced Power C Serum',       rate:  8.1, repeat: 183, total: 2247, st: 'a' },
+      { name: 'Illipe Plumping Lip Butter',            rate:  7.7, repeat: 322, total: 4178, st: 'n' },
+      { name: 'White Tea Sun Serum',                   rate:  7.5, repeat: 119, total: 1577, st: 'n' },
+      { name: 'Soothing Gel Cleanser Twin Pack',       rate:  6.4, repeat:  29, total:  456, st: 'n' },
     ],
   },
 
@@ -1228,23 +1226,16 @@ function vReviewScore(d) {
 }
 
 function vRepurchaseRate(d) {
-  const channelRows = d.channels.map(r => [
+  const prodRows = d.products.map(r => [
     r.name,
-    `<span class="fw">${r.orders.toLocaleString()}</span>`,
-    `${r.pct}%`,
-    H.trendCell(r.mom),
-  ]);
-  const monthRows = d.monthly.map(r => [
-    r.month,
-    `<span class="fw">${r.orders.toLocaleString()}</span>`,
-    r.revenue,
-    r.aov,
+    `<span class="fw">${r.rate}%</span>`,
+    `${r.repeat.toLocaleString()} / ${r.total.toLocaleString()}`,
+    H.statusChip(r.st),
   ]);
   return H.vh('Repurchase Rate', d.desc, d.updated, d.alertBadge)
     + H.callout(d.alert)
     + H.kpiRow(d.kpis)
-    + H.blk('Orders by Channel (Apr–Jul 2026)', H.table(['Channel','Completed Orders','Share','MoM Trend'], channelRows))
-    + H.blk('Monthly Performance (Apr–Jul 2026)', H.table(['Month','Orders','Revenue (IDR)','Avg Order Value'], monthRows));
+    + H.blk('Top 10 Products by Repurchase Rate (Apr–Jul 2026)', H.table(['Product','Rate','Repeat / Total Customers','Status'], prodRows));
 }
 
 function vProductsSentiment(d) {
