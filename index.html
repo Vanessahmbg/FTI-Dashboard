@@ -527,57 +527,66 @@ const MOCK_DATA = {
 
   /* ── 1d. SOCIAL LISTENING ───────────────────────────────── */
   'social-listening': {
-    updated: 'Jul 2026', alertBadge: null,
-    desc: 'Organic mentions across web, TikTok & beauty platforms · Keywords: "From This Island" · "Maudy Ayunda FTI" · "local skincare"',
-    coverageNote: 'This run used free web search (Google indexing). X/Twitter posts only appeared where Google indexed them — direct X feed access is blocked without paid API. Threads returned zero results. Coverage is strongest on TikTok, Female Daily, SOCO/Sociolla, and editorial blogs.',
-    sentiment: { positive: 72, neutral: 20, negative: 8 },
-    ratings: {
-      avg: '4.5', platforms: 'Female Daily & SOCO/Sociolla',
-      products: [
-        { emoji: '☕', name: 'Java Black Tea Cleanser', rating: 4.8, note: 'FD, 45 reviews' },
-        { emoji: '💜', name: 'Illipe Lip Butter',        rating: 4.9, note: 'FD, 22 reviews' },
-        { emoji: '🔴', name: 'Papua Plumping Cream',     rating: 4.4, note: 'SOCO'           },
-        { emoji: '🥭', name: 'Mangosteen Serum',         rating: 4.0, note: 'FD, mixed'      },
-      ],
-    },
-    topSelling: {
-      highlight: '10K+', highlightSub: 'units — Java Black Tea Cleanser',
-      products: [
-        { rank: 1, name: 'Java Black Tea Cleanser',       units: '10,000+' },
-        { rank: 2, name: 'Tropical Guava Moisture Gel',   units: '8,300+'  },
-        { rank: 3, name: 'Papua Red Fruit Plumping Cream',units: '8,000+'  },
-      ],
-    },
-    quotes: [
-      { text: '"Skincarenya Maudy Ayunda — emang bagus sih secara kualitas ya. Ga kecewa, puas banget!"',                                                                                       src: 'TikTok @ema.ervita',         srcType: 'tt', sentiment: 'Positive', sentType: 'pos', url: 'https://www.tiktok.com/@ema.ervita'         },
-      { text: '"My skin has never been plumper! Full review of the highly anticipated clean skincare — love it."',                                                                               src: 'TikTok @suzannesarahs',      srcType: 'tt', sentiment: 'Positive', sentType: 'pos', url: 'https://www.tiktok.com/@suzannesarahs'      },
-      { text: '"From This Island lebih bagus dari brand mewah Jepang? Jujur, skin texture aku jadi lebih plump dan lembab — tapi brightening-nya kurang kerasa."',                              src: 'Jiglyciouss / Hops.ID',      srcType: 'ws', sentiment: 'Mixed',    sentType: 'mix', url: 'https://hops.id'                            },
-      { text: '"Serum ini beneran bisa mencerahkan nggak ya? Tekstur enak, tapi efek brightening-nya enggak se-wow yang diharapkan."',                                                          src: 'Female Daily / Helly Media', srcType: 'fd', sentiment: 'Mixed',    sentType: 'mix', url: 'https://femaledaily.com'                     },
-      { text: '"Papua Red Fruit Plumping Cream: good hydration burst, but might not be enough for dry skin types without layering."',                                                           src: 'SOCO/Sociolla',              srcType: 'sc', sentiment: 'Neutral',  sentType: 'neu', url: 'https://soco.id'                            },
+    updated: 'Jul 13, 2026', alertBadge: null,
+    period: '2026-06-29 – 2026-07-13',
+    desc: 'Brand24 monitoring · Keywords: "From This Island" · "fromthisisland" · "FTI skincare"',
+    kpis: [
+      { lbl: 'Total Mentions',  val: '140',    delta: '-1%',   dir: 'n' },
+      { lbl: 'Total Reach',     val: '39K',    delta: '+7%',   dir: 'u' },
+      { lbl: 'Positive Rate',   val: '53%',    delta: '-1pt',  dir: 'n' },
+      { lbl: 'Presence Score',  val: '13/100', delta: '+133%', dir: 'u' },
+      { lbl: 'Interactions',    val: '1,866',  delta: '+94%',  dir: 'u' },
     ],
-    themes: [
-      { emoji: '🇮🇩', name: 'Local Pride',         sub: 'Bangga produk lokal berkualitas global',  heat: 'h'                },
-      { emoji: '💧',   name: 'Hydration & Texture', sub: 'Kulit lebih plump, lembab, glowing',     heat: 'h'                },
-      { emoji: '⭐',   name: 'Maudy Ayunda Effect', sub: 'Brand credibility via founder name',      heat: 'h'                },
-      { emoji: '🌿',   name: 'Natural Ingredients', sub: 'Papua red fruit, manggis, guava, teh',   heat: 'm'                },
-      { emoji: '✨',   name: 'Brightening Claims',  sub: 'Serum results questioned by users',       heat: 'm', warn: true    },
-      { emoji: '💰',   name: 'Price vs Value',       sub: 'Generally "worth it" for local premium', heat: 'l'                },
-    ],
+    sentiment: { positive: 53, neutral: 44, negative: 3 },
     platforms: [
-      { name: 'TikTok',          pct: 90, note: 'Very active',   danger: false },
-      { name: 'Female Daily',    pct: 80, note: '18 products',   danger: false },
-      { name: 'SOCO/Sociolla',   pct: 70, note: '4.4/5 avg',    danger: false },
-      { name: 'Editorial / Blog',pct: 65, note: 'High coverage', danger: false },
-      { name: 'X (Twitter)',     pct: 15, note: 'API blocked',   danger: true  },
-      { name: 'Threads',         pct:  5, note: 'No results',    danger: true  },
+      { name: 'X / Twitter', mentions: 72 },
+      { name: 'TikTok',      mentions: 66 },
+      { name: 'Other',       mentions: 2  },
     ],
-    signals: [
-      { icon: '🏆', bg: '#f0f4ea', title: 'Bazaar Beauty Award 2025',           body: "Illipe Plumping Lip Butter — Best Innovative Local Product (Harper's Bazaar Indonesia)" },
-      { icon: '🆕', bg: '#e8f4ff', title: 'New Launch — Jan 2026',              body: 'Papua Red Fruit Plumping Lightweight Oil — face oil to strengthen skin barrier, partnered with Wahana Visi Indonesia' },
-      { icon: '⚠️', bg: '#fff3e0', title: 'Watch: Serum Brightening Claims',    body: 'Multiple honest reviews flag that Mangosteen Brightening Serum underdelivers on "brightening" — hydration praised but naming expectation gap exists' },
-      { icon: '📣', bg: '#f0f4ea', title: 'Compared to Japanese Premium Brands', body: 'Organic comparisons surfacing — FTI praised for texture and hydration parity with premium foreign brands at local price' },
+    hashtags: [
+      { tag: '#fromthisisland',          count: 66 },
+      { tag: '#fromthisislandskincare',  count: 60 },
+      { tag: '#fromthisislandserum',     count: 40 },
+      { tag: '#fromthisislandlipbutter', count: 29 },
+      { tag: '#maudyayunda',             count: 5  },
+      { tag: '#ad',                      count: 4  },
+      { tag: '#brighteningserum',        count: 3  },
+      { tag: '#sunscreen',               count: 3  },
     ],
-    summary: 'People organically mention FTI in the context of <strong>skincare recommendations for local products</strong>, often comparing it favorably to foreign brands. The <strong>Maudy Ayunda brand connection</strong> drives initial discovery — but user retention is based on actual product performance.<br><br>The strongest organic signal is around <strong>texture, hydration, and "plump skin"</strong> results. The <strong>Java Black Tea Cleanser</strong> and <strong>Tropical Guava Moisture Gel</strong> get the most unprompted positive mentions.<br><br>The main risk signal: the <strong>Mangosteen Serum brightening claim</strong> is creating a perception gap. Users expect visible brightening but report mainly hydration benefits — this could lead to trust erosion if not addressed in marketing messaging.',
+    influencersSov: [
+      { name: 'doseofvank',  platform: 'TikTok', mentions: 24, reach: '5,222', sov: '13.6%' },
+      { name: 'maishadow55', platform: 'TikTok', mentions: 1,  reach: '5,013', sov: '13.1%' },
+      { name: 'ono.ning',    platform: 'TikTok', mentions: 25, reach: '3,784', sov: '9.9%'  },
+      { name: 'indahstll',   platform: 'X',      mentions: 6,  reach: '2,104', sov: '5.5%'  },
+      { name: 'latte_arrp',  platform: 'TikTok', mentions: 2,  reach: '1,960', sov: '5.1%'  },
+    ],
+    influencersFollowers: [
+      { name: 'my.autumns',    platform: 'TikTok', followers: '18,352', score: 8 },
+      { name: 'varaarylinzar', platform: 'X',      followers: '10,011', score: 8 },
+      { name: 'glossygita',    platform: 'X',      followers: '6,632',  score: 7 },
+      { name: 'latte_arrp',    platform: 'TikTok', followers: '4,350',  score: 7 },
+      { name: 'heiika18',      platform: 'TikTok', followers: '3,167',  score: 7 },
+    ],
+    topics: [
+      { name: 'From This Island Products', icon: '🛍️', sentiment: 'Mixed'    },
+      { name: 'Brightening Serum Reviews', icon: '✨',  sentiment: 'Positive' },
+      { name: 'Community Engagement',      icon: '💬',  sentiment: 'Positive' },
+      { name: 'Lip Products Discussion',   icon: '💄',  sentiment: 'Positive' },
+    ],
+    recentMentions: [
+      { author: 'manyvv',       platform: 'TikTok',    sentiment: 'Positive', date: '2026-07-15', content: 'Favorite lokal skincare dari @From This Island, saat ini lagi suka banget sama vitamin c serumnya mereka #getreadywithme #skincare #fromthisisland' },
+      { author: 'yyyanarchive', platform: 'X/Twitter', sentiment: 'Positive', date: '2026-07-15', content: 'omg plumping lip butter nya @FromThisIsland wishlist akuuu bgt' },
+      { author: 'rinitee__',    platform: 'X/Twitter', sentiment: 'Positive', date: '2026-07-15', content: '@FromThisIsland Aku ingin mencobanya karena aku ingin mendapatkan kulit cerah, berseri ku kembali. Tanpa perlu mengonsumsi obat2an atau pun suntik vitamin C yang banyak dilakukan zaman...' },
+      { author: 'sandikala_',   platform: 'X/Twitter', sentiment: 'Negative', date: '2026-07-15', content: '@FromThisIsland Dehidrasi kusam bruntusan Alias aku lagi ga rutin skincarean' },
+      { author: 'my.autumns',   platform: 'TikTok',    sentiment: 'Positive', date: '2026-07-10', content: 'Sukabgttt 🤎 #fromthisisland #illipebutter #lipbutter' },
+      { author: 'indahstll',    platform: 'X/Twitter', sentiment: 'Positive', date: '2026-07-11', content: '@FromThisIsland dari awal launching udah penasaran. Tapi budgetnya blm ada. Sudah follow di IG and X minland, pengen banget punya ini!' },
+      { author: 'maishadow55',  platform: 'TikTok',    sentiment: 'Positive', date: '2026-07-09', content: 'lip matte favorite.. Blurring PARAH!! Wajib coba Guys!! blurring pot @FromThisIsland #fromthisisland #lipstick #makeup' },
+      { author: 'ono.ning',     platform: 'TikTok',    sentiment: 'Negative', date: '2026-07-07', content: 'Kurang baik apa aku ini #fromthisisland #fromthisislandskincare #fromthisislandserum' },
+    ],
+    comparison: {
+      current:  { label: 'Jun 29–Jul 13', mentions: 140, reach: '38,339', positive: '53%', negative: '3%', score: '14/100', ave: '$4,299' },
+      previous: { label: 'Jun 14–Jun 28', mentions: 141, reach: '36,251', positive: '54%', negative: '4%', score: '6/100',  ave: '$3,935' },
+    },
   },
 
   /* ── 2a. COMPETITOR ALERTS ──────────────────────────────── */
@@ -1507,117 +1516,143 @@ function vProductsSentiment(d) {
 }
 
 function vSocialListening(d) {
-  const C = 'background:#fff;border:1.5px solid #e8e8e4;border-radius:12px;padding:14px';
+  const C  = 'background:#fff;border:1.5px solid #e8e8e4;border-radius:12px;padding:14px';
   const CT = 'font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:10px';
-  const KV = 'font-size:26px;font-weight:900;line-height:1;letter-spacing:-1px';
-  const KL = 'font-size:10px;color:#888;margin-top:4px';
-  const DIV = '<hr style="border:none;border-top:1.5px solid #f0f0ee;margin:12px 0">';
+  const DIV = '<hr style="border:none;border-top:1.5px solid #f0f0ee;margin:10px 0">';
 
-  const alert = `<div style="background:#fff9f0;border:1.5px solid #f0d9a0;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start">
-    <span style="font-size:14px;margin-top:1px">⚠️</span>
-    <div style="font-size:11px;color:#7a5a00;line-height:1.5"><strong>Coverage note:</strong> ${d.coverageNote}</div>
-  </div>`;
+  // KPI boxes
+  const kpiColor = ['#7A8B5E','#1a1a1a','#C47D0E','#1a6fc4','#7A8B5E'];
+  const dirColor = { u:'#7A8B5E', d:'#C0392B', n:'#888' };
+  const kpis = (d.kpis||[]).map((k,i)=>`
+    <div style="${C};text-align:center;display:flex;flex-direction:column;justify-content:center">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:8px">${k.lbl}</div>
+      <div style="font-size:30px;font-weight:900;line-height:1;letter-spacing:-1px;color:${kpiColor[i]||'#1a1a1a'}">${k.val}</div>
+      <div style="font-size:10px;margin-top:6px;color:${dirColor[k.dir]||'#888'};font-weight:700">${k.delta} vs prev period</div>
+    </div>`).join('');
 
+  // Sentiment bars
   const sentBars = [
-    {lbl:'Positive', v:d.sentiment.positive, bc:'#7A8B5E', tc:'#7A8B5E'},
-    {lbl:'Neutral',  v:d.sentiment.neutral,  bc:'#ccc',    tc:'#888'   },
-    {lbl:'Negative', v:d.sentiment.negative, bc:'#C0392B', tc:'#C0392B'},
-  ].map(s=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
-    <div style="width:60px;font-size:11px;color:#555;font-weight:600">${s.lbl}</div>
+    {lbl:'Positive',v:d.sentiment.positive,bc:'#7A8B5E',tc:'#7A8B5E'},
+    {lbl:'Neutral', v:d.sentiment.neutral, bc:'#d0d0cc',tc:'#888'   },
+    {lbl:'Negative',v:d.sentiment.negative,bc:'#C0392B',tc:'#C0392B'},
+  ].map(s=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+    <div style="width:58px;font-size:11px;color:#555;font-weight:600">${s.lbl}</div>
     <div style="flex:1;background:#f0f0ee;border-radius:99px;height:8px;overflow:hidden"><div style="width:${s.v}%;height:8px;border-radius:99px;background:${s.bc}"></div></div>
-    <div style="font-size:11px;font-weight:800;width:30px;text-align:right;color:${s.tc}">${s.v}%</div>
+    <div style="font-size:12px;font-weight:800;width:32px;text-align:right;color:${s.tc}">${s.v}%</div>
   </div>`).join('');
 
-  const card1 = `<div style="${C}">
-    <div style="${CT}">Overall Sentiment</div>
-    <div style="${KV};color:#7A8B5E">Positive</div>
-    <div style="${KL}">Dominant tone across mentions</div>
-    ${DIV}${sentBars}
-  </div>`;
+  // Platform bars
+  const maxP = Math.max(...(d.platforms||[]).map(p=>p.mentions));
+  const platformBars = (d.platforms||[]).map(p=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+    <div style="width:90px;font-size:11px;font-weight:700;color:#333">${p.name}</div>
+    <div style="flex:1;background:#f0f0ee;border-radius:99px;height:8px;overflow:hidden"><div style="width:${Math.round(p.mentions/maxP*100)}%;height:8px;border-radius:99px;background:#7A8B5E"></div></div>
+    <div style="font-size:11px;font-weight:800;width:28px;text-align:right;color:#555">${p.mentions}</div>
+  </div>`).join('');
 
-  const card2 = `<div style="${C}">
-    <div style="${CT}">Avg Rating (Review Platforms)</div>
-    <div style="${KV};color:#C47D0E">${d.ratings.avg}<span style="font-size:16px;color:#bbb">/5</span></div>
-    <div style="${KL}">Across ${d.ratings.platforms}</div>
-    ${DIV}
-    <div style="font-size:10px;color:#555;line-height:1.8">
-      ${d.ratings.products.map(p=>`<div>${p.emoji} ${p.name} &nbsp;<strong>${p.rating}</strong> (${p.note})</div>`).join('')}
-    </div>
-  </div>`;
+  // Hashtags
+  const maxH = Math.max(...(d.hashtags||[]).map(h=>h.count));
+  const hashtags = (d.hashtags||[]).map(h=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:7px">
+    <div style="flex:1;font-size:11px;color:#333">${h.tag}</div>
+    <div style="width:70px;background:#f0f0ee;border-radius:99px;height:6px;overflow:hidden"><div style="width:${Math.round(h.count/maxH*100)}%;height:6px;border-radius:99px;background:#C47D0E"></div></div>
+    <div style="font-size:10px;font-weight:700;color:#C47D0E;width:20px;text-align:right">${h.count}</div>
+  </div>`).join('');
 
-  const card3 = `<div style="${C}">
-    <div style="${CT}">Top Selling Products (Shopee)</div>
-    <div style="${KV};color:#1a1a1a">${d.topSelling.highlight}</div>
-    <div style="${KL}">${d.topSelling.highlightSub}</div>
-    ${DIV}
-    <div style="font-size:10px;color:#555;line-height:1.8">
-      ${d.topSelling.products.map(p=>`<div>${p.rank}. ${p.name} &nbsp;<strong>${p.units}</strong></div>`).join('')}
-    </div>
-  </div>`;
-
-  const srcStyle = {
-    tt: 'background:#e8f4ff;color:#1a6fc4',
-    fd: 'background:#FFE4F0;color:#c0166e',
-    sc: 'background:#f0e8ff;color:#6b2fc4',
-    ws: 'background:#e8f8f0;color:#2c7c45',
-  };
-  const sentColor = { pos:'#7A8B5E', mix:'#C47D0E', neu:'#888' };
-  const quotes = (d.quotes||[]).map((q,i)=>{
-    const uid = 'slq'+i;
-    return `<div style="background:#f8f8f6;border:1.5px solid #e8e8e4;border-radius:10px;padding:10px 12px;margin-bottom:8px">
-      <div style="font-size:11px;line-height:1.5;color:#333;font-style:italic;margin-bottom:8px">${q.text}</div>
-      <div style="display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none" onclick="(function(el){var b=document.getElementById('${uid}');var open=b.style.display!=='none';b.style.display=open?'none':'block';el.querySelector('.slqchv').style.transform=open?'':'rotate(180deg)'})(this)">
-        <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;${srcStyle[q.srcType]||srcStyle.ws}">${q.src}</span>
-        <span style="font-size:9px;font-weight:700;color:${sentColor[q.sentType]||'#888'}">● ${q.sentiment}</span>
-        <span class="slqchv" style="margin-left:auto;font-size:11px;color:#aaa;transition:transform 0.2s">&#8964;</span>
+  // Influencers by SOV
+  const sovRows = (d.influencersSov||[]).map((f,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f0f0ee">
+      <div style="font-size:11px;color:#bbb;width:14px;font-weight:700">${i+1}</div>
+      <div style="flex:1">
+        <div style="font-size:11px;font-weight:700;color:#333">@${f.name}</div>
+        <div style="font-size:9px;color:#888">${f.platform} · ${f.mentions} mentions · ${f.reach} reach</div>
       </div>
-      <div id="${uid}" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid #e8e8e4">
-        ${q.url ? `<a href="${q.url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:#1a6fc4;text-decoration:none;${srcStyle[q.srcType]||srcStyle.ws};padding:3px 8px;border-radius:4px">${q.src} <span style="font-size:10px">↗</span></a>` : ''}
+      <div style="font-size:13px;font-weight:900;color:#7A8B5E">${f.sov}</div>
+    </div>`).join('');
+
+  // Influencers by followers
+  const followerRows = (d.influencersFollowers||[]).map((f,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f0f0ee">
+      <div style="font-size:11px;color:#bbb;width:14px;font-weight:700">${i+1}</div>
+      <div style="flex:1">
+        <div style="font-size:11px;font-weight:700;color:#333">@${f.name}</div>
+        <div style="font-size:9px;color:#888">${f.platform}</div>
       </div>
-    </div>`;
-  }).join('');
+      <div style="text-align:right">
+        <div style="font-size:11px;font-weight:800;color:#1a1a1a">${f.followers}</div>
+        <div style="font-size:9px;color:#aaa">followers</div>
+      </div>
+    </div>`).join('');
 
-  const heatStyle = { h:'background:#fff3e0;color:#C47D0E', m:'background:#f0f4ea;color:#7A8B5E', l:'background:#f5f5f5;color:#888' };
-  const heatLabel = { h:'High', m:'Med', l:'Low' };
-  const themes = (d.themes||[]).map(t=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-    <div style="font-size:14px;width:22px;text-align:center">${t.emoji}</div>
-    <div style="flex:1">
-      <div style="font-size:11px;font-weight:700">${t.name}</div>
-      <div style="font-size:10px;color:#888;margin-top:1px">${t.sub}</div>
-    </div>
-    <span style="font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;${heatStyle[t.heat]}">${heatLabel[t.heat]}${t.warn?' ⚠️':''}</span>
+  // Topics
+  const tSentBg    = {Positive:'#f0f4ea',Negative:'#fff0f0',Mixed:'#fff9f0',Neutral:'#f5f5f5'};
+  const tSentColor = {Positive:'#7A8B5E',Negative:'#C0392B',Mixed:'#C47D0E',Neutral:'#888'  };
+  const topics = (d.topics||[]).map(t=>`
+    <div style="${C};display:flex;align-items:center;gap:10px">
+      <span style="font-size:20px">${t.icon}</span>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#1a1a1a;margin-bottom:4px">${t.name}</div>
+        <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${tSentBg[t.sentiment]||'#f5f5f5'};color:${tSentColor[t.sentiment]||'#888'}">${t.sentiment}</span>
+      </div>
+    </div>`).join('');
+
+  // Recent mentions
+  const sc = {Positive:'#7A8B5E',Negative:'#C0392B',Neutral:'#888',Mixed:'#C47D0E'};
+  const pb = {'TikTok':'background:#e8f4ff;color:#1a6fc4','X/Twitter':'background:#f0e8ff;color:#5b21b6','Other':'background:#f5f5f5;color:#888'};
+  const recentMentions = (d.recentMentions||[]).map(m=>`
+    <div style="padding:9px 0;border-bottom:1px solid #f0f0ee">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;color:#1a1a1a">@${m.author}</span>
+        <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;${pb[m.platform]||pb.Other}">${m.platform}</span>
+        <span style="font-size:9px;font-weight:700;color:${sc[m.sentiment]||'#888'}">● ${m.sentiment}</span>
+        <span style="margin-left:auto;font-size:9px;color:#bbb">${m.date}</span>
+      </div>
+      <div style="font-size:11px;color:#555;line-height:1.5">${m.content}</div>
+    </div>`).join('');
+
+  // Period comparison table
+  const cmp = d.comparison||{};
+  const cmpRows = [
+    {label:'Total Mentions', cur:cmp.current?.mentions,  prv:cmp.previous?.mentions },
+    {label:'Total Reach',    cur:cmp.current?.reach,     prv:cmp.previous?.reach    },
+    {label:'Positive Rate',  cur:cmp.current?.positive,  prv:cmp.previous?.positive },
+    {label:'Negative Rate',  cur:cmp.current?.negative,  prv:cmp.previous?.negative },
+    {label:'Presence Score', cur:cmp.current?.score,     prv:cmp.previous?.score    },
+    {label:'AVE',            cur:cmp.current?.ave,       prv:cmp.previous?.ave      },
+  ].map(r=>`<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #f0f0ee;font-size:11px">
+    <div style="flex:1;color:#555">${r.label}</div>
+    <div style="width:80px;text-align:center;font-weight:700;color:#1a1a1a">${r.cur}</div>
+    <div style="width:80px;text-align:center;color:#888">${r.prv}</div>
   </div>`).join('');
 
-  const platforms = (d.platforms||[]).map(p=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
-    <div style="font-size:11px;font-weight:700;width:100px">${p.name}</div>
-    <div style="flex:1;background:#f0f0ee;border-radius:99px;height:6px;overflow:hidden"><div style="width:${p.pct}%;height:6px;border-radius:99px;background:${p.danger?'#C0392B':'#7A8B5E'}"></div></div>
-    <div style="font-size:10px;width:80px;text-align:right;color:${p.danger?'#C0392B':'#888'}">${p.note}</div>
-  </div>`).join('');
-
-  const signals = (d.signals||[]).map(s=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:8px;background:${s.bg};border-radius:8px;margin-bottom:8px">
-    <span style="font-size:13px">${s.icon}</span>
-    <div>
-      <div style="font-size:11px;font-weight:700">${s.title}</div>
-      <div style="font-size:10px;color:#555">${s.body}</div>
-    </div>
-  </div>`).join('');
-
-  return H.vh('Social Listening — From This Island', d.desc, d.updated, d.alertBadge)
-    + alert
-    + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">${card1}${card2}${card3}</div>`
-    + `<div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px">
-        <div style="${C}"><div style="${CT}">Organic Quotes from Users</div>${quotes}</div>
-        <div>
-          <div style="${C};margin-bottom:12px"><div style="${CT}">Top Organic Themes</div>${themes}</div>
-          <div style="${C}"><div style="${CT}">Platform Coverage</div>${platforms}</div>
-        </div>
+  return H.vh('Social Listening — Brand24', d.desc, d.updated, d.alertBadge)
+    + `<div style="font-size:10px;color:#888;margin-bottom:12px">Period: <strong>${d.period}</strong> · Source: Brand24 · Higher than 45% of brands in Presence Score</div>`
+    + `<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px">${kpis}</div>`
+    + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+        <div style="${C}"><div style="${CT}">Sentiment Breakdown</div>${sentBars}</div>
+        <div style="${C}"><div style="${CT}">Mentions by Platform</div>${platformBars}</div>
+        <div style="${C}"><div style="${CT}">Trending Hashtags</div>${hashtags}</div>
       </div>`
     + `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-        <div style="${C}"><div style="${CT}">Brand Signals — Notable Events</div>${signals}</div>
-        <div style="${C}"><div style="${CT}">What People Are Saying — Summary</div><div style="font-size:11px;line-height:1.8;color:#333">${d.summary||''}</div></div>
+        <div style="${C}"><div style="${CT}">Top Influencers — Share of Voice</div>${sovRows}</div>
+        <div style="${C}"><div style="${CT}">Top Influencers — Most Followers</div>${followerRows}</div>
       </div>`
-    + `<div style="background:#f5f5f5;border-radius:8px;padding:8px 12px;font-size:10px;color:#888;display:flex;gap:6px;align-items:center">
-        <span>ℹ️</span><span>Data source: Google-indexed public content (TikTok, editorial blogs, Female Daily, SOCO/Sociolla, Shopee). X and Threads direct feed not accessible without paid API. Sentiment estimated from qualitative review reading. This is an Option A (free) preview run — not live monitoring.</span>
+    + `<div style="${C};margin-bottom:12px">
+        <div style="${CT}">Top Discussion Topics</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">${topics}</div>
+      </div>`
+    + `<div style="display:grid;grid-template-columns:3fr 2fr;gap:12px;margin-bottom:12px">
+        <div style="${C}">
+          <div style="${CT}">Recent Mentions</div>
+          ${recentMentions}
+        </div>
+        <div style="${C}">
+          <div style="${CT}">Period Comparison</div>
+          <div style="display:flex;font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1px;padding-bottom:6px;border-bottom:1.5px solid #e8e8e4;margin-bottom:2px">
+            <div style="flex:1"></div>
+            <div style="width:80px;text-align:center">${cmp.current?.label||'Current'}</div>
+            <div style="width:80px;text-align:center">${cmp.previous?.label||'Previous'}</div>
+          </div>
+          ${cmpRows}
+        </div>
       </div>`
     + vGoogleAlertsFeed();
 }
@@ -3062,7 +3097,7 @@ let DATA = {};
 let activeId = null;
 
 const WIP_IDS = [
-  'review-score', 'social-listening',
+  'review-score',
   'competitor-alerts', 'competitor-sentiments',
 ];
 
