@@ -1593,11 +1593,11 @@ function vSocialListening(d) {
   const tSentBg    = {Positive:'#f0f4ea',Negative:'#fff0f0',Mixed:'#fff9f0',Neutral:'#f5f5f5'};
   const tSentColor = {Positive:'#7A8B5E',Negative:'#C0392B',Mixed:'#C47D0E',Neutral:'#888'  };
   const topics = (d.topics||[]).map(t=>`
-    <div style="${C};display:flex;align-items:center;gap:10px">
-      <span style="font-size:20px">${t.icon}</span>
+    <div style="${C};display:flex;align-items:center;gap:12px;padding:16px">
+      <span style="font-size:26px;flex-shrink:0">${t.icon}</span>
       <div>
-        <div style="font-size:11px;font-weight:700;color:#1a1a1a;margin-bottom:4px">${t.name}</div>
-        <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${tSentBg[t.sentiment]||'#f5f5f5'};color:${tSentColor[t.sentiment]||'#888'}">${t.sentiment}</span>
+        <div style="font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:6px;line-height:1.3">${t.name}</div>
+        <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:${tSentBg[t.sentiment]||'#f5f5f5'};color:${tSentColor[t.sentiment]||'#888'}">${t.sentiment}</span>
       </div>
     </div>`).join('');
 
@@ -1682,21 +1682,21 @@ function vSocialListening(d) {
 
   return H.vh('Social Listening — Brand24', d.desc, d.updated, d.alertBadge)
     + aiSummary
-    + `<div style="font-size:10px;color:#888;margin-bottom:12px">Period: <strong>${d.period}</strong> · Source: Brand24 · Higher than 45% of brands in Presence Score</div>`
+    + `<div style="font-size:10px;color:#888;margin-bottom:12px">Period: <strong>${d.period}</strong> · Source: Brand24 Full Report · Higher than 45% of brands in Presence Score</div>`
     + `<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px">${kpis}</div>`
-    + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
-        <div style="${C}"><div style="${CT}">Sentiment Breakdown</div>${sentBars}</div>
-        <div style="${C}"><div style="${CT}">Mentions by Platform</div>${platformBars}</div>
-        <div style="${C}"><div style="${CT}">Trending Hashtags</div>${hashtags}</div>
+    + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;align-items:stretch">
+        <div style="${C};display:flex;flex-direction:column;justify-content:space-between"><div style="${CT}">Sentiment Breakdown</div><div style="flex:1;display:flex;flex-direction:column;justify-content:center">${sentBars}</div></div>
+        <div style="${C};display:flex;flex-direction:column;justify-content:space-between"><div style="${CT}">Mentions by Platform</div><div style="flex:1;display:flex;flex-direction:column;justify-content:center">${platformBars}</div></div>
+        <div style="${C};display:flex;flex-direction:column"><div style="${CT}">Trending Hashtags</div><div style="flex:1">${hashtags}</div></div>
       </div>`
-    + `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-        <div style="${C}">
+    + `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;align-items:stretch">
+        <div style="${C};display:flex;flex-direction:column">
           <div style="${CT}">Top Discussion Topics</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${topics}</div>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:10px">${topics.replace(/display:flex;align-items:center/g,'display:flex;align-items:center;height:100%')}</div>
         </div>
-        <div style="${C}">
-          <div style="${CT}">Word Association · Live from hashtag data</div>
-          ${wordCloud}
+        <div style="${C};display:flex;flex-direction:column">
+          <div style="${CT}">Word Association · Live from Brand24 data</div>
+          <div style="flex:1;display:flex;align-items:center">${wordCloud.replace('height:240px','height:100%;min-height:220px')}</div>
           <div style="font-size:9px;color:#bbb;text-align:center;margin-top:4px">Size = mention frequency · Updates each report cycle</div>
         </div>
       </div>`
