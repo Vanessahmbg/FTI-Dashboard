@@ -1544,10 +1544,16 @@ function vSocialListening(d) {
 
   // Platform bars
   const maxP = Math.max(...(d.platforms||[]).map(p=>p.mentions));
-  const platformBars = (d.platforms||[]).map(p=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-    <div style="width:90px;font-size:11px;font-weight:700;color:#333">${p.name}</div>
-    <div style="flex:1;background:#f0f0ee;border-radius:99px;height:8px;overflow:hidden"><div style="width:${Math.round(p.mentions/maxP*100)}%;height:8px;border-radius:99px;background:#7A8B5E"></div></div>
-    <div style="font-size:11px;font-weight:800;width:28px;text-align:right;color:#555">${p.mentions}</div>
+  const platformNote = { 'X / Twitter': 'incl. brand replies' };
+  const platformBars = (d.platforms||[]).map(p=>`<div style="margin-bottom:8px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:90px">
+        <div style="font-size:11px;font-weight:700;color:#333">${p.name}</div>
+        ${platformNote[p.name]?`<div style="font-size:9px;color:#aaa;font-style:italic">${platformNote[p.name]}</div>`:''}
+      </div>
+      <div style="flex:1;background:#f0f0ee;border-radius:99px;height:8px;overflow:hidden"><div style="width:${Math.round(p.mentions/maxP*100)}%;height:8px;border-radius:99px;background:${p.name==='X / Twitter'?'#b0b8c8':'#7A8B5E'}"></div></div>
+      <div style="font-size:11px;font-weight:800;width:28px;text-align:right;color:${p.name==='X / Twitter'?'#aaa':'#555'}">${p.mentions}</div>
+    </div>
   </div>`).join('');
 
   // Hashtags
@@ -1632,12 +1638,12 @@ function vSocialListening(d) {
       <div style="flex:1">
         <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#7A8B5E;margin-bottom:6px">AI Summary · Brand24 Report ${d.period||''}</div>
         <div style="font-size:12.5px;color:#2d2d2d;line-height:1.65">
-          FTI received <strong>140 mentions</strong> in the past 2 weeks with <strong>39K total reach</strong> — a modest <strong>+7% reach gain</strong> despite flat mention count. Sentiment skews positive at <strong>53%</strong>, driven largely by organic TikTok content (66 mentions) and X/Twitter engagement (72 mentions). The <strong>Presence Score of 13/100</strong> puts FTI above 45% of tracked brands, up +133% from the prior period.
+          FTI received <strong>140 mentions</strong> over 2 weeks with <strong>39K total reach</strong> (+7%). The strongest <strong>organic signal is TikTok</strong> — 66 unprompted mentions where users independently share FTI content to their own audiences. X/Twitter's 72 mentions are higher in count but include a significant share of replies to FTI's own tweets, making them less indicative of organic brand conversation. Sentiment is <strong>53% positive</strong> and the <strong>Presence Score hit 13/100</strong> — up +133% from the prior period, now above 45% of tracked brands.
         </div>
         <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px">
-          <span style="font-size:10px;background:#fff;border:1px solid #d0dbb8;border-radius:6px;padding:3px 9px;color:#5a7040;font-weight:600">🛍️ Lip Butter & Vitamin C Serum trending</span>
-          <span style="font-size:10px;background:#fff;border:1px solid #d0dbb8;border-radius:6px;padding:3px 9px;color:#5a7040;font-weight:600">📣 Maudy Ayunda affiliation drives discovery</span>
-          <span style="font-size:10px;background:#fff3e0;border:1px solid #e8c87a;border-radius:6px;padding:3px 9px;color:#b36b00;font-weight:600">⚠ Only 3 negative mentions — monitor serum claims</span>
+          <span style="font-size:10px;background:#fff;border:1px solid #d0dbb8;border-radius:6px;padding:3px 9px;color:#5a7040;font-weight:600">🛍️ Lip Butter & Vitamin C Serum trending organically</span>
+          <span style="font-size:10px;background:#fff;border:1px solid #d0dbb8;border-radius:6px;padding:3px 9px;color:#5a7040;font-weight:600">📣 TikTok is the key organic discovery channel</span>
+          <span style="font-size:10px;background:#fff3e0;border:1px solid #e8c87a;border-radius:6px;padding:3px 9px;color:#b36b00;font-weight:600">⚠ X/Twitter count inflated by brand reply threads</span>
         </div>
       </div>
     </div>
