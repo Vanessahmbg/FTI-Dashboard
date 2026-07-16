@@ -1627,8 +1627,8 @@ function vSocialListening(d) {
     return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:240px">${els.join('')}</svg>`;
   }
   const cloudWords = [
-    ...(d.hashtags||[]).map(h=>({text:h.tag.replace(/^#/,''), count:h.count})),
-    ...(d.topics||[]).flatMap(t=>t.name.split(' ').filter(w=>w.length>3).map(w=>({text:w,count:10}))),
+    ...(d.keywords||[]),
+    ...(d.topics||[]).map(t=>({text:t.name, count:9})),
   ];
   const wordCloud = makeWordCloud(cloudWords, 380, 240);
 
