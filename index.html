@@ -1625,7 +1625,26 @@ function vSocialListening(d) {
     <div style="width:80px;text-align:center;color:#888">${r.prv}</div>
   </div>`).join('');
 
+  // AI summary
+  const aiSummary = `<div style="background:linear-gradient(135deg,#f5f2ea 0%,#eef2e8 100%);border:1.5px solid #d0dbb8;border-radius:12px;padding:16px 18px;margin-bottom:14px;position:relative">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:#7A8B5E;display:flex;align-items:center;justify-content:center;font-size:15px">✦</div>
+      <div style="flex:1">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#7A8B5E;margin-bottom:6px">AI Summary · Brand24 Report ${d.period||''}</div>
+        <div style="font-size:12.5px;color:#2d2d2d;line-height:1.65">
+          FTI received <strong>140 mentions</strong> in the past 2 weeks with <strong>39K total reach</strong> — a modest <strong>+7% reach gain</strong> despite flat mention count. Sentiment skews positive at <strong>53%</strong>, driven largely by organic TikTok content (66 mentions) and X/Twitter engagement (72 mentions). The <strong>Presence Score of 13/100</strong> puts FTI above 45% of tracked brands, up +133% from the prior period.
+        </div>
+        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px">
+          <span style="font-size:10px;background:#fff;border:1px solid #d0dbb8;border-radius:6px;padding:3px 9px;color:#5a7040;font-weight:600">🛍️ Lip Butter & Vitamin C Serum trending</span>
+          <span style="font-size:10px;background:#fff;border:1px solid #d0dbb8;border-radius:6px;padding:3px 9px;color:#5a7040;font-weight:600">📣 Maudy Ayunda affiliation drives discovery</span>
+          <span style="font-size:10px;background:#fff3e0;border:1px solid #e8c87a;border-radius:6px;padding:3px 9px;color:#b36b00;font-weight:600">⚠ Only 3 negative mentions — monitor serum claims</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
   return H.vh('Social Listening — Brand24', d.desc, d.updated, d.alertBadge)
+    + aiSummary
     + `<div style="font-size:10px;color:#888;margin-bottom:12px">Period: <strong>${d.period}</strong> · Source: Brand24 · Higher than 45% of brands in Presence Score</div>`
     + `<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px">${kpis}</div>`
     + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
