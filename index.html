@@ -1634,17 +1634,16 @@ function vSocialListening(d) {
 
   // Recent mentions
   const sc = {Positive:'#7A8B5E',Negative:'#C0392B',Neutral:'#888',Mixed:'#C47D0E'};
-  const pbStyle = p => p==='TikTok' ? 'background:#e8f4ff;color:#1a6fc4' : p.startsWith('X') ? 'background:#f0e8ff;color:#5b21b6' : 'background:#f5f5f5;color:#888';
+  const pbStyle = p => p==='TikTok' ? 'background:#e8f4ff;color:#1a6fc4' : p.startsWith('X') ? 'background:#f0f0f8;color:#7c6bc9' : 'background:#f5f5f5;color:#888';
   const recentMentions = (d.recentMentions||[]).map(m=>`
-    <div style="padding:9px 0;border-bottom:1px solid #f0f0ee">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap">
-        <span style="font-size:11px;font-weight:700;color:#1a1a1a">@${m.author}</span>
-        <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;${pbStyle(m.platform)}">${m.platform}</span>
-        <span style="font-size:9px;font-weight:700;color:${sc[m.sentiment]||'#888'}">● ${m.sentiment}</span>
-        ${m.reach!=null?`<span style="font-size:9px;color:#aaa">${m.reach} reach</span>`:''}
-        <span style="margin-left:auto;font-size:9px;color:#bbb">${m.date}</span>
+    <div style="padding:10px 0;border-bottom:1px solid #f4f4f2">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <span style="font-size:11px;font-weight:700;color:#1a1a1a">${m.author}</span>
+        <span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:99px;${pbStyle(m.platform)}">${m.platform}</span>
+        <span style="font-size:9px;font-weight:600;color:${sc[m.sentiment]||'#888'}">· ${m.sentiment}</span>
+        <span style="margin-left:auto;font-size:9px;color:#ccc">${m.date}</span>
       </div>
-      <div style="font-size:11px;color:#555;line-height:1.5">${m.content}</div>
+      <div style="font-size:11px;color:#666;line-height:1.55">${m.content}</div>
     </div>`).join('');
 
   // Period comparison table
@@ -1681,17 +1680,31 @@ function vSocialListening(d) {
 
   return H.vh('Social Listening — Brand24', d.desc, d.updated, d.alertBadge)
     + aiSummary
-    + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:12px">
-        <div style="${C}"><div style="${CT}">Sentiment Breakdown</div><div style="padding-top:6px">${sentBars}</div></div>
-        <div style="${C}"><div style="${CT}">Mentions by Platform</div><div style="padding-top:6px">${platformBars}</div></div>
-        <div style="${C}"><div style="${CT}">Trending Hashtags</div><div style="padding-top:4px">${hashtags}</div></div>
-        <div style="${C}"><div style="${CT}">Top Discussion Topics</div>${topics}</div>
+    + `<div style="${C};margin-bottom:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0">
+          <div style="padding-right:20px;border-right:1.5px solid #f0f0ee">
+            <div style="${CT}">Sentiment</div>
+            <div style="padding-top:4px">${sentBars}</div>
+          </div>
+          <div style="padding:0 20px;border-right:1.5px solid #f0f0ee">
+            <div style="${CT}">Platform</div>
+            <div style="padding-top:4px">${platformBars}</div>
+          </div>
+          <div style="padding:0 20px;border-right:1.5px solid #f0f0ee">
+            <div style="${CT}">Hashtags</div>
+            <div style="padding-top:4px">${hashtags}</div>
+          </div>
+          <div style="padding-left:20px">
+            <div style="${CT}">Topics</div>
+            ${topics}
+          </div>
+        </div>
       </div>`
     + `<div style="display:grid;grid-template-columns:3fr 2fr;gap:12px;margin-bottom:12px">
         <div style="${C}">
-          <div style="${CT}">Word Association · Live from Brand24 data</div>
+          <div style="${CT}">Word Association</div>
           ${wordCloud}
-          <div style="font-size:9px;color:#bbb;text-align:center;margin-top:2px">Size = mention frequency · Updates each report cycle</div>
+          <div style="font-size:9px;color:#ccc;text-align:center;margin-top:2px">Size = mention frequency · updates each report cycle</div>
         </div>
         <div style="${C}">
           <div style="${CT}">Recent Mentions</div>
