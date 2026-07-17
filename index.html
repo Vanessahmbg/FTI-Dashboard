@@ -1678,38 +1678,45 @@ function vSocialListening(d) {
     </div>
   </div>`;
 
+  // Top 5 hashtags only
+  const hashtagsTop5 = (d.hashtags||[]).slice(0,5);
+  const maxH5 = Math.max(...hashtagsTop5.map(h=>h.count));
+  const hashtags5 = hashtagsTop5.map(h=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+    <div style="flex:1;font-size:11px;color:#333">${h.tag}</div>
+    <div style="width:70px;background:#f0f0ee;border-radius:99px;height:6px;overflow:hidden"><div style="width:${Math.round(h.count/maxH5*100)}%;height:6px;border-radius:99px;background:#C47D0E"></div></div>
+    <div style="font-size:10px;font-weight:700;color:#C47D0E;width:20px;text-align:right">${h.count}</div>
+  </div>`).join('');
+
   return H.vh('Social Listening — Brand24', d.desc, d.updated, d.alertBadge)
     + aiSummary
-    + `<div style="${C};margin-bottom:12px">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0">
-          <div style="padding-right:20px;border-right:1.5px solid #f0f0ee">
-            <div style="${CT}">Sentiment</div>
-            <div style="padding-top:4px">${sentBars}</div>
-          </div>
-          <div style="padding:0 20px;border-right:1.5px solid #f0f0ee">
-            <div style="${CT}">Platform</div>
-            <div style="padding-top:4px">${platformBars}</div>
-          </div>
-          <div style="padding:0 20px;border-right:1.5px solid #f0f0ee">
-            <div style="${CT}">Hashtags</div>
-            <div style="padding-top:4px">${hashtags}</div>
-          </div>
-          <div style="padding-left:20px">
-            <div style="${CT}">Topics</div>
-            ${topics}
-          </div>
+    + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+        <div style="${C}">
+          <div style="${CT}">Sentiment</div>
+          <div style="padding-top:2px">${sentBars}</div>
+        </div>
+        <div style="${C}">
+          <div style="${CT}">Platform</div>
+          <div style="padding-top:2px">${platformBars}</div>
+        </div>
+        <div style="${C}">
+          <div style="${CT}">Hashtags</div>
+          <div style="padding-top:2px">${hashtags5}</div>
         </div>
       </div>`
-    + `<div style="display:grid;grid-template-columns:3fr 2fr;gap:12px;margin-bottom:12px">
+    + `<div style="display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:12px">
+        <div style="${C}">
+          <div style="${CT}">Topics</div>
+          ${topics}
+        </div>
         <div style="${C}">
           <div style="${CT}">Word Association</div>
           ${wordCloud}
           <div style="font-size:9px;color:#ccc;text-align:center;margin-top:2px">Size = mention frequency · updates each report cycle</div>
         </div>
-        <div style="${C}">
-          <div style="${CT}">Recent Mentions</div>
-          ${recentMentions}
-        </div>
+      </div>`
+    + `<div style="${C};margin-bottom:12px">
+        <div style="${CT}">Recent Mentions</div>
+        ${recentMentions}
       </div>`
     + vGoogleAlertsFeed();
 }
