@@ -1593,11 +1593,11 @@ function vSocialListening(d) {
   const tSentBg    = {Positive:'#f0f4ea',Negative:'#fff0f0',Mixed:'#fff9f0',Neutral:'#f5f5f5'};
   const tSentColor = {Positive:'#7A8B5E',Negative:'#C0392B',Mixed:'#C47D0E',Neutral:'#888'  };
   const topics = (d.topics||[]).map((t,i,arr)=>`
-    <div style="display:flex;align-items:center;gap:12px;padding:13px 0;${i<arr.length-1?'border-bottom:1px solid #f0f0ee':''}">
-      <span style="font-size:22px;flex-shrink:0">${t.icon}</span>
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 0;${i<arr.length-1?'border-bottom:1px solid #f0f0ee':''}">
+      <span style="font-size:18px;flex-shrink:0">${t.icon}</span>
       <div style="flex:1">
-        <div style="font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:4px">${t.name}</div>
-        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:${tSentBg[t.sentiment]||'#f5f5f5'};color:${tSentColor[t.sentiment]||'#888'}">${t.sentiment}</span>
+        <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:3px">${t.name}</div>
+        <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${tSentBg[t.sentiment]||'#f5f5f5'};color:${tSentColor[t.sentiment]||'#888'}">${t.sentiment}</span>
       </div>
     </div>`).join('');
 
@@ -1681,12 +1681,12 @@ function vSocialListening(d) {
 
   return H.vh('Social Listening — Brand24', d.desc, d.updated, d.alertBadge)
     + aiSummary
-    + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+    + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;align-items:start">
         <div style="${C}"><div style="${CT}">Sentiment Breakdown</div><div style="padding-top:6px">${sentBars}</div></div>
         <div style="${C}"><div style="${CT}">Mentions by Platform</div><div style="padding-top:6px">${platformBars}</div></div>
-        <div style="${C}"><div style="${CT}">Trending Hashtags</div>${hashtags}</div>
+        <div style="${C}"><div style="${CT}">Trending Hashtags</div><div style="padding-top:4px">${hashtags}</div></div>
       </div>`
-    + `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    + `<div style="display:grid;grid-template-columns:2fr 3fr;gap:12px;margin-bottom:12px;align-items:start">
         <div style="${C}">
           <div style="${CT}">Top Discussion Topics</div>
           ${topics}
@@ -1694,10 +1694,10 @@ function vSocialListening(d) {
         <div style="${C}">
           <div style="${CT}">Word Association · Live from Brand24 data</div>
           ${wordCloud}
-          <div style="font-size:9px;color:#bbb;text-align:center;margin-top:4px">Size = mention frequency · Updates each report cycle</div>
+          <div style="font-size:9px;color:#bbb;text-align:center;margin-top:2px">Size = mention frequency · Updates each report cycle</div>
         </div>
       </div>`
-    + `<div style="display:grid;grid-template-columns:3fr 2fr;gap:12px;margin-bottom:12px">
+    + `<div style="display:grid;grid-template-columns:3fr 2fr;gap:12px;margin-bottom:12px;align-items:start">
         <div style="${C}">
           <div style="${CT}">Recent Mentions</div>
           ${recentMentions}
