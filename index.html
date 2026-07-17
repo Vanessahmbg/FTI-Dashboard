@@ -1608,11 +1608,11 @@ function vSocialListening(d) {
   const emotionBars = `<div style="display:flex;flex-direction:column;justify-content:space-between;height:100%">`
     + emotions.map(e=>`
     <div style="display:flex;align-items:center;gap:8px">
-      <div style="width:88px;font-size:11.5px;font-weight:600;color:#444">${e.name}</div>
-      <div style="flex:1;background:#f0f0ee;border-radius:99px;height:8px;overflow:hidden">
-        <div style="width:${e.pct}%;height:8px;border-radius:99px;background:${e.color}"></div>
+      <div style="width:100px;font-size:13.5px;font-weight:600;color:#444">${e.name}</div>
+      <div style="flex:1;background:#f0f0ee;border-radius:99px;height:9px;overflow:hidden">
+        <div style="width:${e.pct}%;height:9px;border-radius:99px;background:${e.color}"></div>
       </div>
-      <div style="font-size:11px;font-weight:700;width:28px;text-align:right;color:${e.color}">${e.pct}%</div>
+      <div style="font-size:13px;font-weight:700;width:32px;text-align:right;color:${e.color}">${e.pct}%</div>
     </div>`).join('')
     + `</div>`;
 
