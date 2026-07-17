@@ -1544,17 +1544,12 @@ function vSocialListening(d) {
 
   // Platform bars
   const maxP = Math.max(...(d.platforms||[]).map(p=>p.mentions));
-  const platformNote = { 'X / Twitter': 'incl. brand replies' };
-  const platformBars = (d.platforms||[]).map(p=>`<div style="margin-bottom:16px">
-    <div style="display:flex;align-items:center;gap:10px">
-      <div style="width:90px">
-        <div style="font-size:12px;font-weight:700;color:#333">${p.name}</div>
-        ${platformNote[p.name]?`<div style="font-size:9px;color:#aaa;font-style:italic">${platformNote[p.name]}</div>`:''}
-      </div>
-      <div style="flex:1;background:#f0f0ee;border-radius:99px;height:10px;overflow:hidden"><div style="width:${Math.round(p.mentions/maxP*100)}%;height:10px;border-radius:99px;background:${p.name==='X / Twitter'?'#b0b8c8':'#7A8B5E'}"></div></div>
-      <div style="font-size:13px;font-weight:800;width:32px;text-align:right;color:${p.name==='X / Twitter'?'#aaa':'#555'}">${p.mentions}</div>
-    </div>
-  </div>`).join('');
+  const platformBars = (d.platforms||[]).map(p=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+    <div style="width:90px;font-size:12px;font-weight:700;color:#333">${p.name}</div>
+    <div style="flex:1;background:#f0f0ee;border-radius:99px;height:10px;overflow:hidden"><div style="width:${Math.round(p.mentions/maxP*100)}%;height:10px;border-radius:99px;background:${p.name==='X / Twitter'?'#b0b8c8':'#7A8B5E'}"></div></div>
+    <div style="font-size:13px;font-weight:800;width:32px;text-align:right;color:${p.name==='X / Twitter'?'#aaa':'#555'}">${p.mentions}</div>
+  </div>`).join('')
+  + `<div style="font-size:9px;color:#bbb;font-style:italic;margin-top:-4px">X / Twitter incl. brand replies</div>`;
 
   // Hashtags
   const maxH = Math.max(...(d.hashtags||[]).map(h=>h.count));
