@@ -1681,12 +1681,16 @@ function vSocialListening(d) {
 
   return H.vh('Social Listening — Brand24', d.desc, d.updated, d.alertBadge)
     + aiSummary
-    + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;align-items:start">
-        <div style="${C}"><div style="${CT}">Sentiment Breakdown</div><div style="padding-top:6px">${sentBars}</div></div>
-        <div style="${C}"><div style="${CT}">Mentions by Platform</div><div style="padding-top:6px">${platformBars}</div></div>
+    + `<div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px">
+        <div style="${C}">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div><div style="${CT}">Sentiment Breakdown</div><div style="padding-top:6px">${sentBars}</div></div>
+            <div><div style="${CT}">Mentions by Platform</div><div style="padding-top:6px">${platformBars}</div></div>
+          </div>
+        </div>
         <div style="${C}"><div style="${CT}">Trending Hashtags</div><div style="padding-top:4px">${hashtags}</div></div>
       </div>`
-    + `<div style="display:grid;grid-template-columns:2fr 3fr;gap:12px;margin-bottom:12px;align-items:start">
+    + `<div style="display:grid;grid-template-columns:2fr 3fr;gap:12px;margin-bottom:12px">
         <div style="${C}">
           <div style="${CT}">Top Discussion Topics</div>
           ${topics}
@@ -1697,7 +1701,7 @@ function vSocialListening(d) {
           <div style="font-size:9px;color:#bbb;text-align:center;margin-top:2px">Size = mention frequency · Updates each report cycle</div>
         </div>
       </div>`
-    + `<div style="display:grid;grid-template-columns:3fr 2fr;gap:12px;margin-bottom:12px;align-items:start">
+    + `<div style="display:grid;grid-template-columns:3fr 2fr;gap:12px;margin-bottom:12px">
         <div style="${C}">
           <div style="${CT}">Recent Mentions</div>
           ${recentMentions}
