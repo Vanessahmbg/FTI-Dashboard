@@ -1605,14 +1605,16 @@ function vSocialListening(d) {
     {name:'Anger',        pct:1,  color:'#e84040'},
     {name:'Sadness',      pct:1,  color:'#4a8cc4'},
   ];
-  const emotionBars = emotions.map(e=>`
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+  const emotionBars = `<div style="display:flex;flex-direction:column;justify-content:space-between;height:100%">`
+    + emotions.map(e=>`
+    <div style="display:flex;align-items:center;gap:8px">
       <div style="width:88px;font-size:11.5px;font-weight:600;color:#444">${e.name}</div>
       <div style="flex:1;background:#f0f0ee;border-radius:99px;height:8px;overflow:hidden">
         <div style="width:${e.pct}%;height:8px;border-radius:99px;background:${e.color}"></div>
       </div>
       <div style="font-size:11px;font-weight:700;width:28px;text-align:right;color:${e.color}">${e.pct}%</div>
-    </div>`).join('');
+    </div>`).join('')
+    + `</div>`;
 
   // Word cloud — pure SVG, built from hashtag + topic data
   function makeWordCloud(words, W, H) {
@@ -1797,9 +1799,9 @@ function vSocialListening(d) {
           ${wordCloud}
           <div style="font-size:9px;color:#ccc;text-align:center;margin-top:2px">Size = mention frequency · updates each report cycle</div>
         </div>
-        <div style="${C};align-self:start">
+        <div style="${C};display:flex;flex-direction:column">
           <div style="${CT}">Opinion Emotions</div>
-          <div style="padding-top:4px">${emotionBars}</div>
+          <div style="flex:1;padding-top:4px">${emotionBars}</div>
         </div>
       </div>`
     + `<div style="${C};margin-bottom:12px">
