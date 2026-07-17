@@ -1681,8 +1681,6 @@ function vSocialListening(d) {
 
   return H.vh('Social Listening — Brand24', d.desc, d.updated, d.alertBadge)
     + aiSummary
-    + `<div style="font-size:10px;color:#888;margin-bottom:12px">Period: <strong>${d.period}</strong> · Source: Brand24 Full Report · Higher than 45% of brands in Presence Score</div>`
-    + `<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px">${kpis}</div>`
     + `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
         <div style="${C}"><div style="${CT}">Sentiment Breakdown</div><div style="padding-top:6px">${sentBars}</div></div>
         <div style="${C}"><div style="${CT}">Mentions by Platform</div><div style="padding-top:6px">${platformBars}</div></div>
