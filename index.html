@@ -1588,12 +1588,30 @@ function vSocialListening(d) {
   const tSentBg    = {Positive:'#f0f4ea',Negative:'#fff0f0',Mixed:'#fff9f0',Neutral:'#f5f5f5'};
   const tSentColor = {Positive:'#7A8B5E',Negative:'#C0392B',Mixed:'#C47D0E',Neutral:'#888'  };
   const topics = (d.topics||[]).map((t,i,arr)=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:9px 0;${i<arr.length-1?'border-bottom:1px solid #f0f0ee':''}">
-      <span style="font-size:18px;flex-shrink:0">${t.icon}</span>
+    <div style="display:flex;align-items:center;gap:12px;padding:11px 0;${i<arr.length-1?'border-bottom:1px solid #f0f0ee':''}">
+      <span style="font-size:22px;flex-shrink:0">${t.icon}</span>
       <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:3px">${t.name}</div>
-        <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${tSentBg[t.sentiment]||'#f5f5f5'};color:${tSentColor[t.sentiment]||'#888'}">${t.sentiment}</span>
+        <div style="font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:4px">${t.name}</div>
+        <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:${tSentBg[t.sentiment]||'#f5f5f5'};color:${tSentColor[t.sentiment]||'#888'}">${t.sentiment}</span>
       </div>
+    </div>`).join('');
+
+  // Opinion emotions
+  const emotions = [
+    {name:'Joy',          pct:57, color:'#e8d84a'},
+    {name:'Anticipation', pct:20, color:'#C47D0E'},
+    {name:'Trust',        pct:14, color:'#3aaa7a'},
+    {name:'Surprise',     pct:7,  color:'#9b72cf'},
+    {name:'Anger',        pct:1,  color:'#e84040'},
+    {name:'Sadness',      pct:1,  color:'#4a8cc4'},
+  ];
+  const emotionBars = emotions.map(e=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <div style="width:88px;font-size:11.5px;font-weight:600;color:#444">${e.name}</div>
+      <div style="flex:1;background:#f0f0ee;border-radius:99px;height:8px;overflow:hidden">
+        <div style="width:${e.pct}%;height:8px;border-radius:99px;background:${e.color}"></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;width:28px;text-align:right;color:${e.color}">${e.pct}%</div>
     </div>`).join('');
 
   // Word cloud — pure SVG, built from hashtag + topic data
@@ -1622,10 +1640,81 @@ function vSocialListening(d) {
     return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:240px">${els.join('')}</svg>`;
   }
   const cloudWords = [
+    {text:'#fromthisislandskincare', count:60},
+    {text:'#fromthisislandlipbutter', count:40},
+    {text:'#fromthisislandserum', count:32},
+    {text:'doseofvank', count:24},
+    {text:'ning', count:20},
+    {text:'serum', count:18},
+    {text:'island', count:16},
+    {text:'minland', count:15},
+    {text:'banget', count:14},
+    {text:'bgt', count:13},
+    {text:'skincare', count:12},
+    {text:'cantik', count:11},
+    {text:'penasaran', count:10},
+    {text:'bikin', count:10},
+    {text:'pengen', count:9},
+    {text:'hitam', count:9},
+    {text:'#ad', count:8},
+    {text:'produk', count:8},
+    {text:'mauve', count:8},
+    {text:'warna', count:7},
+    {text:'cobain', count:7},
+    {text:'cocok', count:7},
+    {text:'bahan', count:7},
+    {text:'kulit', count:6},
+    {text:'cerah', count:6},
+    {text:'bekas', count:6},
+    {text:'jerawat', count:6},
+    {text:'vitamin', count:6},
+    {text:'brightening', count:6},
+    {text:'turmeric', count:5},
+    {text:'warnanyapeach', count:5},
+    {text:'lip', count:5},
+    {text:'butter', count:5},
+    {text:'pastinya', count:5},
+    {text:'fresh', count:5},
+    {text:'pake', count:4},
+    {text:'wish', count:4},
+    {text:'pilih', count:4},
+    {text:'kunyit', count:4},
+    {text:'#lipbutter', count:4},
+    {text:'#sunscreen', count:4},
+    {text:'maudy', count:4},
+    {text:'#brighteningserum', count:4},
+    {text:'shade', count:3},
+    {text:'sensitif', count:3},
+    {text:'natural', count:3},
+    {text:'menyamarkan', count:3},
+    {text:'advanced', count:3},
+    {text:'power', count:3},
+    {text:'coba', count:3},
+    {text:'acne', count:3},
+    {text:'cerahan', count:3},
+    {text:'semoga', count:3},
+    {text:'ono', count:3},
+    {text:'kaya', count:3},
+    {text:'portrait', count:2},
+    {text:'sureal', count:2},
+    {text:'kulitku', count:2},
+    {text:'bisa', count:2},
+    {text:'follow', count:2},
+    {text:'noda', count:2},
+    {text:'toner', count:2},
+    {text:'cleanser', count:2},
+    {text:'review', count:2},
+    {text:'hydration', count:2},
+    {text:'plumping', count:2},
+    {text:'Vitamin C Serum', count:14},
+    {text:'Lip Butter', count:18},
+    {text:'Brightening', count:12},
+    {text:'skincare lokal', count:11},
+    {text:'wishlist', count:8},
     ...(d.keywords||[]),
-    ...(d.topics||[]).map(t=>({text:t.name, count:9})),
+    ...(d.topics||[]).map(t=>({text:t.name, count:7})),
   ];
-  const wordCloud = makeWordCloud(cloudWords, 380, 240);
+  const wordCloud = makeWordCloud(cloudWords, 520, 280);
 
   // Recent mentions
   const sc = {Positive:'#7A8B5E',Negative:'#C0392B',Neutral:'#888',Mixed:'#C47D0E'};
@@ -1698,7 +1787,7 @@ function vSocialListening(d) {
           <div style="padding-top:2px">${hashtags5}</div>
         </div>
       </div>`
-    + `<div style="display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:12px">
+    + `<div style="display:grid;grid-template-columns:1fr 2fr 1fr;gap:12px;margin-bottom:12px">
         <div style="${C}">
           <div style="${CT}">Topics</div>
           ${topics}
@@ -1707,6 +1796,10 @@ function vSocialListening(d) {
           <div style="${CT}">Word Association</div>
           ${wordCloud}
           <div style="font-size:9px;color:#ccc;text-align:center;margin-top:2px">Size = mention frequency · updates each report cycle</div>
+        </div>
+        <div style="${C}">
+          <div style="${CT}">Opinion Emotions</div>
+          <div style="padding-top:4px">${emotionBars}</div>
         </div>
       </div>`
     + `<div style="${C};margin-bottom:12px">
