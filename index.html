@@ -1193,6 +1193,13 @@ async function fetchRpData(period) {
 }
 window._rpPeriod = '1M';
 window._rpMonthly = [];
+function rpKpiHtml(kpis) {
+  return kpis.map(k => `<div style="background:#ffffff;border:1px solid #e8e8e2;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;justify-content:center">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888888;font-weight:700;margin-bottom:6px">${k.lbl}</div>
+    <div style="font-size:${k.val.toString().length>5?'28':'36'}px;font-weight:800;color:#1A1A1A;line-height:1.1">${k.val}<span style="font-size:18px;font-weight:500;color:#555555">${k.u}</span></div>
+    <div style="font-size:13px;color:${k.trend==='up'?'#5a7040':k.trend==='dn'?'#c0392b':'#888888'};margin-top:5px">${k.t}</div>
+  </div>`).join('');
+}
 window.rpChangePeriod = async function(period) {
   window._rpPeriod = period;
   document.querySelectorAll('.rp-tab').forEach(t => {
@@ -1212,6 +1219,24 @@ window.rpChangePeriod = async function(period) {
   if (chartEl) chartEl.outerHTML = rpMakeChart(filtered.length ? filtered : window._rpMonthly);
 
   const { products, platforms } = await fetchRpData(period);
+
+  // Recompute KPI cards from fresh platform data
+  const totalCust   = platforms.reduce((s, p) => s + (p.total_customers||0), 0);
+  const totalRepeat = platforms.reduce((s, p) => s + (p.repeat_customers||0), 0);
+  const totalOrders = platforms.reduce((s, p) => s + (p.total_orders||0), 0);
+  const overallRate = totalCust ? (totalRepeat / totalCust * 100).toFixed(1) : '0';
+  const shopeeOrd   = platforms.find(p => p.platform === 'Shopee')?.total_orders || 0;
+  const tokOrd      = platforms.find(p => p.platform === 'Tokopedia')?.total_orders || 0;
+  const shopeePct   = totalOrders ? Math.round(shopeeOrd / totalOrders * 100) : 0;
+  const tokPct      = totalOrders ? Math.round(tokOrd / totalOrders * 100) : 0;
+  const kpisEl = document.getElementById('rp-kpis');
+  if (kpisEl) kpisEl.innerHTML = rpKpiHtml([
+    { lbl: 'Overall Repurchase Rate', val: overallRate, u: '%',  trend: 'up', t: `${totalRepeat.toLocaleString()} of ${totalCust.toLocaleString()} customers repurchased` },
+    { lbl: 'Unique Customers',        val: totalCust.toLocaleString(), u: '', trend: null, t: `across all channels · ${period === 'All' ? 'All time' : 'last ' + period}` },
+    { lbl: 'Completed Orders',        val: totalOrders.toLocaleString(), u: '', trend: 'up', t: `↑ Shopee ${shopeePct}% · Tokopedia ${tokPct}%` },
+    { lbl: 'Return Rate',             val: '1.8', u: '%', trend: 'up', t: '↑ 802 returns of 45,067 total orders' },
+  ]);
+
   if (el) el.innerHTML = rpRenderDynamic(products, platforms);
 };
 function rpRenderDynamic(products, platforms) {
@@ -1438,7 +1463,7 @@ function vRepurchaseRate(d) {
 
   const chartAndKpi = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch;margin-bottom:16px">
     <div style="min-width:0">${chart}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:stretch">
+    <div id="rp-kpis" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:stretch">
       ${(d.kpis||[]).map(k => `<div style="background:#ffffff;border:1px solid #e8e8e2;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;justify-content:center">
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888888;font-weight:700;margin-bottom:6px">${k.lbl}</div>
         <div style="font-size:${k.val.toString().length>5?'28':'36'}px;font-weight:800;color:#1A1A1A;line-height:1.1">${k.val}<span style="font-size:18px;font-weight:500;color:#555555">${k.u}</span></div>
