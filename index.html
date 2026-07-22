@@ -1196,11 +1196,21 @@ window._rpMonthly = [];
 window.rpChangePeriod = async function(period) {
   window._rpPeriod = period;
   document.querySelectorAll('.rp-tab').forEach(t => {
-    t.style.background = t.dataset.p === period ? '#3D4A2E' : 'transparent';
-    t.style.color = t.dataset.p === period ? '#fff' : '#555555';
+    const active = t.dataset.p === period;
+    t.style.background = active ? '#3D4A2E' : '#fff';
+    t.style.color = active ? '#fff' : '#444';
+    t.style.borderColor = active ? '#3D4A2E' : '#d0d0c8';
   });
   const el = document.getElementById('rp-dynamic');
   if (el) el.innerHTML = '<div style="padding:24px;color:#888888;font-size:13px">Loading…</div>';
+
+  // Filter monthly chart data by period
+  const cutoff = rpCutoff(period);
+  const cutoffDate = new Date(cutoff);
+  const filtered = (window._rpMonthly || []).filter(m => new Date(m.month_date) >= cutoffDate);
+  const chartEl = document.getElementById('rp-chart');
+  if (chartEl) chartEl.outerHTML = rpMakeChart(filtered.length ? filtered : window._rpMonthly);
+
   const { products, platforms } = await fetchRpData(period);
   if (el) el.innerHTML = rpRenderDynamic(products, platforms);
 };
@@ -1246,7 +1256,7 @@ function rpMakeChart(monthly) {
   const xLabels = xs.map((x,i) => `<text x="${x}" y="${H2-2}" text-anchor="middle" fill="#444" font-size="8">${monthly[i].month_label}</text>`).join('');
   const benchLine = `<line x1="${PL}" y1="${benchY}" x2="${W-4}" y2="${benchY}" stroke="#555" stroke-width="1" stroke-dasharray="5,3"/>
     <text x="${W-6}" y="${benchY-3}" text-anchor="end" fill="#444" font-size="7.5" font-weight="600">Benchmark</text>`;
-  return `<div style="background:#ffffff;border:1px solid #e8e8e2;border-radius:12px;padding:14px 16px">
+  return `<div id="rp-chart" style="background:#ffffff;border:1px solid #e8e8e2;border-radius:12px;padding:14px 16px">
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888888;margin-bottom:6px">Monthly Repurchase Rate Trend</div>
     <div style="display:flex;gap:14px;margin-bottom:6px;font-size:9px;color:#555;align-items:center">
       <span><span style="display:inline-block;width:16px;height:2.5px;background:${LINE_COLOR};vertical-align:middle;margin-right:4px;border-radius:2px"></span>FTI Rate</span>
