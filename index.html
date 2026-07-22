@@ -551,14 +551,14 @@ const MOCK_DATA = {
       { name: 'Other',       mentions: 2  },
     ],
     hashtags: [
-      { tag: '#fromthisisland',          count: 66 },
-      { tag: '#fromthisislandskincare',  count: 60 },
-      { tag: '#fromthisislandserum',     count: 40 },
-      { tag: '#fromthisislandlipbutter', count: 29 },
-      { tag: '#maudyayunda',             count: 5  },
-      { tag: '#ad',                      count: 4  },
-      { tag: '#brighteningserum',        count: 3  },
-      { tag: '#sunscreen',               count: 3  },
+      { tag: '#maudyayunda',      count: 5  },
+      { tag: '#ad',               count: 4  },
+      { tag: '#brighteningserum', count: 3  },
+      { tag: '#sunscreen',        count: 3  },
+      { tag: '#skincare',         count: 3  },
+      { tag: '#lipbutter',        count: 3  },
+      { tag: '#getreadywithme',   count: 2  },
+      { tag: '#makeup',           count: 2  },
     ],
     influencersSov: [
       { name: 'doseofvank',  platform: 'TikTok', mentions: 24, reach: '5,222', sov: '13.6%' },
@@ -1682,7 +1682,9 @@ function vSocialListening(d) {
     return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:240px">${els.join('')}</svg>`;
   }
   // Auto-generate word cloud from mention content + Brand24 seed data (refreshes as Supabase is updated)
-  const _stop = new Set(['yang','aku','ini','dan','ke','di','untuk','tapi','juga','dengan','ada','ga','gak','tidak','mau','nya','lagi','nih','pun','dari','atau','itu','kan','ya','lah','sih','the','a','an','is','are','was','were','i','me','my','we','you','your','it','of','in','on','to','for','at','by','as','so','be','do','go','no','not','but','and','this','that','kagi','alias','mau','mulai','rajin','ingin','mendapatkan','karena','tanpa','perlu','suntik','obat2an','banyak','dilakukan','zaman','kembali','berseri','cerah','darah','sulut','serum','kan']);
+  const _stop = new Set(['yang','aku','ini','dan','ke','di','untuk','tapi','juga','dengan','ada','ga','gak','tidak','mau','nya','lagi','nih','pun','dari','atau','itu','kan','ya','lah','sih','the','a','an','is','are','was','were','i','me','my','we','you','your','it','of','in','on','to','for','at','by','as','so','be','do','go','no','not','but','and','this','that','kagi','alias','mau','mulai','rajin','ingin','mendapatkan','karena','tanpa','perlu','suntik','obat2an','banyak','dilakukan','zaman','kembali','berseri','cerah','darah','sulut','kan',
+    // brand name terms — filtered out so word cloud shows topics/products, not just brand mentions
+    'fromthisisland','fromthisislandskincare','fromthisislandserum','fromthisislandlipbutter','island','minland','fti']);
   const _wc = {};
   (d.recentMentions||[]).forEach(m => {
     if (!m.content) return;
@@ -1695,8 +1697,7 @@ function vSocialListening(d) {
     });
   });
   const _seedWords = [
-    {text:'#fromthisislandskincare',count:60},{text:'#fromthisislandlipbutter',count:40},{text:'#fromthisislandserum',count:32},
-    {text:'doseofvank',count:24},{text:'ning',count:20},{text:'serum',count:18},{text:'island',count:16},{text:'minland',count:15},
+    {text:'serum',count:18},
     {text:'banget',count:14},{text:'bgt',count:13},{text:'skincare',count:12},{text:'cantik',count:11},{text:'penasaran',count:10},
     {text:'bikin',count:10},{text:'pengen',count:9},{text:'hitam',count:9},{text:'#ad',count:8},{text:'produk',count:8},
     {text:'mauve',count:8},{text:'warna',count:7},{text:'cobain',count:7},{text:'cocok',count:7},{text:'bahan',count:7},
