@@ -103,7 +103,13 @@
     }
     .sb-item:hover { background: var(--g1); color: var(--olive-dk); }
     .sb-item.active { background: var(--olive-lt); color: var(--olive-dk); font-weight: 600; border-left-color: var(--olive); }
-    .sb-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); flex-shrink: 0; margin-left: auto; }
+    .sb-flag { display:inline-flex; align-items:center; margin-left:auto; flex-shrink:0; position:relative; width:10px; height:11px; }
+    .sb-flag::after { content:''; position:absolute; left:0; top:0; width:1.5px; height:11px; border-radius:1px; }
+    .sb-flag::before { content:''; position:absolute; left:1.5px; top:1px; width:0; height:0; border-top:4px solid transparent; border-bottom:4px solid transparent; }
+    .sb-flag-red::after  { background:#c0392b; }
+    .sb-flag-red::before { border-left:8px solid #c0392b; }
+    .sb-flag-yellow::after  { background:#c8952a; }
+    .sb-flag-yellow::before { border-left:8px solid #e6ac30; }
 
     /* ── CONTENT ─────────────────────────────────────────── */
     .content { flex: 1; overflow-y: auto; padding: 22px 26px 40px; }
@@ -361,28 +367,28 @@ const NAV_TABS = [
 
 const SIDEBAR = [
   { id: 'customer',  num: '01', name: 'Customer', items: [
-    { id: 'review-score',        label: 'Review Score',        alert: true  },
-    { id: 'repurchase-rate',     label: 'Repurchase Rate',     alert: true  },
-    { id: 'products-sentiment',  label: 'Products Sentiment',  alert: true  },
-    { id: 'social-listening',    label: 'Social Listening',    alert: true  },
+    { id: 'review-score',        label: 'Review Score',        alert: 'red'    },
+    { id: 'repurchase-rate',     label: 'Repurchase Rate',     alert: 'yellow' },
+    { id: 'products-sentiment',  label: 'Products Sentiment',  alert: 'yellow' },
+    { id: 'social-listening',    label: 'Social Listening',    alert: false    },
   ]},
   { id: 'competitor', num: '02', name: 'Competitor', items: [
-    { id: 'competitor-alerts',     label: 'Competitor Alerts',     alert: true  },
-    { id: 'competitor-sentiments', label: 'Competitor Sentiments', alert: true  },
+    { id: 'competitor-alerts',     label: 'Competitor Alerts',     alert: false },
+    { id: 'competitor-sentiments', label: 'Competitor Sentiments', alert: false },
   ]},
   { id: 'trends', num: '03', name: 'Trends', items: [
     { id: 'trends-signals',     label: 'Trends Signals',     alert: false },
-    { id: 'fti-relevance-score', label: 'Product Relevance Score', alert: true  },
+    { id: 'fti-relevance-score', label: 'Product Relevance Score', alert: false },
     { id: 'brand-relevance',    label: 'Brand Relevance',    alert: false },
   ]},
   { id: 'category', num: '04', name: 'Category', items: [
-    { id: 'self-care',              label: 'Self-Care',              alert: false },
-    { id: 'makeup',                 label: 'Makeup',                 alert: false },
-    { id: 'lifestyle-merchandise',  label: 'Lifestyle & Merch',      alert: false },
+    { id: 'self-care',              label: 'Self-Care',              alert: 'red' },
+    { id: 'makeup',                 label: 'Makeup',                 alert: 'red' },
+    { id: 'lifestyle-merchandise',  label: 'Lifestyle & Merch',      alert: 'red' },
   ]},
   { id: 'macro', num: '05', name: 'Macro Outlook', items: [
     { id: 'inflation-rate',      label: 'Macro Indicators',   alert: false },
-    { id: 'peak-season-alert',   label: 'Peak Season Alert',   alert: true  },
+    { id: 'peak-season-alert',   label: 'Peak Season Alert',   alert: false },
   ]},
 ];
 
@@ -3321,7 +3327,7 @@ function renderSidebar() {
         ${group.items.map(item => `
           <div class="sb-item" data-id="${item.id}" onclick="navigate('${item.id}')">
             ${item.label}
-            ${item.alert ? '<span class="sb-dot"></span>' : ''}
+            ${item.alert ? `<span class="sb-flag sb-flag-${item.alert}"></span>` : ''}
           </div>`).join('')}
       </div>
     </div>`).join('');
