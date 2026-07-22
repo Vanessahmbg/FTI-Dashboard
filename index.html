@@ -1211,12 +1211,10 @@ window.rpChangePeriod = async function(period) {
   const el = document.getElementById('rp-dynamic');
   if (el) el.innerHTML = '<div style="padding:24px;color:#888888;font-size:13px">Loading…</div>';
 
-  // Filter monthly chart data by period
-  const cutoff = rpCutoff(period);
-  const cutoffDate = new Date(cutoff);
-  const filtered = (window._rpMonthly || []).filter(m => new Date(m.month_date) >= cutoffDate);
+  // Chart always shows full monthly trend — monthly granularity makes 1W/1M meaningless to filter
+  // Period filter applies to KPIs and tables only
   const chartEl = document.getElementById('rp-chart');
-  if (chartEl) chartEl.outerHTML = rpMakeChart(filtered.length ? filtered : window._rpMonthly);
+  if (chartEl) chartEl.outerHTML = rpMakeChart(window._rpMonthly || []);
 
   const { products, platforms } = await fetchRpData(period);
 
