@@ -1637,14 +1637,11 @@ function vSocialListening(d) {
     </div>`).join('');
 
   // Opinion emotions
-  const emotions = [
-    {name:'Joy',          pct:57, color:'#e8d84a'},
-    {name:'Anticipation', pct:20, color:'#C47D0E'},
-    {name:'Trust',        pct:14, color:'#3aaa7a'},
-    {name:'Surprise',     pct:7,  color:'#9b72cf'},
-    {name:'Anger',        pct:1,  color:'#e84040'},
-    {name:'Sadness',      pct:1,  color:'#4a8cc4'},
-  ];
+  const emotionColorMap = {Joy:'#e8d84a',Anticipation:'#C47D0E',Trust:'#3aaa7a',Surprise:'#9b72cf',Anger:'#e84040',Sadness:'#4a8cc4',Fear:'#c47d7d',Disgust:'#7d8b5e'};
+  const rawEmotions = d.opinionEmotions && d.opinionEmotions.length
+    ? d.opinionEmotions
+    : [{name:'Joy',pct:57},{name:'Anticipation',pct:20},{name:'Trust',pct:14},{name:'Surprise',pct:7},{name:'Anger',pct:1},{name:'Sadness',pct:1}];
+  const emotions = rawEmotions.map(e=>({...e, color: emotionColorMap[e.name]||'#888'}));
   const emotionBars = `<div style="display:flex;flex-direction:column;justify-content:space-between;height:100%">`
     + emotions.map(e=>`
     <div style="display:flex;align-items:center;gap:8px">
