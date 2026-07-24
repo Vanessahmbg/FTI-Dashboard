@@ -2017,12 +2017,12 @@ function vCompetitorAlerts(d) {
   const tBg     = { red: 'var(--red-lt)',amber: 'var(--amber-lt)',green: 'var(--green-lt)',gray: 'var(--g2)'    };
   const tLabel  = { red: '⬤ High Threat', amber: '⬤ Monitor', green: '⬤ Watch', gray: '⬤ New' };
   const catBadge = c => {
-    if (c === 'both')     return '<span class="tag tag-amber" style="font-size:9.5px">Skincare + Lips</span>';
-    if (c === 'skincare') return '<span class="tag tag-olive" style="font-size:9.5px">Skincare</span>';
-    if (c === 'lips')     return '<span class="tag tag-red"   style="font-size:9.5px">Lips</span>';
+    if (c === 'both')     return '<span class="tag tag-amber" style="font-size:12px">Skincare + Lips</span>';
+    if (c === 'skincare') return '<span class="tag tag-olive" style="font-size:12px">Skincare</span>';
+    if (c === 'lips')     return '<span class="tag tag-red"   style="font-size:12px">Lips</span>';
     return '';
   };
-  const ph = '<span style="font-size:11px;color:var(--muted);font-style:italic">— connect data source</span>';
+  const ph = '<span style="font-size:13px;color:var(--muted);font-style:italic">— connect data source</span>';
 
   const buildCard = c => {
     const tc = tColor[c.threat], tb = tBg[c.threat];
@@ -2030,77 +2030,77 @@ function vCompetitorAlerts(d) {
     const lpCount = d.competitors.filter(x => x.cat === 'lips'     || x.cat === 'both').length;
 
     const productRows = c.bestSellers.map(p =>
-      `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--g2)">
-        <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
-          <span style="flex-shrink:0;font-size:9.5px;font-weight:700;background:var(--g2);color:#555;padding:1px 6px;border-radius:3px">${p.type}</span>
-          <span style="font-size:11.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.product !== '—' ? p.product : ph}</span>
+      `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--g2)">
+        <div style="display:flex;align-items:center;gap:7px;flex:1;min-width:0">
+          <span style="flex-shrink:0;font-size:11px;font-weight:700;background:var(--g2);color:#555;padding:2px 7px;border-radius:3px">${p.type}</span>
+          <span style="font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.product !== '—' ? p.product : ph}</span>
         </div>
-        <span style="flex-shrink:0;font-size:11px;font-weight:700;color:${p.rank !== '—' ? 'var(--olive-dk)' : 'var(--muted)'};margin-left:8px">${p.rank}</span>
+        <span style="flex-shrink:0;font-size:12.5px;font-weight:700;color:${p.rank !== '—' ? 'var(--olive-dk)' : 'var(--muted)'};margin-left:8px">${p.rank}</span>
       </div>`
     ).join('');
 
     const kolHtml = c.kol
-      ? `<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--olive-lt);border-radius:7px">
-          <span style="font-size:13px;color:var(--olive);flex-shrink:0;margin-top:1px">✦</span>
+      ? `<div style="display:flex;align-items:flex-start;gap:9px;padding:10px 12px;background:var(--olive-lt);border-radius:7px">
+          <span style="font-size:15px;color:var(--olive);flex-shrink:0;margin-top:1px">✦</span>
           <div>
-            <div style="font-size:12px;font-weight:700;color:var(--olive-dk)">${c.kol.name}</div>
-            <div style="font-size:10.5px;color:var(--muted)">${c.kol.platform} · ${c.kol.type}</div>
-            ${c.kol.note ? `<div style="font-size:11px;color:#555;margin-top:3px;line-height:1.5">${c.kol.note}</div>` : ''}
+            <div style="font-size:14px;font-weight:700;color:var(--olive-dk)">${c.kol.name}</div>
+            <div style="font-size:12px;color:var(--muted)">${c.kol.platform} · ${c.kol.type}</div>
+            ${c.kol.note ? `<div style="font-size:12.5px;color:#555;margin-top:3px;line-height:1.5">${c.kol.note}</div>` : ''}
           </div>
         </div>`
       : ph;
 
     const launchHtml = c.latestLaunch
-      ? `<div style="font-size:12px;color:var(--text)">${c.latestLaunch.name} <span style="color:var(--muted)">${c.latestLaunch.date}</span></div>`
+      ? `<div style="font-size:13.5px;color:var(--text)">${c.latestLaunch.name} <span style="color:var(--muted)">${c.latestLaunch.date}</span></div>`
       : ph;
 
     const salesHtml = c.salesEst
-      ? `<div style="font-size:13px;font-weight:700;color:var(--text)">${c.salesEst}</div>`
+      ? `<div style="font-size:14.5px;font-weight:700;color:var(--text)">${c.salesEst}</div>`
       : ph;
 
     return `<div class="comp-card" data-cat="${c.cat}"
       style="background:var(--white);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;border-top:3px solid ${tc};display:flex;flex-direction:column">
       <!-- header -->
-      <div style="padding:13px 14px 10px;border-bottom:1px solid var(--g2)">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px">
-          <div style="font-size:13.5px;font-weight:800;color:var(--text);line-height:1.2">${c.name}</div>
-          <span style="font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;background:${tb};color:${tc};white-space:nowrap;flex-shrink:0">${tLabel[c.threat]}</span>
+      <div style="padding:14px 16px 12px;border-bottom:1px solid var(--g2)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
+          <div style="font-size:16px;font-weight:800;color:var(--text);line-height:1.2">${c.name}</div>
+          <span style="font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:20px;background:${tb};color:${tc};white-space:nowrap;flex-shrink:0">${tLabel[c.threat]}</span>
         </div>
         ${catBadge(c.cat)}
-        <div style="display:flex;gap:0;margin-top:10px;border:1px solid var(--g2);border-radius:7px;overflow:hidden">
-          <div style="flex:1;text-align:center;padding:7px 4px;border-right:1px solid var(--g2)">
-            <div style="font-size:17px;font-weight:900;color:var(--olive-dk);line-height:1">#${c.bestRank}</div>
-            <div style="font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Best Rank</div>
+        <div style="display:flex;gap:0;margin-top:12px;border:1px solid var(--g2);border-radius:7px;overflow:hidden">
+          <div style="flex:1;text-align:center;padding:9px 4px;border-right:1px solid var(--g2)">
+            <div style="font-size:20px;font-weight:900;color:var(--olive-dk);line-height:1">#${c.bestRank}</div>
+            <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:3px">Best Rank</div>
           </div>
-          <div style="flex:1;text-align:center;padding:7px 4px;border-right:1px solid var(--g2)">
-            <div style="font-size:17px;font-weight:900;color:var(--text);line-height:1">${c.avgRank}</div>
-            <div style="font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Avg Rank</div>
+          <div style="flex:1;text-align:center;padding:9px 4px;border-right:1px solid var(--g2)">
+            <div style="font-size:20px;font-weight:900;color:var(--text);line-height:1">${c.avgRank}</div>
+            <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:3px">Avg Rank</div>
           </div>
-          <div style="flex:1;text-align:center;padding:7px 4px">
-            <div style="font-size:17px;font-weight:900;color:var(--text);line-height:1">${c.appearances}×</div>
-            <div style="font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:2px">In Top 20</div>
+          <div style="flex:1;text-align:center;padding:9px 4px">
+            <div style="font-size:20px;font-weight:900;color:var(--text);line-height:1">${c.appearances}×</div>
+            <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:3px">In Top 20</div>
           </div>
         </div>
-        <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:8px">
-          ${c.topCats.map(t => `<span style="font-size:9.5px;background:var(--g1);border:1px solid var(--g2);color:#555;padding:1px 6px;border-radius:3px">${t}</span>`).join('')}
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:10px">
+          ${c.topCats.map(t => `<span style="font-size:11.5px;background:var(--g1);border:1px solid var(--g2);color:#555;padding:2px 8px;border-radius:3px">${t}</span>`).join('')}
         </div>
       </div>
       <!-- sections -->
-      <div style="padding:10px 14px;border-bottom:1px solid var(--g2)">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--olive);margin-bottom:6px">Top Products on Shopee</div>
+      <div style="padding:12px 16px;border-bottom:1px solid var(--g2)">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--olive);margin-bottom:7px">Top Products on Shopee</div>
         ${productRows}
-        <div style="font-size:9.5px;color:var(--muted);font-style:italic;margin-top:5px">Live rank + price → connect Compas</div>
+        <div style="font-size:11px;color:var(--muted);font-style:italic;margin-top:6px">Live rank + price → connect Compas</div>
       </div>
-      <div style="padding:10px 14px;border-bottom:1px solid var(--g2)">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--olive);margin-bottom:5px">KOL / Brand Ambassador</div>
+      <div style="padding:12px 16px;border-bottom:1px solid var(--g2)">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--olive);margin-bottom:6px">KOL / Brand Ambassador</div>
         ${kolHtml}
       </div>
-      <div style="padding:10px 14px;border-bottom:1px solid var(--g2)">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--olive);margin-bottom:5px">Latest Launch</div>
+      <div style="padding:12px 16px;border-bottom:1px solid var(--g2)">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--olive);margin-bottom:6px">Latest Launch</div>
         ${launchHtml}
       </div>
-      <div style="padding:10px 14px">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--olive);margin-bottom:5px">Est. Monthly GMV (Shopee)</div>
+      <div style="padding:12px 16px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--olive);margin-bottom:6px">Est. Monthly GMV (Shopee)</div>
         ${salesHtml}
       </div>
     </div>`;
