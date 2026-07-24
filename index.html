@@ -598,25 +598,160 @@ const MOCK_DATA = {
 
   /* ── 2a. COMPETITOR ALERTS ──────────────────────────────── */
   'competitor-alerts': {
-    updated: 'June 2026', alertBadge: '⚠ 3 Alerts',
-    desc: 'Significant movements in competitor sales and product rankings across Shopee and TikTok Shop. AI flags emerging threats.',
+    updated: 'Q1–Q2 2026', alertBadge: '⚠ Placeholder Data',
+    desc: 'Shopee top-20 ranking movements, influencer campaigns, new launches, and estimated GMV for FTI\'s key skincare and lip competitors. Rankings from Marketplace Rank Analysis (Q1–Q2 2026). Live signals via Compas + Brand24 — connect to populate.',
     kpis: [
-      { lbl: 'Competitors Tracked',  val: '5',   u: '', trend: null },
-      { lbl: 'Active Alerts',        val: '3',   u: '', trend: 'dn', t: '↓ Needs response' },
-      { lbl: 'Trending Products',    val: '7',   u: '', trend: 'dn', t: '↓ Competitor launches' },
-      { lbl: 'FTI Rank (Shopee)',    val: '#4',  u: '', trend: 'dn', t: '↓ Was #3 last month' },
+      { lbl: 'Brands Tracked',            val: '12',  u: '',   trend: null },
+      { lbl: 'Skincare Appearances',       val: '312', u: '',   trend: null,  t: '→ Top-20 entries, Q1–Q2 2026' },
+      { lbl: 'Lip / Makeup Appearances',   val: '65',  u: '',   trend: null,  t: '→ Top-20 entries, Q1–Q2 2026' },
+      { lbl: 'Active KOL Campaigns',       val: '—',  u: '',   trend: null,  t: '→ Connect Brand24 to populate' },
     ],
-    alerts: [
-      { type: 'red',   comp: 'Skintific',  product: '5% Niacinamide Serum',    change: 'Entered Shopee Mall Top 3 skincare — up from #12. Sales volume +180% MoM. Price: Rp 89,000.' },
-      { type: 'red',   comp: 'Somethinc',  product: 'Niacinamide 10% + Zinc',  change: 'TikTok Shop #1 bestseller skincare for 3rd consecutive week. Live-selling sessions averaging 50K viewers.' },
-      { type: 'amber', comp: 'Avoskin',    product: 'Glazed Donut Toner',      change: 'Newly trending on Threads — 8K mentions in 2 weeks. Positioned directly against FTI Hydra Toner.' },
-    ],
-    table: [
-      { comp: 'Skintific',  product: '5% Niacinamide Serum',   platform: 'Shopee',      rank: '#2',  mom: '+180%', price: 'Rp 89K',  st: 'r' },
-      { comp: 'Somethinc',  product: 'Niacinamide 10% + Zinc', platform: 'TikTok Shop', rank: '#1',  mom: '+95%',  price: 'Rp 105K', st: 'r' },
-      { comp: 'Avoskin',    product: 'Glazed Donut Toner',     platform: 'Both',        rank: '#8',  mom: '+62%',  price: 'Rp 99K',  st: 'a' },
-      { comp: 'MS Glow',    product: 'Facial Wash Range',      platform: 'Shopee',      rank: '#5',  mom: '+12%',  price: 'Rp 75K',  st: 'n' },
-      { comp: 'Wardah',     product: 'Lightening Series',      platform: 'Both',        rank: '#9',  mom: '−8%',   price: 'Rp 65K',  st: 'g' },
+    competitors: [
+      /* ── SKINCARE ──────────────────────────────────────── */
+      {
+        name: 'Skintific', cat: 'skincare', threat: 'red',
+        appearances: 59, avgRank: 4.8, bestRank: 1,
+        topCats: ['Serum', 'Moisturizer', 'Sunscreen'],
+        bestSellers: [
+          { type: 'Serum',       product: '5% Niacinamide Barrier Serum', rank: '—', price: '—' },
+          { type: 'Moisturizer', product: 'Symwhite 377 Moisturizer',      rank: '—', price: '—' },
+          { type: 'Sunscreen',   product: 'Cover All Sunscreen SPF50+',    rank: '—', price: '—' },
+        ],
+        kol: null, latestLaunch: null, salesEst: null,
+      },
+      {
+        name: 'Glad2Glow', cat: 'both', threat: 'red',
+        appearances: 37, avgRank: 4.7, bestRank: 1,
+        topCats: ['Moisturizer', 'Face Wash', 'Serum', 'Blurring Pot', 'Lip Plumper'],
+        bestSellers: [
+          { type: 'Moisturizer', product: '—', rank: '—', price: '—' },
+          { type: 'Blurring Pot', product: '—', rank: '#1 avg (lips)', price: '—' },
+          { type: 'Lip Plumper', product: '—', rank: '—', price: '—' },
+        ],
+        kol: null, latestLaunch: null, salesEst: null,
+      },
+      {
+        name: 'Finally Found You!', cat: 'both', threat: 'amber',
+        appearances: 22, avgRank: 5.1, bestRank: 1,
+        topCats: ['Toner', 'Eye Cream', 'Serum', 'Blurring Pot'],
+        bestSellers: [
+          { type: 'Toner',     product: '—', rank: '—', price: '—' },
+          { type: 'Eye Cream', product: '—', rank: '—', price: '—' },
+          { type: 'Serum',     product: '—', rank: '—', price: '—' },
+        ],
+        kol: { name: 'Manohara Odelia Pinot', platform: 'Instagram · TikTok', type: 'Brand Ambassador', note: 'Confirmed ambassador — drives strong toner & eye cream awareness.' },
+        latestLaunch: null, salesEst: null,
+      },
+      {
+        name: 'La Roche Posay', cat: 'skincare', threat: 'amber',
+        appearances: 11, avgRank: 2.9, bestRank: 1,
+        topCats: ['Moisturizer', 'Serum'],
+        bestSellers: [
+          { type: 'Moisturizer', product: 'Cicaplast Baume B5+', rank: '—', price: '—' },
+          { type: 'Serum',       product: '—',                   rank: '—', price: '—' },
+        ],
+        kol: null, latestLaunch: null, salesEst: null,
+      },
+      {
+        name: 'NPure', cat: 'both', threat: 'amber',
+        appearances: 16, avgRank: 6.3, bestRank: 1,
+        topCats: ['Toner', 'Micellar Water', 'Lip Plumper'],
+        bestSellers: [
+          { type: 'Toner',         product: '—', rank: '—', price: '—' },
+          { type: 'Micellar Water', product: '—', rank: '—', price: '—' },
+          { type: 'Lip Plumper',   product: '—', rank: '#4 avg (lips)', price: '—' },
+        ],
+        kol: null, latestLaunch: null, salesEst: null,
+      },
+      {
+        name: 'Labore', cat: 'skincare', threat: 'amber',
+        appearances: 14, avgRank: 8.5, bestRank: 3,
+        topCats: ['Moisturizer', 'Sunscreen', 'Serum'],
+        bestSellers: [
+          { type: 'Moisturizer', product: '—', rank: '—', price: '—' },
+          { type: 'Sunscreen',   product: '—', rank: '—', price: '—' },
+        ],
+        kol: null, latestLaunch: null, salesEst: null,
+      },
+      {
+        name: 'Facetology', cat: 'skincare', threat: 'green',
+        appearances: 11, avgRank: 7.4, bestRank: 1,
+        topCats: ['Sunscreen', 'Face Wash', 'Micellar Water'],
+        bestSellers: [
+          { type: 'Sunscreen',   product: '—', rank: '—', price: '—' },
+          { type: 'Face Wash',   product: '—', rank: '—', price: '—' },
+        ],
+        kol: null, latestLaunch: null, salesEst: null,
+      },
+      {
+        name: 'Scora', cat: 'skincare', threat: 'green',
+        appearances: 12, avgRank: 8.1, bestRank: 1,
+        topCats: ['Face Wash', 'Sunscreen', 'Moisturizer'],
+        bestSellers: [
+          { type: 'Face Wash',   product: '—', rank: '—', price: '—' },
+          { type: 'Sunscreen',   product: '—', rank: '—', price: '—' },
+        ],
+        kol: null, latestLaunch: null, salesEst: null,
+      },
+      {
+        name: 'Avoskin', cat: 'skincare', threat: 'green',
+        appearances: 8, avgRank: 7.6, bestRank: 1,
+        topCats: ['Toner', 'Serum'],
+        bestSellers: [
+          { type: 'Toner', product: '—', rank: '—', price: '—' },
+          { type: 'Serum', product: '—', rank: '—', price: '—' },
+        ],
+        kol: null, latestLaunch: null, salesEst: null,
+      },
+      {
+        name: 'Skin1004', cat: 'skincare', threat: 'green',
+        appearances: 8, avgRank: 4.9, bestRank: 3,
+        topCats: ['Serum', 'Toner'],
+        bestSellers: [
+          { type: 'Serum', product: 'Centella Ampoule', rank: '—', price: '—' },
+          { type: 'Toner', product: '—',                rank: '—', price: '—' },
+        ],
+        kol: null, latestLaunch: null, salesEst: null,
+      },
+      /* ── LIPS / MAKEUP ─────────────────────────────────── */
+      {
+        name: 'Secret Ingredients', cat: 'lips', threat: 'red',
+        appearances: 5, avgRank: 3.0, bestRank: 2,
+        topCats: ['Lip Plumper'],
+        bestSellers: [
+          { type: 'Lip Plumper', product: '—', rank: '#2 avg', price: '—' },
+        ],
+        kol: null, latestLaunch: null, salesEst: null,
+      },
+      {
+        name: 'Somethinc', cat: 'lips', threat: 'amber',
+        appearances: 9, avgRank: 11.3, bestRank: 9,
+        topCats: ['Lip Plumper', 'Blurring Pot'],
+        bestSellers: [
+          { type: 'Lip Plumper', product: '—', rank: '—', price: '—' },
+          { type: 'Blurring Pot', product: '—', rank: '—', price: '—' },
+        ],
+        kol: null, latestLaunch: null, salesEst: null,
+      },
+      {
+        name: 'Timephoria', cat: 'lips', threat: 'green',
+        appearances: 4, avgRank: 8.0, bestRank: 5,
+        topCats: ['Blurring Pot', 'Lip Plumper'],
+        bestSellers: [
+          { type: 'Blurring Pot', product: '—', rank: '—', price: '—' },
+          { type: 'Lip Plumper',  product: '—', rank: '—', price: '—' },
+        ],
+        kol: null, latestLaunch: null, salesEst: null,
+      },
+      {
+        name: 'O.TWO.O', cat: 'lips', threat: 'green',
+        appearances: 5, avgRank: 12.6, bestRank: 11,
+        topCats: ['Lip Plumper', 'Blurring Pot'],
+        bestSellers: [
+          { type: 'Lip Plumper', product: '—', rank: '—', price: '—' },
+        ],
+        kol: null, latestLaunch: null, salesEst: null,
+      },
     ],
   },
 
@@ -1338,7 +1473,9 @@ async function loadData() {
     const sbData = (miRes.data && miRes.data.length)
       ? Object.fromEntries(miRes.data.map(row => [row.id, row.data]))
       : {};
-    const merged = { ...MOCK_DATA, ...sbData };
+    const merged = Object.fromEntries(
+      Object.keys(MOCK_DATA).map(k => [k, sbData[k] ? { ...MOCK_DATA[k], ...sbData[k] } : MOCK_DATA[k]])
+    );
     window._rpMonthly = monthRes.data || [];
 
     const { products, platforms } = await fetchRpData(window._rpPeriod);
@@ -1876,25 +2013,120 @@ function vGoogleAlertsFeed() {
 }
 
 function vCompetitorAlerts(d) {
-  const alerts = d.alerts.map(a =>
-    `<div class="callout ${a.type}">
-      <div class="c-title">${a.comp} — ${a.product}</div>
-      <div class="c-body">${a.change}</div>
-    </div>`
-  ).join('');
-  const rows = d.table.map(r => [
-    `<span class="fw">${r.comp}</span>`,
-    r.product,
-    r.platform,
-    r.rank,
-    H.trendCell(r.mom),
-    r.price,
-    H.statusChip(r.st),
-  ]);
+  const tColor  = { red: 'var(--red)',   amber: 'var(--amber)',   green: 'var(--green)',   gray: 'var(--muted)' };
+  const tBg     = { red: 'var(--red-lt)',amber: 'var(--amber-lt)',green: 'var(--green-lt)',gray: 'var(--g2)'    };
+  const tLabel  = { red: '⬤ High Threat', amber: '⬤ Monitor', green: '⬤ Watch', gray: '⬤ New' };
+  const catBadge = c => {
+    if (c === 'both')     return '<span class="tag tag-amber" style="font-size:9.5px">Skincare + Lips</span>';
+    if (c === 'skincare') return '<span class="tag tag-olive" style="font-size:9.5px">Skincare</span>';
+    if (c === 'lips')     return '<span class="tag tag-red"   style="font-size:9.5px">Lips</span>';
+    return '';
+  };
+  const ph = '<span style="font-size:11px;color:var(--muted);font-style:italic">— connect data source</span>';
+
+  const buildCard = c => {
+    const tc = tColor[c.threat], tb = tBg[c.threat];
+    const skCount = d.competitors.filter(x => x.cat === 'skincare' || x.cat === 'both').length;
+    const lpCount = d.competitors.filter(x => x.cat === 'lips'     || x.cat === 'both').length;
+
+    const productRows = c.bestSellers.map(p =>
+      `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--g2)">
+        <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+          <span style="flex-shrink:0;font-size:9.5px;font-weight:700;background:var(--g2);color:#555;padding:1px 6px;border-radius:3px">${p.type}</span>
+          <span style="font-size:11.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.product !== '—' ? p.product : ph}</span>
+        </div>
+        <span style="flex-shrink:0;font-size:11px;font-weight:700;color:${p.rank !== '—' ? 'var(--olive-dk)' : 'var(--muted)'};margin-left:8px">${p.rank}</span>
+      </div>`
+    ).join('');
+
+    const kolHtml = c.kol
+      ? `<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--olive-lt);border-radius:7px">
+          <span style="font-size:13px;color:var(--olive);flex-shrink:0;margin-top:1px">✦</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--olive-dk)">${c.kol.name}</div>
+            <div style="font-size:10.5px;color:var(--muted)">${c.kol.platform} · ${c.kol.type}</div>
+            ${c.kol.note ? `<div style="font-size:11px;color:#555;margin-top:3px;line-height:1.5">${c.kol.note}</div>` : ''}
+          </div>
+        </div>`
+      : ph;
+
+    const launchHtml = c.latestLaunch
+      ? `<div style="font-size:12px;color:var(--text)">${c.latestLaunch.name} <span style="color:var(--muted)">${c.latestLaunch.date}</span></div>`
+      : ph;
+
+    const salesHtml = c.salesEst
+      ? `<div style="font-size:13px;font-weight:700;color:var(--text)">${c.salesEst}</div>`
+      : ph;
+
+    return `<div class="comp-card" data-cat="${c.cat}"
+      style="background:var(--white);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;border-top:3px solid ${tc};display:flex;flex-direction:column">
+      <!-- header -->
+      <div style="padding:13px 14px 10px;border-bottom:1px solid var(--g2)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px">
+          <div style="font-size:13.5px;font-weight:800;color:var(--text);line-height:1.2">${c.name}</div>
+          <span style="font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;background:${tb};color:${tc};white-space:nowrap;flex-shrink:0">${tLabel[c.threat]}</span>
+        </div>
+        ${catBadge(c.cat)}
+        <div style="display:flex;gap:0;margin-top:10px;border:1px solid var(--g2);border-radius:7px;overflow:hidden">
+          <div style="flex:1;text-align:center;padding:7px 4px;border-right:1px solid var(--g2)">
+            <div style="font-size:17px;font-weight:900;color:var(--olive-dk);line-height:1">#${c.bestRank}</div>
+            <div style="font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Best Rank</div>
+          </div>
+          <div style="flex:1;text-align:center;padding:7px 4px;border-right:1px solid var(--g2)">
+            <div style="font-size:17px;font-weight:900;color:var(--text);line-height:1">${c.avgRank}</div>
+            <div style="font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Avg Rank</div>
+          </div>
+          <div style="flex:1;text-align:center;padding:7px 4px">
+            <div style="font-size:17px;font-weight:900;color:var(--text);line-height:1">${c.appearances}×</div>
+            <div style="font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:2px">In Top 20</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:8px">
+          ${c.topCats.map(t => `<span style="font-size:9.5px;background:var(--g1);border:1px solid var(--g2);color:#555;padding:1px 6px;border-radius:3px">${t}</span>`).join('')}
+        </div>
+      </div>
+      <!-- sections -->
+      <div style="padding:10px 14px;border-bottom:1px solid var(--g2)">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--olive);margin-bottom:6px">Top Products on Shopee</div>
+        ${productRows}
+        <div style="font-size:9.5px;color:var(--muted);font-style:italic;margin-top:5px">Live rank + price → connect Compas</div>
+      </div>
+      <div style="padding:10px 14px;border-bottom:1px solid var(--g2)">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--olive);margin-bottom:5px">KOL / Brand Ambassador</div>
+        ${kolHtml}
+      </div>
+      <div style="padding:10px 14px;border-bottom:1px solid var(--g2)">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--olive);margin-bottom:5px">Latest Launch</div>
+        ${launchHtml}
+      </div>
+      <div style="padding:10px 14px">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--olive);margin-bottom:5px">Est. Monthly GMV (Shopee)</div>
+        ${salesHtml}
+      </div>
+    </div>`;
+  };
+
+  const skCount = d.competitors.filter(c => c.cat === 'skincare' || c.cat === 'both').length;
+  const lpCount = d.competitors.filter(c => c.cat === 'lips'     || c.cat === 'both').length;
+
+  const filterBtns = `<div class="cal-tabs" style="margin-bottom:14px">
+    <button class="cal-tab active" onclick="compFilter(this,'all')">All (${d.competitors.length})</button>
+    <button class="cal-tab" onclick="compFilter(this,'skincare')">Skincare (${skCount})</button>
+    <button class="cal-tab" onclick="compFilter(this,'lips')">Lips (${lpCount})</button>
+  </div>`;
+
+  const srcNote = `<div class="callout amber" style="margin-bottom:14px">
+    <div class="c-title">Placeholder Data — Rankings Source: Q1–Q2 2026 Shopee Export</div>
+    <div class="c-body">Appearances, avg rank, and best rank are from the Marketplace Rank Analysis file. Live fields (KOL activity, new launches, current rank, est. GMV) show "—" until connected to <strong>Compas.co.id</strong> (rankings/GMV) and <strong>Brand24</strong> (KOL/social signals).</div>
+  </div>`;
+
   return H.vh('Competitor Alerts', d.desc, d.updated, d.alertBadge)
     + H.kpiRow(d.kpis)
-    + H.blk('Active Alerts', alerts)
-    + H.blk('Competitor Overview', H.table(['Brand','Product','Platform','Rank','Sales MoM','Price','Status'], rows));
+    + srcNote
+    + filterBtns
+    + `<div id="comp-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+        ${d.competitors.map(buildCard).join('')}
+      </div>`;
 }
 
 function vCompetitorSentiments(d) {
@@ -1922,6 +2154,17 @@ function vCompetitorSentiments(d) {
     + H.callout(d.alert)
     + H.kpiRow(d.kpis)
     + H.blk('Attribute Sentiment Comparison — % Positive', legend + bars);
+}
+
+function compFilter(btn, cat) {
+  document.querySelectorAll('#comp-grid').forEach(grid => {
+    grid.querySelectorAll('.comp-card').forEach(el => {
+      const c = el.dataset.cat;
+      el.style.display = (cat === 'all' || c === cat || c === 'both') ? '' : 'none';
+    });
+  });
+  btn.closest('.cal-tabs').querySelectorAll('.cal-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 }
 
 function tsTog(uid) {
