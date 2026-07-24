@@ -1796,7 +1796,7 @@ function vSocialListening(d) {
     const max = sorted[0]?.count || 1;
     const palette = ['#3D4A2E','#7A8B5E','#C47D0E','#5a7040','#1a6fc4','#8B9B6E','#b36b00','#1a1a1a'];
     const placed = [];
-    const els = [];
+    const raw = [];
     sorted.forEach((w,i) => {
       const sz  = Math.max(9, Math.round(9 + (w.count/max)*26));
       const tw  = w.text.length * sz * 0.56;
@@ -1808,12 +1808,21 @@ function vSocialListening(d) {
         if (x-tw/2<4||x+tw/2>W-4||y-th/2<4||y+th/2>H-4) { angle+=0.5; r+=2; continue; }
         if (placed.some(p=>Math.abs(p.x-x)<(p.w+tw)/2+4&&Math.abs(p.y-y)<(p.h+th)/2+3)) { angle+=0.42; r+=1.6; continue; }
         placed.push({x,y,w:tw,h:th});
-        const op = (0.65 + (w.count/max)*0.35).toFixed(2);
-        els.push(`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="${sz}" font-weight="${sz>18?'900':'700'}" fill="${palette[i%palette.length]}" font-family="Manrope,Arial,sans-serif" text-anchor="middle" dominant-baseline="middle" opacity="${op}">${w.text}</text>`);
+        raw.push({x,y,sz,op:(0.65+(w.count/max)*0.35).toFixed(2),color:palette[i%palette.length],text:w.text,bold:sz>18});
         ok = true;
       }
     });
-    return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:240px">${els.join('')}</svg>`;
+    if (!placed.length) return '';
+    const pad = 10;
+    const minX = Math.min(...placed.map(p=>p.x-p.w/2));
+    const maxX = Math.max(...placed.map(p=>p.x+p.w/2));
+    const minY = Math.min(...placed.map(p=>p.y-p.h/2));
+    const maxY = Math.max(...placed.map(p=>p.y+p.h/2));
+    const dx = (W - (maxX-minX)) / 2 - minX;
+    const dy = pad - minY;
+    const vbH = (maxY - minY) + pad*2;
+    const els = raw.map(e=>`<text x="${(e.x+dx).toFixed(1)}" y="${(e.y+dy).toFixed(1)}" font-size="${e.sz}" font-weight="${e.bold?'900':'700'}" fill="${e.color}" font-family="Manrope,Arial,sans-serif" text-anchor="middle" dominant-baseline="middle" opacity="${e.op}">${e.text}</text>`);
+    return `<svg viewBox="0 0 ${W} ${vbH.toFixed(0)}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">${els.join('')}</svg>`;
   }
   // Auto-generate word cloud from mention content + Brand24 seed data (refreshes as Supabase is updated)
   const _stop = new Set(['yang','aku','ini','dan','ke','di','untuk','tapi','juga','dengan','ada','ga','gak','tidak','mau','nya','lagi','nih','pun','dari','atau','itu','kan','ya','lah','sih','the','a','an','is','are','was','were','i','me','my','we','you','your','it','of','in','on','to','for','at','by','as','so','be','do','go','no','not','but','and','this','that','kagi','alias','mau','mulai','rajin','ingin','mendapatkan','karena','tanpa','perlu','suntik','obat2an','banyak','dilakukan','zaman','kembali','berseri','cerah','darah','sulut','kan',
